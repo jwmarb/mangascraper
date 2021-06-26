@@ -6,7 +6,7 @@
     "scripts": {
         "start": "npm-run-all --parallel watch:run watch:compile --print-label",
         "watch:compile": "tsc --watch",
-        "watch:run": "nodemon ./src/main.js"
+        "watch:run": "nodemon ./src/index.js"
     },
     "keywords": [],
     "author": "",
