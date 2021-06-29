@@ -448,7 +448,7 @@ export default class MangaNato {
         const coverImage: MangaAttributeCoverImage[] = [];
 
         /** Get manga titles */
-        $(`div.panel.content-genres > div.content-genres-item > div.genres-item-info > h3 > a.genres-item-name`).each(
+        $(`div.panel-content-genres > div.content-genres-item > div.genres-item-info > h3 > a.genres-item-name`).each(
           (_, el) => {
             const title = $(el).text();
             if (typeof title !== 'undefined') titles.push(title);
@@ -457,7 +457,7 @@ export default class MangaNato {
 
         /** Get manga views */
         $(
-          `div.panel.content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-view`,
+          `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-view`,
         ).each((_, el) => {
           const viewCount = $(el).text();
           if (typeof viewCount !== 'undefined') views.push(viewCount);
@@ -465,7 +465,7 @@ export default class MangaNato {
 
         /** Get manga date */
         $(
-          `div.panel.content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-time`,
+          `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-time`,
         ).each((_, el) => {
           const time_string = $(el).text();
           if (typeof time_string !== 'undefined') updatedAt.push(moment(time_string, 'MMM DD,YY').toDate());
@@ -473,7 +473,7 @@ export default class MangaNato {
 
         /** Get manga authors */
         $(
-          `div.panel.content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-author`,
+          `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-author`,
         ).each((_, el) => {
           const author = $(el).text();
           if (typeof author !== 'undefined') authors.push(author.split(','));
