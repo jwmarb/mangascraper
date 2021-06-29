@@ -1,12 +1,12 @@
 ## Install
 
-[npm][];
+### npm
 
 ```sh
 npm install @specify_/mangascraper
 ```
 
-This installs the [`mangascraper`][m] package which scrapes manga from the sources below (more will be added soon):
+This installs the [`mangascraper`]("https://github.com/EGGaming/mangascraper") package which scrapes manga from the sources below (more will be added soon):
 
 - [Mangakakalot]("https://mangakakalot.com/")
 - [MangaNato]("http://manganato.com/")
