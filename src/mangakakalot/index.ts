@@ -40,7 +40,7 @@ export default class Mangakakalot {
    * test(); // Output: [ { title: 'Naruto', url: 'https://readmanganato.com/manga-ng952689' ... }]
    * ```
    */
-  public async getMangasByTitle(title: string, callback: CallbackFunc<Manga[]> = () => {}): Promise<Manga[]> {
+  public getMangasByTitle(title: string, callback: CallbackFunc<Manga[]> = () => {}): Promise<Manga[]> {
     function convertToSearch(query: string): string {
       return query.replace(/[^a-zA-Z0-9]/g, '_');
     }
@@ -132,7 +132,7 @@ export default class Mangakakalot {
    * test(); // Output: { title: { main: 'Fukushuu...', alt: { jp: [...], en: [...], cn: [], ...} }}
    * ```
    */
-  public async getMangaMeta(url: string, callback: CallbackFunc<MangaMeta> = () => {}): Promise<MangaMeta> {
+  public getMangaMeta(url: string, callback: CallbackFunc<MangaMeta> = () => {}): Promise<MangaMeta> {
     return new Promise(async (res, rej) => {
       if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
       try {
@@ -385,7 +385,7 @@ export default class Mangakakalot {
    * />
    * ```
    */
-  public async getPages(url: string, callback: CallbackFunc<string[]> = () => {}): Promise<string[]> {
+  public getPages(url: string, callback: CallbackFunc<string[]> = () => {}): Promise<string[]> {
     return new Promise(async (res, rej) => {
       if (typeof url === 'undefined') return failure(new Error("Argument 'chapter_url' is required"), callback);
 
