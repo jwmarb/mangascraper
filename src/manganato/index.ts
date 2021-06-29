@@ -416,6 +416,29 @@ export default class MangaNato {
     });
   }
 
+  /**
+   * Get a list of manga that contain the given genre.
+   * This can only search for one genre at a time, so if you
+   * want to search multiple genres, use the `getMangas()` method instead.
+   *
+   * @param genre - A manga genre (e.g. Comedy, Fantasy)
+   * @param options - Options to add to search (e.g. Filter results for ongoing mangas)
+   * @param callback - Callback Function
+   * @returns Returns an array of manga from the given genre
+   * @example
+   * ```js
+   * import { MangaNato } from "manganato";
+   *
+   * const manganato = new MangaNato();
+   *
+   * async function test() {
+   *  const mangas = await manganato.getMangasFromGenre('Comedy', { type: 'new' })
+   *  console.log(mangas);
+   * }
+   *
+   * test(); // Output: [{ ... }, { ... }, ...] Fetches the newest mangas with the Comedy genre
+   * ```
+   */
   public getMangasFromGenre(
     genre: MangaNatoGenre,
     options: MangaNatoGenreOptions = {},
