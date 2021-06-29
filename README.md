@@ -90,3 +90,15 @@ manganato.getMangaMeta('https://readmanganato.com/manga-dr980474', function (err
   console.log(meta);
 });
 ```
+
+Simple search for manga that match the genre, which uses less compute power compared to `getMangas()`
+
+```js
+import { MangaNato } from '@specify_/mangascraper';
+
+const manganato = new MangaNato();
+
+manganato.getMangasFromGenre('Comedy', {}, (err, mangas) => {
+  console.log(mangas);
+});
+```
