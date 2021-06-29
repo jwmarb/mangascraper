@@ -486,6 +486,12 @@ export default class MangaNato {
           if (typeof alt !== 'undefined') coverImage.push({ url: img, alt });
         });
 
+        /** Get manga URL */
+        $(`div.panel-content-genres > div.content-genres-item > a.genres-item-img`).each((_, el) => {
+          const url = $(el).attr('href');
+          if (typeof url !== 'undefined') urls.push(url);
+        });
+
         const mangas: Manga[] = new Array(titles.length).fill('').map((_, index) => ({
           title: titles[index],
           url: urls[index],
