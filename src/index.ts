@@ -6,7 +6,7 @@ export type CallbackFunc<T> = (error?: Error | undefined, result?: T) => void;
 export interface Manga {
   title: string;
   url: string;
-  authors: string[];
+  authors?: string[];
   updatedAt: Date;
   views: string;
   coverImage: MangaAttributeCoverImage;
