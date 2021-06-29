@@ -1,5 +1,3 @@
-import axios from 'axios';
-import cheerio from 'cheerio';
 import failure from '../functions/failure';
 import readHtml from '../functions/readHtml';
 import success from '../functions/success';
@@ -15,9 +13,13 @@ import {
   MangaNatoOptions,
   MangaRating,
   MangaNatoGenres,
+  MangaNatoGenre,
+  MangaNatoGenreOptions,
+  MangakakalotGenres,
 } from '../';
 import moment from 'moment';
 import splitAltTitles from '../functions/splitAltTitles';
+import { CheerioAPI, Element } from 'cheerio';
 
 export default class MangaNato {
   /**
@@ -410,6 +412,90 @@ export default class MangaNato {
         success(pages, callback, res);
       } catch (e) {
         return failure(new Error(e), callback);
+      }
+    });
+  }
+
+  public getMangasFromGenre(
+    genre: MangaNatoGenre,
+    options: MangaNatoGenreOptions = {},
+    callback: CallbackFunc<Manga[]> = () => {},
+  ): Promise<Manga[]> {
+    const { type = 'updated', status = 'all', page = 1 } = options;
+
+    function generateURL(): string {
+      const filter_state = `state=${status}`;
+      const filter_type = `type=${type === 'updated' ? 'latest' : 'newest'}`;
+      const base_url = `https://manganato.com/genre-${MangakakalotGenres[genre]}?${filter_state}&${filter_type}`;
+
+      return base_url;
+    }
+
+    return new Promise(async (res, rej) => {
+      if (typeof genre === 'undefined') return failure(new Error("Argument 'genres' is required"), callback);
+      if (page <= 0) return failure(new Error("'page' must be greater than 0"), callback);
+
+      try {
+        /** Parse HTML document */
+        const $ = await readHtml(generateURL());
+        const titles: string[] = [];
+        const urls: string[] = [];
+        const authors: string[][] = [];
+        const updatedAt: Date[] = [];
+        const views: string[] = [];
+        const coverImage: MangaAttributeCoverImage[] = [];
+
+        /** Get manga titles */
+        $(`div.panel.content-genres > div.content-genres-item > div.genres-item-info > h3 > a.genres-item-name`).each(
+          (_, el) => {
+            const title = $(el).text();
+            if (typeof title !== 'undefined') titles.push(title);
+          },
+        );
+
+        /** Get manga views */
+        $(
+          `div.panel.content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-view`,
+        ).each((_, el) => {
+          const viewCount = $(el).text();
+          if (typeof viewCount !== 'undefined') views.push(viewCount);
+        });
+
+        /** Get manga date */
+        $(
+          `div.panel.content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-time`,
+        ).each((_, el) => {
+          const time_string = $(el).text();
+          if (typeof time_string !== 'undefined') updatedAt.push(moment(time_string, 'MMM DD,YY').toDate());
+        });
+
+        /** Get manga authors */
+        $(
+          `div.panel.content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-author`,
+        ).each((_, el) => {
+          const author = $(el).text();
+          if (typeof author !== 'undefined') authors.push(author.split(','));
+        });
+
+        /** Get manga cover image */
+        $(`div.panel-content-genres > div.content-genres-item > a.genres-item-img > img.img-loading`).each((_, el) => {
+          const img = $(el).attr('src');
+          const alt = $(el).attr('alt');
+          if (typeof alt !== 'undefined') coverImage.push({ url: img, alt });
+        });
+
+        const mangas: Manga[] = new Array(titles.length).fill('').map((_, index) => ({
+          title: titles[index],
+          url: urls[index],
+          authors: authors[index],
+          updatedAt: updatedAt[index],
+          views: views[index],
+          coverImage: coverImage[index],
+        }));
+
+        success(mangas, callback, res);
+      } catch (e) {
+        failure(new Error(e), callback);
       }
     });
   }

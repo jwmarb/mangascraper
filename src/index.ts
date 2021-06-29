@@ -85,6 +85,12 @@ export interface MangaNatoOptions {
   page?: number;
 }
 
+export interface MangaNatoGenreOptions {
+  type?: MangaType;
+  status?: MangaStatus;
+  page?: number;
+}
+
 export type MangaStatus = 'ongoing' | 'completed' | 'all';
 
 export type MangaType = 'new' | 'updated';
