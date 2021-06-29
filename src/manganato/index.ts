@@ -449,7 +449,7 @@ export default class MangaNato {
     function generateURL(): string {
       const filter_state = `state=${status}`;
       const filter_type = `type=${type === 'updated' ? 'latest' : 'newest'}`;
-      const base_url = `https://manganato.com/genre-${MangaNatoGenres[genre]}?${filter_type}&${filter_state}`;
+      const base_url = `https://manganato.com/genre-${MangaNatoGenres[genre]}/${page}?${filter_type}&${filter_state}`;
 
       return base_url;
     }
