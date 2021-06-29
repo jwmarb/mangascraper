@@ -71,7 +71,7 @@ export type MangaAttributeCoverImage = {
 
 export type MangaOrder = 'latest_updates' | 'top_view' | 'new_manga' | 'A-Z';
 
-export interface MangaOptions {
+export interface MangakakalotOptions {
   genre?: MangakakalotGenre | null;
   status?: MangaStatus | null;
   type?: MangaType | null;

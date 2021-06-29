@@ -29,7 +29,7 @@ export default class MangaNato {
    * @returns Returns an array of manga from manganato
    * @example
    * ```js
-   * import { MangaNato } from "mangascraper";
+   * import { MangaNato } from "@specify_/mangascraper";
    * const manganato = new MangaNato();
    *
    * async function test() {
@@ -184,7 +184,7 @@ export default class MangaNato {
    * @returns Returns metadata of manga
    * @example
    * ```js
-   * import { MangaNato } from "mangascraper";
+   * import { MangaNato } from "@specify_/mangascraper";
    *
    * const manganato = new MangaNato();
    *

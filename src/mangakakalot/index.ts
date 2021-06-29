@@ -14,7 +14,7 @@ import {
   MangaRating,
   MangakakalotGenre,
   MangaChapters,
-  MangaOptions,
+  MangakakalotOptions,
   MangaList,
   MangakakalotGenres,
 } from '../';
@@ -29,7 +29,7 @@ export default class Mangakakalot {
    * @returns List of Manga that match `title`
    * @example
    * ```typescript
-   * import { Mangakakalot } from 'mangascraper';
+   * import { Mangakakalot } from '@specify_/mangascraper';
    * const mangakakalot = new Mangakakalot();
    *
    * async function test() {
@@ -121,7 +121,7 @@ export default class Mangakakalot {
    * @returns Returns metadata of manga (chapters, alternate titles, status, etc.)
    * @example
    * ```js
-   * import { Mangakakalot } from "mangascraper";
+   * import { Mangakakalot } from "@specify_/mangascraper";
    * const mangakakalot = new Mangakakalot();
    *
    * async function test() {
@@ -288,7 +288,7 @@ export default class Mangakakalot {
    * @returns Returns a list of manga from mangakakalot
    * @example
    * ```js
-   * import { Mangakakalot } from "mangascraper";
+   * import { Mangakakalot } from "@specify_/mangascraper";
    * const mangakakalot = new Mangakakalot();
    *
    * async function test() {
@@ -301,7 +301,7 @@ export default class Mangakakalot {
    */
 
   public getMangas(
-    options: MangaOptions = {},
+    options: MangakakalotOptions = {},
     page: number = 1,
     callback: CallbackFunc<MangaList[]> = () => {},
   ): Promise<MangaList[]> {

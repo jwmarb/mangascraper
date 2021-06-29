@@ -1,11 +1,10 @@
 {
-  "name": "mangascraper",
+  "name": "@specify_/mangascraper",
   "version": "1.0.0",
-  "description": "",
+  "description": "A mangascraper for fetching manga from a variety of manga sources (mangakakalot, manganato, and etc.)",
   "main": "lib/index.js",
   "types": "lib",
   "scripts": {
-    "test": "jest --config jestconfig.json",
     "build": "tsc -p .",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json"
