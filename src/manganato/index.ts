@@ -428,8 +428,6 @@ export default class MangaNato {
       const filter_type = `type=${type === 'updated' ? 'latest' : 'newest'}`;
       const base_url = `https://manganato.com/genre-${MangaNatoGenres[genre]}?${filter_type}&${filter_state}`;
 
-      console.log(base_url);
-
       return base_url;
     }
 
