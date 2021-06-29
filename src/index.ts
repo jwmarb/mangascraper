@@ -85,6 +85,8 @@ export interface MangaNatoOptions {
   page?: number;
 }
 
+export interface MangakakalotGenreOptions extends MangaNatoGenreOptions {}
+
 export interface MangaNatoGenreOptions {
   type?: MangaType;
   status?: MangaStatus;

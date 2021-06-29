@@ -17,6 +17,7 @@ import {
   MangakakalotOptions,
   MangaList,
   MangakakalotGenres,
+  MangakakalotGenreOptions,
 } from '../';
 import splitAltTitles from '../functions/splitAltTitles';
 
@@ -403,6 +404,24 @@ export default class Mangakakalot {
         success(pages, callback, res);
       } catch (e) {
         failure(new Error(e), callback);
+      }
+    });
+  }
+
+  public getMangasFromGenre(
+    genre: MangakakalotGenres,
+    options: MangakakalotGenreOptions = {},
+    callback: CallbackFunc<Manga[]> = () => {},
+  ): Promise<Manga[]> {
+    const { type = 'updated', status = 'all', page = 1 } = options;
+
+    return new Promise((res) => {
+      if (page <= 0) return failure(new Error('"page" must be greater than 0'));
+      if (typeof genre === 'undefined') return failure(new Error('Argument "genre" is required'));
+
+      try {
+      } catch (e) {
+        return failure(new Error(e));
       }
     });
   }
