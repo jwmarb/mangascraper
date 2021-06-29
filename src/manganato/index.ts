@@ -524,7 +524,7 @@ export default class MangaNato {
 
         success(mangas, callback, res);
       } catch (e) {
-        failure(new Error(e), callback);
+        return failure(new Error(e), callback);
       }
     });
   }
