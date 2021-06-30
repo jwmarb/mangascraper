@@ -444,7 +444,7 @@ export default class MangaNato {
     options: MangaNatoGenreOptions = {},
     callback: CallbackFunc<Manga[]> = () => {},
   ): Promise<Manga[]> {
-    const { type = 'updated', status = 'all', page = 1 } = options;
+    const { age: type = 'updated', status = 'all', page = 1 } = options;
 
     function generateURL(): string {
       const filter_state = `state=${status}`;

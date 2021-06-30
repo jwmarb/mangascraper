@@ -74,7 +74,7 @@ export type MangaOrder = 'latest_updates' | 'top_view' | 'new_manga' | 'A-Z';
 export interface MangakakalotOptions {
   genre?: MangakakalotGenre | null;
   status?: MangaStatus | null;
-  type?: MangaType | null;
+  type?: MangaAge | null;
 }
 
 export interface MangaNatoOptions {
@@ -88,18 +88,133 @@ export interface MangaNatoOptions {
 export interface MangakakalotGenreOptions extends MangaNatoGenreOptions {}
 
 export interface MangaNatoGenreOptions {
-  type?: MangaType;
+  age?: MangaAge;
   status?: MangaStatus;
   page?: number;
 }
 
 export type MangaStatus = 'ongoing' | 'completed' | 'all';
 
-export type MangaType = 'new' | 'updated';
+export type MangaAge = 'new' | 'updated';
+
+export type MangaParkRating = '5 stars' | '4 stars' | '3 stars' | '2 stars' | '1 stars' | '0 stars';
+
+export interface MangaParkOptions {
+  genres?: {
+    include?: MangaParkGenre[];
+    exclude?: MangaParkGenre[];
+  };
+  status?: MangaStatus;
+  rating?: MangaParkRating;
+}
 
 export type MangakakalotGenre = keyof typeof MangakakalotGenres;
 
 export type MangaNatoGenre = keyof typeof MangaNatoGenres;
+
+export type MangaParkGenre = keyof typeof MangaParkGenres;
+
+export enum MangaParkGenres {
+  '4 koma' = '4-koma',
+  'Aliens' = 'aliens',
+  'Cooking' = 'cooking',
+  'Doujinshi' = 'doujinshi',
+  'Food' = 'food',
+  'Ghosts' = 'ghosts',
+  'Historical' = 'historical',
+  'Kids' = 'kids',
+  'Magic' = 'magic',
+  'Mecha' = 'mecha',
+  'Music' = 'music',
+  'One shot' = 'one-shot',
+  'Psychological' = 'psychological',
+  'School life' = 'school-life',
+  'Shoujo' = 'shoujo',
+  'Smut' = 'smut',
+  'Supernatural' = 'supernatural',
+  'Toomics' = 'toomics',
+  'Vampires' = 'vampires',
+  'Webtoon' = 'webtoon',
+  'Action' = 'action',
+  'Animals' = 'animals',
+  'Crime' = 'crime',
+  'Drama' = 'drama',
+  'Full color' = 'full-color',
+  'Gore' = 'gore',
+  'Horror' = 'horror',
+  'Loli' = 'loli',
+  'Magical girls' = 'magical-girls',
+  'Medical' = 'medical',
+  'Mystery' = 'mystery',
+  'Parody' = 'parody',
+  'Reincarnation' = 'reincarnation',
+  'Sci fi' = 'sci-fi',
+  'Shoujo ai' = 'shoujo-ai',
+  'Space' = 'space',
+  'Survival' = 'survival',
+  'Traditional games' = 'traditional-games',
+  'Wuxia' = 'wuxia',
+  'Adaptation' = 'adaptation',
+  'Anthology' = 'anthology',
+  'Crossdressing' = 'crossdressing',
+  'Ecchi' = 'ecchi',
+  'Game' = 'game',
+  'Gossip' = 'gossip',
+  'Incest' = 'incest',
+  'Lolicon' = 'lolicon',
+  'Manhwa' = 'manhwa',
+  'Military' = 'military',
+  'Ninja' = 'ninja',
+  'Philosophical' = 'philosophical',
+  'Reverse harem' = 'reverse-harem',
+  'Seinen' = 'seinen',
+  'Shounen' = 'shounen',
+  'Sports' = 'sports',
+  'Suspense' = 'suspense',
+  'Tragedy' = 'tragedy',
+  'Villainess' = 'villainess',
+  'Yaoi' = 'yaoi',
+  'Adult' = 'adult',
+  'Award winning' = 'award-winning',
+  'Delinquents' = 'delinquents',
+  'Fan colored' = 'fan-colored',
+  'Gender bender' = 'gender-bender',
+  'Gyaru' = 'gyaru',
+  'Isekai' = 'isekai',
+  'Long strip' = 'long-strip',
+  'Martial arts' = 'martial-arts',
+  'Monster girls' = 'monster-girls',
+  'Office workers' = 'office-workers',
+  'Police' = 'police',
+  'Romance' = 'romance',
+  'Shota' = 'shota',
+  'Shounen ai' = 'shounen-ai',
+  'Super power' = 'super-power',
+  'Thriller' = 'thriller',
+  'User created' = 'user-created',
+  'Virtual reality' = 'virtual-reality',
+  'Yuri' = 'yuri',
+  'Adventure' = 'adventure',
+  'Comedy' = 'comedy',
+  'Demons' = 'demons',
+  'Fantasy' = 'fantasy',
+  'Genderswap' = 'genderswap',
+  'Harem' = 'harem',
+  'Josei' = 'josei',
+  'Mafia' = 'mafia',
+  'Mature' = 'mature',
+  'Monsters' = 'monsters',
+  'Official colored' = 'official-colored',
+  'Post apocalyptic' = 'post-apocalyptic',
+  'Samurai' = 'samurai',
+  'Shotacon' = 'shotacon',
+  'Slice of life' = 'slice-of-life',
+  'Superhero' = 'superhero',
+  'Time travel' = 'time-travel',
+  'Vampire' = 'vampire',
+  'Web comic' = 'web-comic',
+  'Zombies' = 'zombies',
+}
 
 export enum MangakakalotGenres {
   'All' = 'all',
