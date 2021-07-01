@@ -1,6 +1,10 @@
-import { CallbackFunc } from '../';
+import { MangaCallback } from '../';
 
-export default function success<T>(result: T, callback: CallbackFunc<T>, resolve: (value: T | PromiseLike<T>) => void) {
+export default function success<T>(
+  result: T,
+  callback: MangaCallback<T>,
+  resolve: (value: T | PromiseLike<T>) => void,
+) {
   callback(undefined, result);
   resolve(result);
 }
