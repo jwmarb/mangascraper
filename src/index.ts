@@ -1,17 +1,12 @@
 export { default as Mangakakalot } from './mangakakalot';
 export { default as MangaNato } from './manganato';
-export { default as MangaParkv2 } from './mangapark/v2';
 
 export type CallbackFunc<T> = (error?: Error | undefined, result?: T) => void;
 
-export interface MangaParkv2Manga {
-  title: {
-    main: string;
-    alt: string[];
-  };
+export interface MangaHasuManga {
+  title: string;
   url: string;
-  status: MangaStatus;
-  genres: MangaParkv2Genre[];
+  coverImage: MangaAttributeCoverImage;
 }
 
 export interface Manga {
@@ -106,152 +101,148 @@ export interface MangaNatoGenreOptions {
 
 export type MangaStatus = 'ongoing' | 'completed' | 'all';
 
-export type MangaType = 'manga' | 'manhwa' | 'manhua' | 'unknown';
+export type MangaType = 'manga' | 'manhwa' | 'manhua' | 'any';
 
 export type MangaAge = 'new' | 'updated';
 
-export interface MangaParkv2Options {
+export interface MangaHasuOptions {
   genres?: {
-    include?: MangaParkv2Genre[];
-    exclude?: MangaParkv2Genre[];
+    include?: MangaHasuGenre[];
+    exclude?: MangaHasuGenre[];
   };
   searchFor?: 'title' | 'author/artist';
   status?: MangaStatus;
-  rating?: MangaParkRating;
-  showSummary?: boolean;
-  sortBy?: MangaParkv2SortBy;
   type?: MangaType;
   page?: number;
-  yearReleased?: number | null;
 }
+
+export type MangaHasuSearch =
+  | {
+      title?: string;
+      author?: string;
+      artist?: string;
+    }
+  | string;
 
 export type MangakakalotGenre = keyof typeof MangakakalotGenres;
 
 export type MangaNatoGenre = keyof typeof MangaNatoGenres;
 
-export type MangaParkv2Genre = keyof typeof MangaParkv2Genres;
+export type MangaHasuGenre = keyof typeof MangaHasuGenres;
 
-export type MangaParkv2SortBy = keyof typeof MangaParkv2SortByEnum;
-
-export type MangaParkRating = keyof typeof MangaParkv2RatingEnum;
-
-export enum MangaParkv2RatingEnum {
-  '5 stars' = '5',
-  '4 stars' = '4',
-  '3 stars' = '3',
-  '2 stars' = '2',
-  '1 star' = '1',
-  '0 stars' = '0',
-}
-
-export enum MangaParkv2SortByEnum {
-  'A-Z' = 'a-z',
-  'Rating' = 'rating',
-  'Update' = 'update',
-  'Create' = 'create',
-  'Total views' = 'views_a',
-}
-
-export enum MangaParkv2Genres {
-  '4 koma' = '4-koma',
-  'Aliens' = 'aliens',
-  'Cooking' = 'cooking',
-  'Doujinshi' = 'doujinshi',
-  'Food' = 'food',
-  'Ghosts' = 'ghosts',
-  'Historical' = 'historical',
-  'Kids' = 'kids',
-  'Magic' = 'magic',
-  'Mecha' = 'mecha',
-  'Music' = 'music',
-  'One shot' = 'one-shot',
-  'Psychological' = 'psychological',
-  'School life' = 'school-life',
-  'Shoujo' = 'shoujo',
-  'Smut' = 'smut',
-  'Supernatural' = 'supernatural',
-  'Toomics' = 'toomics',
-  'Vampires' = 'vampires',
-  'Webtoon' = 'webtoon',
-  'Action' = 'action',
-  'Animals' = 'animals',
-  'Crime' = 'crime',
-  'Drama' = 'drama',
-  'Full color' = 'full-color',
-  'Gore' = 'gore',
-  'Horror' = 'horror',
-  'Loli' = 'loli',
-  'Magical girls' = 'magical-girls',
-  'Medical' = 'medical',
-  'Mystery' = 'mystery',
-  'Parody' = 'parody',
-  'Reincarnation' = 'reincarnation',
-  'Sci fi' = 'sci-fi',
-  'Shoujo ai' = 'shoujo-ai',
-  'Space' = 'space',
-  'Survival' = 'survival',
-  'Traditional games' = 'traditional-games',
-  'Wuxia' = 'wuxia',
-  'Adaptation' = 'adaptation',
-  'Anthology' = 'anthology',
-  'Crossdressing' = 'crossdressing',
-  'Ecchi' = 'ecchi',
-  'Game' = 'game',
-  'Gossip' = 'gossip',
-  'Incest' = 'incest',
-  'Lolicon' = 'lolicon',
-  'Manhwa' = 'manhwa',
-  'Military' = 'military',
-  'Ninja' = 'ninja',
-  'Philosophical' = 'philosophical',
-  'Reverse harem' = 'reverse-harem',
-  'Seinen' = 'seinen',
-  'Shounen' = 'shounen',
-  'Sports' = 'sports',
-  'Suspense' = 'suspense',
-  'Tragedy' = 'tragedy',
-  'Villainess' = 'villainess',
-  'Yaoi' = 'yaoi',
-  'Adult' = 'adult',
-  'Award winning' = 'award-winning',
-  'Delinquents' = 'delinquents',
-  'Fan colored' = 'fan-colored',
-  'Gender bender' = 'gender-bender',
-  'Gyaru' = 'gyaru',
-  'Isekai' = 'isekai',
-  'Long strip' = 'long-strip',
-  'Martial arts' = 'martial-arts',
-  'Monster girls' = 'monster-girls',
-  'Office workers' = 'office-workers',
-  'Police' = 'police',
-  'Romance' = 'romance',
-  'Shota' = 'shota',
-  'Shounen ai' = 'shounen-ai',
-  'Super power' = 'super-power',
-  'Thriller' = 'thriller',
-  'User created' = 'user-created',
-  'Virtual reality' = 'virtual-reality',
-  'Yuri' = 'yuri',
-  'Adventure' = 'adventure',
-  'Comedy' = 'comedy',
-  'Demons' = 'demons',
-  'Fantasy' = 'fantasy',
-  'Genderswap' = 'genderswap',
-  'Harem' = 'harem',
-  'Josei' = 'josei',
-  'Mafia' = 'mafia',
-  'Mature' = 'mature',
-  'Monsters' = 'monsters',
-  'Official colored' = 'official-colored',
-  'Post apocalyptic' = 'post-apocalyptic',
-  'Samurai' = 'samurai',
-  'Shotacon' = 'shotacon',
-  'Slice of life' = 'slice-of-life',
-  'Superhero' = 'superhero',
-  'Time travel' = 'time-travel',
-  'Vampire' = 'vampire',
-  'Web comic' = 'web-comic',
-  'Zombies' = 'zombies',
+export enum MangaHasuGenres {
+  '4-koma' = '46',
+  'Action' = '1',
+  'Adaptation' = '101',
+  'Adult' = '2',
+  'Adventure' = '3',
+  'Aliens' = '103',
+  'Animals' = '73',
+  'Anime' = '57',
+  'Anthology' = '99',
+  'Award Winning' = '48',
+  'Bara' = '60',
+  'Comedy' = '4',
+  'Comic' = '5',
+  'Cooking' = '6',
+  'Crime' = '92',
+  'Crossdressing' = '86',
+  'Delinquents' = '83',
+  'Demons' = '51',
+  'Doujinshi' = '7',
+  'Drama' = '8',
+  'Ecchi' = '9',
+  'Fan Colored' = '107',
+  'Fantasy' = '10',
+  'Full Color' = '95',
+  'Game' = '68',
+  'Gender Bender' = '11',
+  'Genderswap' = '81',
+  'Ghosts' = '90',
+  'Gore' = '100',
+  'Gyaru' = '97',
+  'Harem' = '12',
+  'Historical' = '13',
+  'Horror' = '14',
+  'Incest' = '84',
+  'Isekai' = '67',
+  'Josei' = '15',
+  'Live Action' = '59',
+  'Loli' = '91',
+  'Lolicon' = '16',
+  'Long Strip' = '93',
+  'Mafia' = '113',
+  'Magic' = '55',
+  'Magical Girls' = '89',
+  'Manga Reviews' = '64',
+  'Martial Arts' = '20',
+  'Mature' = '21',
+  'Mecha' = '22',
+  'Medical' = '23',
+  'Military' = '62',
+  'Monster Girls' = '87',
+  'Monsters' = '72',
+  'Music' = '24',
+  'Mystery' = '25',
+  'Netorare/NTR' = '123',
+  'Ninja' = '112',
+  'Office' = '119',
+  'Office Workers' = '80',
+  'Official Colored' = '96',
+  'One shot' = '26',
+  'Others' = '114',
+  'Philosophical' = '110',
+  'Police' = '105',
+  'Post-Apocalyptic' = '76',
+  'Psychological' = '27',
+  'Reincarnation' = '74',
+  'Reverse harem' = '69',
+  'Romance' = '28',
+  'Samurai' = '108',
+  'school' = '118',
+  'School Life' = '29',
+  'School Life. Seinen' = '115',
+  'Sci-fi' = '30',
+  'Seinen' = '31',
+  'Seinen  Supernatural' = '66',
+  'Sexual Violence' = '98',
+  'Shota' = '104',
+  'Shotacon' = '32',
+  'Shoujo' = '33',
+  'Shoujo Ai' = '34',
+  'Shoujoai' = '63',
+  'Shounen' = '35',
+  'Shounen Ai' = '36',
+  'Shounenai' = '61',
+  'Slice of Life' = '37',
+  'SM/BDSM' = '122',
+  'Smut' = '38',
+  'Sports' = '39',
+  'Super power' = '70',
+  'Superhero' = '88',
+  'Supernatural' = '40',
+  'Survival' = '77',
+  'Thriller' = '75',
+  'Time Travel' = '78',
+  'Traditional Games' = '111',
+  'Tragedy' = '41',
+  'Uncategorized' = '65',
+  'User Created' = '102',
+  'Vampire' = '58',
+  'Vampires' = '82',
+  'Video Games' = '85',
+  'Villainess' = '116',
+  'Violence' = '120',
+  'Virtual Reality' = '109',
+  'Web Comic' = '94',
+  'Webtoon' = '42',
+  'Webtoons' = '56',
+  'Western' = '121',
+  'Wuxia' = '71',
+  'Yaoi' = '43',
+  'Youkai' = '106',
+  'Yuri' = '44',
+  'Zombies' = '79',
 }
 
 export enum MangakakalotGenres {
