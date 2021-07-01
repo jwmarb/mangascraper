@@ -73,7 +73,7 @@ export default class Mangahasu {
         .filter((arg) => arg.length > 0)
         .join('&');
 
-      const base_url = `https://mangahasu.se/advanced-search.html?${url_args}`;
+      const base_url = `https://mangahasu.se/advanced-search.html?${url_args}&page=${page}`;
       return base_url;
     }
 
@@ -250,7 +250,9 @@ export default class Mangahasu {
     });
   }
 
-  public getPages(url: string, callback: MangaCallback<string>): Promise<string[]> {
-    return new Promise(async (res) => {});
+  public getPages(url: string, callback: MangaCallback<string> = () => {}): Promise<string[]> {
+    return new Promise(async (res) => {
+      if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
+    });
   }
 }
