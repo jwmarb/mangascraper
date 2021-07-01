@@ -40,7 +40,7 @@ export type MangaFilters<T> = T extends Manganato
   ? ManganatoOptions
   : T extends Mangakakalot
   ? MangakakalotOptions
-  : T extends 'Mangahasu'
+  : T extends Mangahasu
   ? MangahasuOptions
   : never;
 
@@ -127,8 +127,6 @@ export interface MangaNatoGenreOptions {
 
 export type MangaStatus = 'ongoing' | 'completed' | 'all';
 
-export type MangaType = 'manga' | 'manhwa' | 'manhua' | 'any';
-
 export type MangaAge = 'new' | 'updated';
 
 export interface MangahasuOptions {
@@ -138,8 +136,17 @@ export interface MangahasuOptions {
   };
   searchFor?: 'title' | 'author/artist';
   status?: MangaStatus;
-  type?: MangaType;
+  type?: MangahasuType;
   page?: number;
+}
+
+export type MangahasuType = keyof typeof MangahasuTypes;
+
+export enum MangahasuTypes {
+  'any' = '',
+  'manga' = '10',
+  'manhwa' = '12',
+  'manhua' = '19',
 }
 
 export type MangakakalotGenre = keyof typeof MangakakalotGenres;
