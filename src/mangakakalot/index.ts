@@ -5,7 +5,7 @@ import failure from '../functions/failure';
 import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import {
-  CallbackFunc,
+  MangaCallback,
   MangakakalotManga,
   MangaAttributeCoverImage,
   MangaMeta,
@@ -14,10 +14,9 @@ import {
   MangaRating,
   MangakakalotGenre,
   MangaChapters,
-  MangakakalotOptions,
   MangaList,
   MangakakalotGenres,
-  MangaSearch,
+  MangaFilters,
 } from '../';
 import splitAltTitles from '../functions/splitAltTitles';
 
@@ -41,7 +40,10 @@ export default class Mangakakalot {
    * test(); // Output: [ { title: 'Naruto', url: 'https://readmanganato.com/manga-ng952689' ... }]
    * ```
    */
-  public search(keyword: string, callback: CallbackFunc<MangakakalotManga[]> = () => {}): Promise<MangakakalotManga[]> {
+  public search(
+    keyword: string,
+    callback: MangaCallback<MangakakalotManga[]> = () => {},
+  ): Promise<MangakakalotManga[]> {
     function generateURL(): string {
       const search: string = keyword.replace(/[^a-zA-Z0-9]/g, '_');
 
@@ -137,7 +139,7 @@ export default class Mangakakalot {
    * test(); // Output: { title: { main: 'Fukushuu...', alt: { jp: [...], en: [...], cn: [], ...} }}
    * ```
    */
-  public getMangaMeta(url: string, callback: CallbackFunc<MangaMeta> = () => {}): Promise<MangaMeta> {
+  public getMangaMeta(url: string, callback: MangaCallback<MangaMeta> = () => {}): Promise<MangaMeta> {
     return new Promise(async (res, rej) => {
       if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
       try {
@@ -306,8 +308,8 @@ export default class Mangakakalot {
    */
 
   public getMangas(
-    options: MangakakalotOptions = {},
-    callback: CallbackFunc<MangaList[]> = () => {},
+    options: MangaFilters<Mangakakalot> = {},
+    callback: MangaCallback<MangaList[]> = () => {},
   ): Promise<MangaList[]> {
     const { page = 1, genre = 'All', status = 'all', type = 'updated' } = options;
     return new Promise(async (res, rej) => {
@@ -390,7 +392,7 @@ export default class Mangakakalot {
    * />
    * ```
    */
-  public getPages(url: string, callback: CallbackFunc<string[]> = () => {}): Promise<string[]> {
+  public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
     return new Promise(async (res, rej) => {
       if (typeof url === 'undefined') return failure(new Error("Argument 'chapter_url' is required"), callback);
 
