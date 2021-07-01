@@ -282,14 +282,7 @@ export default class Manganato {
         };
 
         /** Get manga summary */
-        summary = $(`div.panel-story-info-description`)
-          .clone()
-          .children()
-          .remove()
-          .end()
-          .text()
-          .replace(/\r?\n|\r/g, ' ')
-          .trim();
+        summary = $(`div.panel-story-info-description`).clone().children().remove().end().text().trim();
 
         /** Get manga cover image */
         $(`div.story-info-left > span.info-image > img`).each((_, el) => {

@@ -217,14 +217,7 @@ export default class Mangakakalot {
         });
 
         /** Remove all children and get summary text */
-        const summary = $(`div#noidungm`)
-          .clone()
-          .children()
-          .remove()
-          .end()
-          .text()
-          .replace(/\r?\n|\r/g, ' ')
-          .trim();
+        const summary = $(`div#noidungm`).clone().children().remove().end().text().trim();
 
         /** Get image URL and alt */
         $(`div.manga-info-top > div.manga-info-pic > img`).each((_, element) => {
