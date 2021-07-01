@@ -250,9 +250,43 @@ export default class Mangahasu {
     });
   }
 
-  public getPages(url: string, callback: MangaCallback<string> = () => {}): Promise<string[]> {
+  /**
+   * Get raw image URLs from chapter URL.
+   * Note: Each image URL does not require any `headers` when making requests
+   *
+   * @param url - URL of chapter
+   * @param callback - Callback function
+   * @returns Returns an array of URLs of each page in the chapter
+   * @example
+   * ```js
+   * import { Mangahasu } from "@specify_/mangascraper";
+   * const mangahasu = new Mangahasu();
+   *
+   * (async () => {
+   *  const pages = mangahasu.getPages("https://mangahasu.se/solo-leveling/chapter-0-prologue-v1-c628457.html");
+   *  console.log(pages); // Output: [ 'https://.../0000-001.png', 'https://.../0000-002.png', 'https://.../0000-003.png', ... ]
+   * })();
+   * ```
+   */
+  public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
     return new Promise(async (res) => {
       if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
+      try {
+        /** parse HTML document */
+        const $ = await readHtml(url);
+        const pages: string[] = [];
+
+        /** Get URLs of each img element */
+        $(`div.img-chapter > div.img > img`).each((_, el) => {
+          const img = $(el).attr('src');
+
+          if (typeof img !== 'undefined') pages.push(img);
+        });
+
+        success(pages, callback, res);
+      } catch (e) {
+        return failure(new Error(e), callback);
+      }
     });
   }
 }
