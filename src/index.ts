@@ -101,7 +101,7 @@ export type MangaAge = 'new' | 'updated';
 
 export type MangaParkRating = '5 stars' | '4 stars' | '3 stars' | '2 stars' | '1 stars' | '0 stars';
 
-export interface MangaParkOptions {
+export interface MangaParkv2Options {
   genres?: {
     include?: MangaParkv2Genre[];
     exclude?: MangaParkv2Genre[];
