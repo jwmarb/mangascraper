@@ -3,7 +3,7 @@ import Mangakakalot from './mangakakalot';
 import Manganato from './manganato';
 
 export { default as Mangakakalot } from './mangakakalot';
-export { default as MangaNato } from './manganato';
+export { default as Manganato } from './manganato';
 
 export type MangaCallback<T> = (error?: Error | undefined, result?: T) => void;
 
