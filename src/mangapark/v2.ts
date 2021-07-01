@@ -64,7 +64,6 @@ export default class MangaParkv2 {
     }
 
     return new Promise(async (res) => {
-      if (typeof search === 'undefined') return failure(new Error('Argument "search" is required'), callback);
       if (page <= 0) return failure(new Error('"page" must be greater than 0'), callback);
 
       try {
