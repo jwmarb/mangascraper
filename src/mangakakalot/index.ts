@@ -22,9 +22,9 @@ import splitAltTitles from '../functions/splitAltTitles';
 
 export default class Mangakakalot {
   /**
-   * Get a list of manga that match the title
+   * Get a list of manga that match the title. Unfortunately, Mangakakalot does not offer an advanced search, so this can only search manga titles only. I will be updating this if Mangakakalot introduces a better search system
    *
-   * @param title - Title of Manga (e.g "Black Clover", "One Piece", "Naruto")
+   * @param title - Title of manga (e.g "Black Clover", "One Piece", "Naruto")
    * @param callback - Callback function
    * @returns List of Manga that match `title`
    * @example
@@ -33,11 +33,11 @@ export default class Mangakakalot {
    * const mangakakalot = new Mangakakalot();
    *
    * async function test() {
-   *  const mangas = await mangakakalot.getMangaByTitle("naruto")
+   *  const mangas = await mangakakalot.search("pokemon")
    *  console.log(mangas);
    * }
    *
-   * test(); // Output: [ { title: 'Naruto', url: 'https://readmanganato.com/manga-ng952689' ... }]
+   * test(); // Output: [ { title: 'Pokemon: The World Champion Season', url: 'https://mangakakalot.com/manga/zv925092' ... }]
    * ```
    */
   public search(
@@ -289,7 +289,7 @@ export default class Mangakakalot {
   /**
    * Get a list of manga from mangakakalot
    *
-   * @param options - Fetch options within mangakakalot's query system
+   * @param filters - Filters to apply based on mangakakalot's query system
    * @param page - Page # for Pagination
    * @param callback - Callback function
    * @returns Returns a list of manga from mangakakalot
@@ -308,10 +308,10 @@ export default class Mangakakalot {
    */
 
   public getMangas(
-    options: MangaFilters<Mangakakalot> = {},
+    filters: MangaFilters<Mangakakalot> = {},
     callback: MangaCallback<MangaList[]> = () => {},
   ): Promise<MangaList[]> {
-    const { page = 1, genre = 'All', status = 'all', type = 'updated' } = options;
+    const { page = 1, genre = 'All', status = 'all', type = 'updated' } = filters;
     return new Promise(async (res, rej) => {
       if (typeof page === 'undefined') return failure(new Error("Argument 'page' is required"));
       if (typeof page !== 'number') return failure(new Error("Argument 'page' must be a number"), callback);
