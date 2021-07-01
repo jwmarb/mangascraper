@@ -31,7 +31,7 @@ export type MangaSearch<T> = T extends Manganato
   ? ManganatoQuery
   :
       | {
-          title: string;
+          title?: string;
           author?: T extends Mangahasu ? string : never;
           artist?: T extends Mangahasu ? string : never;
         }
