@@ -3,7 +3,6 @@ import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import {
   CallbackFunc,
-  Manga,
   MangaAttributeCoverImage,
   MangaAuthors,
   MangaChapters,
@@ -16,10 +15,11 @@ import {
   MangaNatoGenre,
   MangaNatoGenreOptions,
   MangakakalotGenres,
+  ManganatoManga,
+  MangaSearch,
 } from '../';
 import moment from 'moment';
 import splitAltTitles from '../functions/splitAltTitles';
-import { CheerioAPI, Element } from 'cheerio';
 
 export default class MangaNato {
   /**
@@ -47,17 +47,24 @@ export default class MangaNato {
    * console.log(titlesWithMyHeroAcademia); // Output: [{ title: 'Boku No Hero Academia', ... }, { title: 'My Hero Academia Team Up Mission'}, ... ]
    * ```
    */
-  public getMangas(
-    title?: string,
+  public search(
+    title?: MangaSearch<ManganatoManga>,
     options: MangaNatoOptions = {},
-    callback: CallbackFunc<Manga[]> = () => {},
-  ): Promise<Manga[]> {
-    const { genre = null, status = '', orderBy = 'latest_updates', page = 1, searchFor = 'all' } = options;
+    callback: CallbackFunc<ManganatoManga[]> = () => {},
+  ): Promise<ManganatoManga[]> {
+    const { genre = null, status = '', orderBy = 'latest_updates', page = 1 } = options;
 
-    function convertToSearch(query?: string): string {
+    function generateURL(): string {
       let g_i: string = ''; // short for genre_includes
       let g_e: string = ''; // short for genre_excludes
-      const keyw: string = (query && `keyw=${query.replace(/[^a-zA-Z0-9]/g, '_')}`) || ''; // Basically search query for manganato
+      const keyw: string = (() => {
+        if (typeof title === 'undefined') return '';
+        if (typeof title === 'string') return `keyw=${title.replace(/[^a-zA-Z0-9]/g, '_')}`;
+        if ('title' in title) return `keyw=${title.title.replace(/[^a-zA-Z0-9]/g, '_')}`;
+        if ('author' in title) return `keyw=${title.author.replace(/[^a-zA-Z0-9]/g, '_')}&keyt=author`;
+        if ('altTitle' in title) return `keyw=${title.altTitle.replace(/[^a-zA-Z0-9]/g, '_')}&keyt=alternative`;
+        return '';
+      })(); // Basically search query for manganato
       const sts = `sts=${status}` || ''; // short for status
       const orby = (() => {
         /** Converts 'orderBy' into an argument manganato can use for its filters */
@@ -77,24 +84,6 @@ export default class MangaNato {
             return '';
         }
       })(); // short for Order By
-      const keyt = (() => {
-        /** Converts 'searchFor' into an argument manganato can use for its filters */
-        switch (searchFor) {
-          case 'all':
-            return '';
-          case 'alt_titles':
-            return 'keyt=alternative';
-          case 'title':
-            return 'keyt=title';
-          case 'authors':
-            return 'keyt=author';
-          default:
-            console.warn(
-              `The value "searchFor" is equal to "${searchFor}". Use a matching value such as "all" to get the correct search results`,
-            );
-            return '';
-        }
-      })(); // short for keyword type; this just tells manganato what do we want to search for from the query (such as manga author, manga title, manga alternate titles)
 
       /** Check if there is a genre object */
       if (genre) {
@@ -109,11 +98,11 @@ export default class MangaNato {
       return `https://manganato.com/advanced_search?s=all&${url_args.join('&')}&page=${page}`;
     }
     return new Promise(async (res, rej) => {
-      if (page <= 0) return failure(new Error("'page' must be greater than 0"));
+      if (page <= 0) return failure(new Error('"page" must be greater than 0'));
 
       try {
         /** Parse HTML document */
-        const $ = await readHtml(convertToSearch(title));
+        const $ = await readHtml(generateURL());
         const titles: string[] = [];
         const urls: string[] = [];
         const authors: string[][] = [];
@@ -162,7 +151,7 @@ export default class MangaNato {
           if (typeof alt !== 'undefined') coverImage.push({ url: img, alt });
         });
 
-        const mangaList: Manga[] = new Array(titles.length).fill('').map((_, index) => ({
+        const mangaList: ManganatoManga[] = new Array(titles.length).fill('').map((_, index) => ({
           title: titles[index],
           url: urls[index],
           authors: authors[index],
@@ -442,8 +431,8 @@ export default class MangaNato {
   public getMangasFromGenre(
     genre: MangaNatoGenre,
     options: MangaNatoGenreOptions = {},
-    callback: CallbackFunc<Manga[]> = () => {},
-  ): Promise<Manga[]> {
+    callback: CallbackFunc<ManganatoManga[]> = () => {},
+  ): Promise<ManganatoManga[]> {
     const { age: type = 'updated', status = 'all', page = 1 } = options;
 
     function generateURL(): string {
@@ -513,7 +502,7 @@ export default class MangaNato {
           if (typeof url !== 'undefined') urls.push(url);
         });
 
-        const mangas: Manga[] = new Array(titles.length).fill('').map((_, index) => ({
+        const mangas: ManganatoManga[] = new Array(titles.length).fill('').map((_, index) => ({
           title: titles[index],
           url: urls[index],
           authors: authors[index],

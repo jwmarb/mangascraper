@@ -6,7 +6,7 @@ import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import {
   CallbackFunc,
-  Manga,
+  MangakakalotManga,
   MangaAttributeCoverImage,
   MangaMeta,
   MangaGenres,
@@ -17,7 +17,7 @@ import {
   MangakakalotOptions,
   MangaList,
   MangakakalotGenres,
-  MangakakalotGenreOptions,
+  MangaSearch,
 } from '../';
 import splitAltTitles from '../functions/splitAltTitles';
 
@@ -41,18 +41,22 @@ export default class Mangakakalot {
    * test(); // Output: [ { title: 'Naruto', url: 'https://readmanganato.com/manga-ng952689' ... }]
    * ```
    */
-  public getMangasByTitle(title: string, callback: CallbackFunc<Manga[]> = () => {}): Promise<Manga[]> {
-    function convertToSearch(query: string): string {
-      return query.replace(/[^a-zA-Z0-9]/g, '_');
+  public search(keyword: string, callback: CallbackFunc<MangakakalotManga[]> = () => {}): Promise<MangakakalotManga[]> {
+    function generateURL(): string {
+      const search: string = keyword.replace(/[^a-zA-Z0-9]/g, '_');
+
+      const base_url = `https://mangakakalot.com/search/story/${search}`;
+
+      return base_url;
     }
 
     return new Promise(async (res, rej) => {
       /** Param Validation */
-      if (typeof title === 'undefined') return failure(new Error('Missing argument "title" is required'), callback);
+      if (typeof keyword === 'undefined') return failure(new Error('Missing argument "keyword" is required'), callback);
 
       try {
         /** Load HTML Document to cheerio to extract HTML data */
-        const $ = await readHtml(`https://mangakakalot.com/search/story/${convertToSearch(title)}`);
+        const $ = await readHtml(generateURL());
         const links: string[] = [];
         const titles: string[] = [];
         const authors: string[][] = [];
@@ -303,12 +307,12 @@ export default class Mangakakalot {
 
   public getMangas(
     options: MangakakalotOptions = {},
-    page: number = 1,
     callback: CallbackFunc<MangaList[]> = () => {},
   ): Promise<MangaList[]> {
+    const { page = 1, genre = 'All', status = 'all', type = 'updated' } = options;
     return new Promise(async (res, rej) => {
-      const { genre = 'All', status = 'all', type = 'updated' } = options;
-      if (typeof page === 'undefined') return failure(new Error("Argument 'page' must be a number"), callback);
+      if (typeof page === 'undefined') return failure(new Error("Argument 'page' is required"));
+      if (typeof page !== 'number') return failure(new Error("Argument 'page' must be a number"), callback);
       if (page <= 0) return failure(new Error("'page' must be greater than 0"), callback);
 
       try {

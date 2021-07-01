@@ -3,20 +3,32 @@ export { default as MangaNato } from './manganato';
 
 export type CallbackFunc<T> = (error?: Error | undefined, result?: T) => void;
 
-export interface MangaHasuManga {
+export interface Manga {
+  title: string;
+  url: string;
+  authors: string[];
+  updatedAt: Date;
+  views: string;
+  coverImage: MangaAttributeCoverImage;
+}
+
+export interface MangakakalotManga extends Manga {}
+export interface ManganatoManga extends Manga {}
+export interface MangahasuManga {
   title: string;
   url: string;
   coverImage: MangaAttributeCoverImage;
 }
 
-export interface Manga {
-  title: string;
-  url: string;
-  authors?: string[];
-  updatedAt: Date;
-  views: string;
-  coverImage: MangaAttributeCoverImage;
-}
+export type MangaSearch<T> = T extends ManganatoManga
+  ? { title: string } | { author: string } | { altTitle: string } | string
+  :
+      | {
+          title: string;
+          author?: T extends MangahasuManga ? string : never;
+          artist?: T extends MangahasuManga ? string : never;
+        }
+      | string;
 
 export interface MangaList {
   title: string;
@@ -81,12 +93,12 @@ export interface MangakakalotOptions {
   genre?: MangakakalotGenre | null;
   status?: MangaStatus | null;
   type?: MangaAge | null;
+  page?: number;
 }
 
 export interface MangaNatoOptions {
   genre?: { include?: MangaNatoGenre[]; exclude?: MangaNatoGenre[] } | null;
   status?: MangaStatus | null;
-  searchFor?: 'title' | 'alt_titles' | 'authors' | 'all';
   orderBy?: MangaOrder;
   page?: number;
 }
