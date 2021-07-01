@@ -3,19 +3,17 @@ import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import {
   MangaCallback,
-  MangaAttributeCoverImage,
+  MangaCoverImage,
   MangaAuthors,
   MangaChapters,
-  MangakakalotGenre,
-  MangaGenres,
   MangaMeta,
   MangaFilters,
   MangaRating,
   ManganatoGenres,
-  ManganatoGenre,
-  MangaNatoGenreOptions,
-  ManganatoManga,
+  MangaGenre,
   MangaSearch,
+  Manga,
+  MangaGenreFilters,
 } from '../';
 import moment from 'moment';
 import splitAltTitles from '../functions/splitAltTitles';
@@ -42,8 +40,8 @@ export default class Manganato {
   public search(
     title?: MangaSearch<Manganato>,
     filters: MangaFilters<Manganato> = {},
-    callback: MangaCallback<ManganatoManga[]> = () => {},
-  ): Promise<ManganatoManga[]> {
+    callback: MangaCallback<Manga<Manganato>[]> = () => {},
+  ): Promise<Manga<Manganato>[]> {
     const { genre = null, status = '', orderBy = 'latest_updates', page = 1 } = filters;
 
     function generateURL(): string {
@@ -101,7 +99,7 @@ export default class Manganato {
         const authors: string[][] = [];
         const updatedAt: Date[] = [];
         const views: string[] = [];
-        const coverImage: MangaAttributeCoverImage[] = [];
+        const coverImage: MangaCoverImage[] = [];
 
         /** Get manga URLs and titles */
         $(`div.panel-content-genres > div.content-genres-item > div.genres-item-info > h3 > a`).each((_, element) => {
@@ -144,7 +142,7 @@ export default class Manganato {
           if (typeof alt !== 'undefined') coverImage.push({ url: img, alt });
         });
 
-        const mangaList: ManganatoManga[] = new Array(titles.length).fill('').map((_, index) => ({
+        const mangaList: Manga<Manganato>[] = new Array(titles.length).fill('').map((_, index) => ({
           title: titles[index],
           url: urls[index],
           authors: authors[index],
@@ -180,7 +178,10 @@ export default class Manganato {
    * test(); // Output: { title: { 'Utakata No Minato', alt: [ 'Minato of the Foam', 'ウタカタノミナト' ] } ... }
    * ```
    */
-  public getMangaMeta(url: string, callback: MangaCallback<MangaMeta> = () => {}): Promise<MangaMeta> {
+  public getMangaMeta(
+    url: string,
+    callback: MangaCallback<MangaMeta<Manganato>> = () => {},
+  ): Promise<MangaMeta<Manganato>> {
     return new Promise(async (res, rej) => {
       if (typeof url === 'undefined') return failure(new Error("Argument 'url' is required"));
       try {
@@ -192,8 +193,8 @@ export default class Manganato {
         let status: string = '';
         let updatedAt: Date = new Date();
         let views: string = '';
-        const genres: MangaGenres[] = [];
-        let coverImage: MangaAttributeCoverImage = { url: '', alt: '' };
+        const genres: string[] = [];
+        let coverImage: MangaCoverImage = { url: '', alt: '' };
         let summary: string = '';
         const chapters_names: string[] = [];
         const chapters_urls: string[] = [];
@@ -239,10 +240,9 @@ export default class Manganato {
           .children(`a`)
           .each((_, el) => {
             const genre = $(el).text();
-            const genre_url = $(el).attr('href');
 
-            if (typeof genre !== 'undefined' && typeof genre_url !== 'undefined') {
-              genres.push({ genre: genre as MangakakalotGenre, url: genre_url });
+            if (typeof genre !== 'undefined') {
+              genres.push(genre);
             }
           });
 
@@ -422,10 +422,10 @@ export default class Manganato {
    * ```
    */
   public getMangasFromGenre(
-    genre: ManganatoGenre,
-    options: MangaNatoGenreOptions = {},
-    callback: MangaCallback<ManganatoManga[]> = () => {},
-  ): Promise<ManganatoManga[]> {
+    genre: MangaGenre<Manganato>,
+    options: MangaGenreFilters<Manganato> = {},
+    callback: MangaCallback<Manga<Manganato>[]> = () => {},
+  ): Promise<Manga<Manganato>[]> {
     const { age: type = 'updated', status = 'all', page = 1 } = options;
 
     function generateURL(): string {
@@ -448,7 +448,7 @@ export default class Manganato {
         const authors: string[][] = [];
         const updatedAt: Date[] = [];
         const views: string[] = [];
-        const coverImage: MangaAttributeCoverImage[] = [];
+        const coverImage: MangaCoverImage[] = [];
 
         /** Get manga titles */
         $(`div.panel-content-genres > div.content-genres-item > div.genres-item-info > h3 > a.genres-item-name`).each(
@@ -495,7 +495,7 @@ export default class Manganato {
           if (typeof url !== 'undefined') urls.push(url);
         });
 
-        const mangas: ManganatoManga[] = new Array(titles.length).fill('').map((_, index) => ({
+        const mangas: Manga<Manganato>[] = new Array(titles.length).fill('').map((_, index) => ({
           title: titles[index],
           url: urls[index],
           authors: authors[index],

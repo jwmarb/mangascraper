@@ -8,22 +8,30 @@ export { default as Mangahasu } from './mangahasu';
 
 export type MangaCallback<T> = (error?: Error | undefined, result?: T) => void;
 
-export interface Manga {
+export interface MangaBase {
   title: string;
   url: string;
   authors: string[];
   updatedAt: Date;
   views: string;
-  coverImage: MangaAttributeCoverImage;
+  coverImage: MangaCoverImage;
 }
 
-export interface MangakakalotManga extends Manga {}
-export interface ManganatoManga extends Manga {}
+export interface MangakakalotManga extends MangaBase {}
+export interface ManganatoManga extends MangaBase {}
 export interface MangahasuManga {
   title: string;
   url: string;
-  coverImage: MangaAttributeCoverImage;
+  coverImage: MangaCoverImage;
 }
+
+export type Manga<T> = T extends Mangakakalot
+  ? MangakakalotManga
+  : T extends Manganato
+  ? ManganatoManga
+  : T extends Mangahasu
+  ? MangahasuManga
+  : never;
 
 export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'everything'; search: string } | string;
 
@@ -49,24 +57,44 @@ export interface MangaList {
   title: string;
   url: string;
   views: string;
-  coverImage: MangaAttributeCoverImage;
+  coverImage: MangaCoverImage;
 }
 
-export interface MangaMeta {
-  title: {
-    main: string;
-    alt: string[];
-  };
-  authors: MangaAuthors[];
-  status: string;
-  updatedAt: Date;
-  views: string;
-  genres: MangaGenres[];
-  rating: MangaRating;
-  coverImage: MangaAttributeCoverImage;
-  summary: string | null;
-  chapters: MangaChapters[];
-}
+export type MangaGenre<T> = T extends Mangakakalot
+  ? MangakakalotGenre
+  : T extends Manganato
+  ? ManganatoGenre
+  : T extends Mangahasu
+  ? MangahasuGenre
+  : never;
+
+export type MangaMeta<T> = T extends Mangakakalot | Manganato
+  ? {
+      title: {
+        main: string;
+        alt: string[];
+      };
+      authors: MangaAuthors[];
+      status: string;
+      updatedAt: Date;
+      views: string;
+      genres: string[];
+      rating: MangaRating;
+      coverImage: MangaCoverImage;
+      summary: string | null;
+      chapters: MangaChapters[];
+    }
+  : T extends Mangahasu
+  ? {
+      title: {
+        main: string;
+        alt: string[];
+      };
+      authors: string[];
+      artists: string[];
+      type: Omit<MangahasuType, 'any'>;
+    }
+  : never;
 
 export type MangaAuthors = {
   name: string;
@@ -92,35 +120,30 @@ export type MangaAttribute = {
   item: string | string[];
 };
 
-export type MangaGenres = {
-  genre: MangakakalotGenre;
-  url: string;
-};
-
-export type MangaAttributeCoverImage = {
+export type MangaCoverImage = {
   url: string | undefined;
   alt: string;
 };
 
 export type MangaOrder = 'latest_updates' | 'top_view' | 'new_manga' | 'A-Z';
 
-export interface MangakakalotOptions {
-  genre?: MangakakalotGenre | null;
+interface MangakakalotOptions {
+  genre?: MangaGenre<Mangakakalot> | null;
   status?: MangaStatus | null;
   type?: MangaAge | null;
   page?: number;
 }
 
-export interface ManganatoOptions {
+interface ManganatoOptions {
   genre?: { include?: ManganatoGenre[]; exclude?: ManganatoGenre[] } | null;
   status?: MangaStatus | null;
   orderBy?: MangaOrder;
   page?: number;
 }
 
-export interface MangakakalotGenreOptions extends MangaNatoGenreOptions {}
+export type MangaGenreFilters<T> = T extends Mangakakalot | Manganato ? BaseMangaGenreOptions : never;
 
-export interface MangaNatoGenreOptions {
+export interface BaseMangaGenreOptions {
   age?: MangaAge;
   status?: MangaStatus;
   page?: number;
@@ -149,11 +172,11 @@ export enum MangahasuTypes {
   'manhua' = '19',
 }
 
-export type MangakakalotGenre = keyof typeof MangakakalotGenres;
+type MangakakalotGenre = keyof typeof MangakakalotGenres;
 
-export type ManganatoGenre = keyof typeof ManganatoGenres;
+type ManganatoGenre = keyof typeof ManganatoGenres;
 
-export type MangahasuGenre = keyof typeof MangahasuGenres;
+type MangahasuGenre = keyof typeof MangahasuGenres;
 
 export enum MangahasuGenres {
   '4-koma' = '46',

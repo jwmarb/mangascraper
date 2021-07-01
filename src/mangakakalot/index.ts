@@ -6,17 +6,15 @@ import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import {
   MangaCallback,
-  MangakakalotManga,
-  MangaAttributeCoverImage,
+  MangaCoverImage,
   MangaMeta,
-  MangaGenres,
   MangaAuthors,
   MangaRating,
-  MangakakalotGenre,
   MangaChapters,
   MangaList,
   MangakakalotGenres,
   MangaFilters,
+  Manga,
 } from '../';
 import splitAltTitles from '../functions/splitAltTitles';
 
@@ -42,8 +40,8 @@ export default class Mangakakalot {
    */
   public search(
     keyword: string,
-    callback: MangaCallback<MangakakalotManga[]> = () => {},
-  ): Promise<MangakakalotManga[]> {
+    callback: MangaCallback<Manga<Mangakakalot>[]> = () => {},
+  ): Promise<Manga<Mangakakalot>[]> {
     function generateURL(): string {
       const search: string = keyword.replace(/[^a-zA-Z0-9]/g, '_');
 
@@ -64,7 +62,7 @@ export default class Mangakakalot {
         const authors: string[][] = [];
         const views: string[] = [];
         const updatedAt: Date[] = [];
-        const coverImage: MangaAttributeCoverImage[] = [];
+        const coverImage: MangaCoverImage[] = [];
 
         /** Simple string date converter to Date type */
         function convertToDate(date: string): Date {
@@ -139,7 +137,10 @@ export default class Mangakakalot {
    * test(); // Output: { title: { main: 'Fukushuu...', alt: { jp: [...], en: [...], cn: [], ...} }}
    * ```
    */
-  public getMangaMeta(url: string, callback: MangaCallback<MangaMeta> = () => {}): Promise<MangaMeta> {
+  public getMangaMeta(
+    url: string,
+    callback: MangaCallback<MangaMeta<Mangakakalot>> = () => {},
+  ): Promise<MangaMeta<Mangakakalot>> {
     return new Promise(async (res, rej) => {
       if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
       try {
@@ -150,7 +151,7 @@ export default class Mangakakalot {
         let status: string = '';
         let updatedAt: Date = new Date();
         let views: string = '';
-        const genres: MangaGenres[] = [];
+        const genres: string[] = [];
         const authors: MangaAuthors[] = [];
         let rating: MangaRating = {
           sourceRating: '',
@@ -158,7 +159,7 @@ export default class Mangakakalot {
           rating_percentage: '',
           voteCount: NaN,
         };
-        let coverImage: MangaAttributeCoverImage = { alt: '', url: undefined };
+        let coverImage: MangaCoverImage = { alt: '', url: undefined };
         const chaptersNameURL: Array<{ name: string; url: string }> = [];
         const chaptersViews: string[] = [];
         const chaptersDate: Date[] = [];
@@ -196,10 +197,8 @@ export default class Mangakakalot {
         /** Get manga genres */
         $(`div.manga-info-top > ul > li:contains("Genres") > a`).each((_, element) => {
           const genre = $(element).text();
-          const genreURL = $(element).attr('href');
 
-          if (typeof genre !== 'undefined' && typeof genreURL !== 'undefined')
-            genres.push({ genre: genre as MangakakalotGenre, url: genreURL });
+          if (typeof genre !== 'undefined') genres.push(genre);
         });
 
         /** Get manga rating */
@@ -327,7 +326,7 @@ export default class Mangakakalot {
         const titles: string[] = [];
         const urls: string[] = [];
         const views: string[] = [];
-        const covers: MangaAttributeCoverImage[] = [];
+        const covers: MangaCoverImage[] = [];
 
         /** Get manga titles */
         $(`div.list-truyen-item-wrap > h3 > a`).each((_, element) => {
