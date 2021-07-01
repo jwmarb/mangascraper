@@ -2,14 +2,15 @@ import failure from '../functions/failure';
 import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import {
-  CallbackFunc,
+  MangaCallback,
   MangaAttributeCoverImage,
   MangaAuthors,
   MangaChapters,
   MangakakalotGenre,
   MangaGenres,
   MangaMeta,
-  MangaNatoOptions,
+  MangaFilters,
+  ManganatoOptions,
   MangaRating,
   MangaNatoGenres,
   MangaNatoGenre,
@@ -21,7 +22,7 @@ import {
 import moment from 'moment';
 import splitAltTitles from '../functions/splitAltTitles';
 
-export default class MangaNato {
+export default class Manganato {
   /**
    * Get a list of manga.
    * This uses MangaNato's advanced search. You can sort by most views
@@ -48,9 +49,9 @@ export default class MangaNato {
    * ```
    */
   public search(
-    title?: MangaSearch<ManganatoManga>,
-    options: MangaNatoOptions = {},
-    callback: CallbackFunc<ManganatoManga[]> = () => {},
+    title?: MangaSearch<Manganato>,
+    options: MangaFilters<Manganato> = {},
+    callback: MangaCallback<ManganatoManga[]> = () => {},
   ): Promise<ManganatoManga[]> {
     const { genre = null, status = '', orderBy = 'latest_updates', page = 1 } = options;
 
@@ -188,7 +189,7 @@ export default class MangaNato {
    * test(); // Output: { title: { 'Utakata No Minato', alt: [ 'Minato of the Foam', 'ウタカタノミナト' ] } ... }
    * ```
    */
-  public getMangaMeta(url: string, callback: CallbackFunc<MangaMeta> = () => {}): Promise<MangaMeta> {
+  public getMangaMeta(url: string, callback: MangaCallback<MangaMeta> = () => {}): Promise<MangaMeta> {
     return new Promise(async (res, rej) => {
       if (typeof url === 'undefined') return failure(new Error("Argument 'url' is required"));
       try {
@@ -384,7 +385,7 @@ export default class MangaNato {
    * />
    * ```
    */
-  public getPages(url: string, callback: CallbackFunc<string[]> = () => {}): Promise<string[]> {
+  public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
     return new Promise(async (res, rej) => {
       if (typeof url === 'undefined') return failure(new Error("Argument 'url' is required"), callback);
 
@@ -432,7 +433,7 @@ export default class MangaNato {
   public getMangasFromGenre(
     genre: MangaNatoGenre,
     options: MangaNatoGenreOptions = {},
-    callback: CallbackFunc<ManganatoManga[]> = () => {},
+    callback: MangaCallback<ManganatoManga[]> = () => {},
   ): Promise<ManganatoManga[]> {
     const { age: type = 'updated', status = 'all', page = 1 } = options;
 
