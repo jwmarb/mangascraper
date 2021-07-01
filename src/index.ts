@@ -20,8 +20,10 @@ export interface MangahasuManga {
   coverImage: MangaAttributeCoverImage;
 }
 
+export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'everything'; search: string } | string;
+
 export type MangaSearch<T> = T extends ManganatoManga
-  ? { title: string } | { author: string } | { altTitle: string } | string
+  ? ManganatoQuery
   :
       | {
           title: string;

@@ -58,12 +58,13 @@ export default class MangaNato {
       let g_i: string = ''; // short for genre_includes
       let g_e: string = ''; // short for genre_excludes
       const keyw: string = (() => {
-        if (typeof title === 'undefined') return '';
+        if (typeof title === 'undefined' || title === null) return '';
         if (typeof title === 'string') return `keyw=${title.replace(/[^a-zA-Z0-9]/g, '_')}`;
-        if ('title' in title) return `keyw=${title.title.replace(/[^a-zA-Z0-9]/g, '_')}`;
-        if ('author' in title) return `keyw=${title.author.replace(/[^a-zA-Z0-9]/g, '_')}&keyt=author`;
-        if ('altTitle' in title) return `keyw=${title.altTitle.replace(/[^a-zA-Z0-9]/g, '_')}&keyt=alternative`;
-        return '';
+        const { search, keywords } = title;
+        if (keywords === 'title') return `keyw=${search.replace(/[^a-zA-Z0-9]/g, '_')}`;
+        if (keywords === 'author') return `keyw=${search.replace(/[^a-zA-Z0-9]/g, '_')}&keyt=author`;
+        if (keywords === 'alt_title') return `keyw=${search.replace(/[^a-zA-Z0-9]/g, '_')}&keyt=alternative`;
+        return `keyw=${search.replace(/[^a-zA-Z0-9]/g, '_')}`;
       })(); // Basically search query for manganato
       const sts = `sts=${status}` || ''; // short for status
       const orby = (() => {
