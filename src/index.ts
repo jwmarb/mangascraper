@@ -134,7 +134,6 @@ export interface MangahasuOptions {
     include?: MangahasuGenre[];
     exclude?: MangahasuGenre[];
   };
-  searchFor?: 'title' | 'author/artist';
   status?: MangaStatus;
   type?: MangahasuType;
   page?: number;
