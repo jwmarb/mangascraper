@@ -24,7 +24,7 @@ export default class Mangakakalot {
    *
    * @param title - Title of Manga (e.g "Black Clover", "One Piece", "Naruto")
    * @param callback - Callback function
-   * @deprecated
+   * @deprecated - This method has been superseded by `search()` and will no longer be updated
    * @returns List of Manga that match `title`
    * @example
    * ```typescript
