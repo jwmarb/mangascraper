@@ -22,36 +22,29 @@ import splitAltTitles from '../functions/splitAltTitles';
 
 export default class Manganato {
   /**
-   * Get a list of manga.
-   * This uses MangaNato's advanced search. You can sort by most views
+   * Search up a manga from Manganato (uses built-in advanced search)
    *
-   * @param title - Title of the manga
+   * @param title - Title of manga. By default, it searches for all mangas that have matching keywords. If you want to only search for a specific keyword (such as author name only), pass in an object containing all or either values: `author`, `artist`, `title`
+   * @param filters - Filters to apply when searching up the manga.
    * @param callback - Callback function
    * @returns Returns an array of manga from manganato
    * @example
    * ```js
-   * import { MangaNato } from "@specify_/mangascraper";
-   * const manganato = new MangaNato();
+   * import { Manganato } from "@specify_/mangascraper";
+   * const manganato = new Manganato();
    *
-   * async function test() {
-   *  const mostViewedRomanceMangas = await manganato.getMangas(null, { genre: { include: ['Romance'] }, orderBy: 'top_view' });
-   *
-   *  const newIsekaiMangas = await manganato.getMangas(null, { genre: { include: ['Isekai', 'Action', 'Fantasy'] }, orderBy: 'new_manga' });
-   *
-   * const titlesWithMyHeroAcademia = await manganato.getMangas('my hero academia');
-   *
-   * console.log(mostViewedRomanceMangas); // Output: [{ ...views: '334,592,606' }, { ...views: '162,501,040' }, ...]
-   * console.log(newIsekaiMangas); // Output: [{ title: 'Survival Story Of A Sword King...' ... }, { title: 'People Made Fun Of Me For Being Jobless...' }, ...]
-   * }
-   * console.log(titlesWithMyHeroAcademia); // Output: [{ title: 'Boku No Hero Academia', ... }, { title: 'My Hero Academia Team Up Mission'}, ... ]
+   * (async () => {
+   *  const mangas = manganato.search({ title: "black clover" });
+   *  console.log(mangas); // Output: [{ title: "Black Clover" ...}, ... ]
+   * })();
    * ```
    */
   public search(
     title?: MangaSearch<Manganato>,
-    options: MangaFilters<Manganato> = {},
+    filters: MangaFilters<Manganato> = {},
     callback: MangaCallback<ManganatoManga[]> = () => {},
   ): Promise<ManganatoManga[]> {
-    const { genre = null, status = '', orderBy = 'latest_updates', page = 1 } = options;
+    const { genre = null, status = '', orderBy = 'latest_updates', page = 1 } = filters;
 
     function generateURL(): string {
       let g_i: string = ''; // short for genre_includes
@@ -408,7 +401,7 @@ export default class Manganato {
   /**
    * Get a list of manga that contain the given genre.
    * This can only search for one genre at a time, so if you
-   * want to search multiple genres, use the `getMangas()` method instead.
+   * want to search multiple genres, use the `search()` method instead.
    *
    * @param genre - A manga genre (e.g. Comedy, Fantasy)
    * @param options - Options to add to search (e.g. Filter results for ongoing mangas)
