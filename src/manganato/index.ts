@@ -10,12 +10,10 @@ import {
   MangaGenres,
   MangaMeta,
   MangaFilters,
-  ManganatoOptions,
   MangaRating,
-  MangaNatoGenres,
-  MangaNatoGenre,
+  ManganatoGenres,
+  ManganatoGenre,
   MangaNatoGenreOptions,
-  MangakakalotGenres,
   ManganatoManga,
   MangaSearch,
 } from '../';
@@ -90,10 +88,10 @@ export default class Manganato {
       /** Check if there is a genre object */
       if (genre) {
         /** Put each genre from 'includes' into 'genre_includes' */
-        g_i = (genre.include && `g_i=_${genre.include.map((genre) => MangaNatoGenres[genre]).join('_')}_`) || '';
+        g_i = (genre.include && `g_i=_${genre.include.map((genre) => ManganatoGenres[genre]).join('_')}_`) || '';
 
         /** Put each genre from 'excludes' into 'genre_excludes' */
-        g_e = (genre.exclude && `g_e=_${genre.exclude.map((genre) => MangaNatoGenres[genre]).join('_')}_`) || '';
+        g_e = (genre.exclude && `g_e=_${genre.exclude.map((genre) => ManganatoGenres[genre]).join('_')}_`) || '';
       }
       let url_args: string[] = [g_i, g_e, sts, orby, keyw].filter((arg) => arg.length > 0);
 
@@ -431,7 +429,7 @@ export default class Manganato {
    * ```
    */
   public getMangasFromGenre(
-    genre: MangaNatoGenre,
+    genre: ManganatoGenre,
     options: MangaNatoGenreOptions = {},
     callback: MangaCallback<ManganatoManga[]> = () => {},
   ): Promise<ManganatoManga[]> {
@@ -440,7 +438,7 @@ export default class Manganato {
     function generateURL(): string {
       const filter_state = `state=${status}`;
       const filter_type = `type=${type === 'updated' ? 'latest' : 'newest'}`;
-      const base_url = `https://manganato.com/genre-${MangaNatoGenres[genre]}/${page}?${filter_type}&${filter_state}`;
+      const base_url = `https://manganato.com/genre-${ManganatoGenres[genre]}/${page}?${filter_type}&${filter_state}`;
 
       return base_url;
     }
