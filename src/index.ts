@@ -90,9 +90,15 @@ export type MangaMeta<T> = T extends Mangakakalot | Manganato
         main: string;
         alt: string[];
       };
+      summary: string;
       authors: string[];
       artists: string[];
-      type: Omit<MangahasuType, 'any'>;
+      type: string;
+      status: string;
+      views: string;
+      rating: MangaRating;
+      coverImage: MangaCoverImage;
+      chapters: MangaChapters[];
     }
   : never;
 
@@ -104,7 +110,7 @@ export type MangaAuthors = {
 export interface MangaChapters {
   name: string;
   url: string;
-  views: string;
+  views?: string;
   uploadDate: Date;
 }
 
@@ -166,10 +172,10 @@ export interface MangahasuOptions {
 export type MangahasuType = keyof typeof MangahasuTypes;
 
 export enum MangahasuTypes {
-  'any' = '',
-  'manga' = '10',
-  'manhwa' = '12',
-  'manhua' = '19',
+  'Any' = '',
+  'Manga' = '10',
+  'Manhwa' = '12',
+  'Manhua' = '19',
 }
 
 type MangakakalotGenre = keyof typeof MangakakalotGenres;
