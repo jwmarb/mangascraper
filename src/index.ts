@@ -111,7 +111,7 @@ export interface MangakakalotOptions {
 }
 
 export interface ManganatoOptions {
-  genre?: { include?: MangaNatoGenre[]; exclude?: MangaNatoGenre[] } | null;
+  genre?: { include?: ManganatoGenre[]; exclude?: ManganatoGenre[] } | null;
   status?: MangaStatus | null;
   orderBy?: MangaOrder;
   page?: number;
@@ -133,8 +133,8 @@ export type MangaAge = 'new' | 'updated';
 
 export interface MangahasuOptions {
   genres?: {
-    include?: MangaHasuGenre[];
-    exclude?: MangaHasuGenre[];
+    include?: MangahasuGenre[];
+    exclude?: MangahasuGenre[];
   };
   searchFor?: 'title' | 'author/artist';
   status?: MangaStatus;
@@ -144,11 +144,11 @@ export interface MangahasuOptions {
 
 export type MangakakalotGenre = keyof typeof MangakakalotGenres;
 
-export type MangaNatoGenre = keyof typeof MangaNatoGenres;
+export type ManganatoGenre = keyof typeof ManganatoGenres;
 
-export type MangaHasuGenre = keyof typeof MangaHasuGenres;
+export type MangahasuGenre = keyof typeof MangahasuGenres;
 
-export enum MangaHasuGenres {
+export enum MangahasuGenres {
   '4-koma' = '46',
   'Action' = '1',
   'Adaptation' = '101',
@@ -307,7 +307,7 @@ export enum MangakakalotGenres {
   'Yuri' = '42',
 }
 
-export enum MangaNatoGenres {
+export enum ManganatoGenres {
   'Action' = '2',
   'Adult' = '3',
   'Adventure' = '4',
