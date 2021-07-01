@@ -95,26 +95,31 @@ export interface MangaNatoGenreOptions {
 
 export type MangaStatus = 'ongoing' | 'completed' | 'all';
 
+export type MangaType = 'manga' | 'manhwa' | 'manhua' | 'unknown';
+
 export type MangaAge = 'new' | 'updated';
 
 export type MangaParkRating = '5 stars' | '4 stars' | '3 stars' | '2 stars' | '1 stars' | '0 stars';
 
 export interface MangaParkOptions {
   genres?: {
-    include?: MangaParkGenre[];
-    exclude?: MangaParkGenre[];
+    include?: MangaParkv2Genre[];
+    exclude?: MangaParkv2Genre[];
   };
+  searchFor?: 'title' | 'author/artist';
   status?: MangaStatus;
   rating?: MangaParkRating;
+  type?: MangaType;
+  yearReleased?: number | null;
 }
 
 export type MangakakalotGenre = keyof typeof MangakakalotGenres;
 
 export type MangaNatoGenre = keyof typeof MangaNatoGenres;
 
-export type MangaParkGenre = keyof typeof MangaParkGenres;
+export type MangaParkv2Genre = keyof typeof MangaParkv2Genres;
 
-export enum MangaParkGenres {
+export enum MangaParkv2Genres {
   '4 koma' = '4-koma',
   'Aliens' = 'aliens',
   'Cooking' = 'cooking',
