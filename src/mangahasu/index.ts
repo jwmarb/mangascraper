@@ -1,3 +1,4 @@
+import moment from 'moment';
 import {
   MangaCallback,
   Manga,
@@ -12,6 +13,7 @@ import {
   MangaChapters,
 } from '..';
 import failure from '../functions/failure';
+import numberSeperator from '../functions/numberSeperator';
 import readHtml from '../functions/readHtml';
 import splitAltTitles from '../functions/splitAltTitles';
 import success from '../functions/success';
@@ -122,6 +124,23 @@ export default class Mangahasu {
     });
   }
 
+  /**
+   * Get metadata of a manga from its url
+   *
+   * @param url - URL of manga
+   * @param callback - Callback function
+   * @returns Returns the metadata of a manga from the given url
+   * @example
+   * ```js
+   * import { Mangahasu } from "@specify_/mangascraper";
+   * const mangahasu = new Mangahasu();
+   *
+   * (async () => {
+   *  const one_piece = await mangahasu.getMangaMeta('https://mangahasu.se/one-piece-p10328.html');
+   *  console.log(one_piece); // Output: { title: { main: "One Piece", alt: ["ワンピース", ... ] }, ... }
+   * })();
+   * ```
+   */
   public getMangaMeta(
     url: string,
     callback: MangaCallback<MangaMeta<Mangahasu>> = () => {},
@@ -134,13 +153,14 @@ export default class Mangahasu {
         let title: string = '';
         let altTitles: string[] = [];
         let summary: string = '';
-        const authors: string[] = [];
-        const artists: string[] = [];
+        let authors: string[] = [];
+        let artists: string[] = [];
+        let genres: string[] = [];
         let type: string = '';
         let status: string = '';
         let views: string = '';
         let rating: MangaRating = {} as MangaRating;
-        let coverImages: MangaCoverImage = {} as MangaCoverImage;
+        let coverImage: MangaCoverImage = {} as MangaCoverImage;
         const chapters: MangaChapters[] = [];
 
         /** Get manga title */
@@ -150,12 +170,87 @@ export default class Mangahasu {
         altTitles = splitAltTitles($(`div.info-title > h3`).text());
 
         /** Get manga summary */
-        summary = $(`div.content-info > div > p`).text();
+        summary = $(`div.content-info > h3:contains("Summary")`).siblings('div').text().trim();
 
-        success({ title: { main: title, alt: altTitles }, summary } as any, callback, res);
+        /** Get manga authors */
+        authors = $(`div.row > b:contains("Author(s)")`).siblings('span.info').text().trim().split('; ');
+
+        /** Get manga artists */
+        artists = $(`div.box-des > div.detail_item > b:contains("Artist(s)")`)
+          .siblings('span.info')
+          .text()
+          .trim()
+          .split('; ');
+
+        /** Get manga type */
+        type = $(`div.detail_item > b:contains("Type")`).siblings('span.info').text().trim();
+
+        /** Get manga genres */
+        genres = $(`div.detail_item > b:contains("Genre(s)")`).siblings('span.info').text().trim().split(', ');
+
+        /** Get status of the manga */
+        status = $(`div.detail_item > b:contains("Status")`).siblings('span.info').text().trim();
+
+        /** Get manga views */
+        views = numberSeperator(
+          $(`div.detail_item > div.row > b:contains("Views")`).siblings('span.info').text().trim(),
+        );
+
+        /** Get manga rating */
+        let rating_stars = `${$(`div[class="div-evaluate detail_item"] > span.info > span.ratings`).text().trim()}/5`;
+        let rating_percentage = `${(
+          (Number($(`div[class="div-evaluate detail_item"] > span.info > span.ratings`).text().trim()) / 5) *
+          100
+        ).toFixed(2)}%`;
+        let voteCount = Number(
+          $(`div[class="div-evaluate detail_item"] > span.info > span.div_evaluate`).text().trim(),
+        );
+        rating = {
+          sourceRating: 'Mangahasu.se',
+          rating_percentage,
+          rating_stars,
+          voteCount,
+        };
+
+        /** Get manga cover image */
+        const img = $(`div.container > div.wrapper_content > div.info-img > img`).attr('src');
+        const alt = $(`div.container > div.wrapper_content > div.info-img > img`).attr('alt');
+        coverImage = { url: img, alt: typeof alt !== 'undefined' ? alt : '' };
+
+        /** Get manga chapters */
+        $(`div.content-info > div.list-chapter > table.table > tbody > tr`).each((_, el) => {
+          const anchorEl = $(el).children('td.name').children('a');
+          const chapter_name = anchorEl.text().replace(title, '').trim();
+          const chapter_url = anchorEl.attr('href');
+          const chapter_date = moment($(el).children('td.date-updated').text().trim(), 'MMM DD, YYYY').toDate();
+          if (typeof chapter_url !== 'undefined')
+            chapters.push({ name: chapter_name, url: chapter_url, uploadDate: chapter_date });
+        });
+
+        success(
+          {
+            title: { main: title, alt: altTitles },
+            summary,
+            authors,
+            artists,
+            type,
+            status,
+            genres,
+            views,
+            rating,
+            coverImage,
+            chapters,
+          },
+          callback,
+          res,
+        );
       } catch (e) {
         return failure(new Error(e), callback);
       }
     });
+  }
+
+  public getPages(url: string, callback: MangaCallback<string>): Promise<string[]> {
+    return new Promise(async (res) => {});
   }
 }
