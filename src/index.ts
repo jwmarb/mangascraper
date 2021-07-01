@@ -1,7 +1,11 @@
+import Mangahasu from './mangahasu';
+import Mangakakalot from './mangakakalot';
+import Manganato from './manganato';
+
 export { default as Mangakakalot } from './mangakakalot';
 export { default as MangaNato } from './manganato';
 
-export type CallbackFunc<T> = (error?: Error | undefined, result?: T) => void;
+export type MangaCallback<T> = (error?: Error | undefined, result?: T) => void;
 
 export interface Manga {
   title: string;
@@ -22,15 +26,23 @@ export interface MangahasuManga {
 
 export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'everything'; search: string } | string;
 
-export type MangaSearch<T> = T extends ManganatoManga
+export type MangaSearch<T> = T extends Manganato
   ? ManganatoQuery
   :
       | {
           title: string;
-          author?: T extends MangahasuManga ? string : never;
-          artist?: T extends MangahasuManga ? string : never;
+          author?: T extends Mangahasu ? string : never;
+          artist?: T extends Mangahasu ? string : never;
         }
       | string;
+
+export type MangaFilters<T> = T extends Manganato
+  ? ManganatoOptions
+  : T extends Mangakakalot
+  ? MangakakalotOptions
+  : T extends 'Mangahasu'
+  ? MangahasuOptions
+  : never;
 
 export interface MangaList {
   title: string;
@@ -98,7 +110,7 @@ export interface MangakakalotOptions {
   page?: number;
 }
 
-export interface MangaNatoOptions {
+export interface ManganatoOptions {
   genre?: { include?: MangaNatoGenre[]; exclude?: MangaNatoGenre[] } | null;
   status?: MangaStatus | null;
   orderBy?: MangaOrder;
@@ -119,7 +131,7 @@ export type MangaType = 'manga' | 'manhwa' | 'manhua' | 'any';
 
 export type MangaAge = 'new' | 'updated';
 
-export interface MangaHasuOptions {
+export interface MangahasuOptions {
   genres?: {
     include?: MangaHasuGenre[];
     exclude?: MangaHasuGenre[];
@@ -129,14 +141,6 @@ export interface MangaHasuOptions {
   type?: MangaType;
   page?: number;
 }
-
-export type MangaHasuSearch =
-  | {
-      title?: string;
-      author?: string;
-      artist?: string;
-    }
-  | string;
 
 export type MangakakalotGenre = keyof typeof MangakakalotGenres;
 
