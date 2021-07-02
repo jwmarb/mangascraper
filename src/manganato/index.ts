@@ -161,8 +161,14 @@ export default class Manganato {
   /**
    * Search up a manga from Manganato (uses built-in advanced search)
    *
-   * @param title - Title of manga. By default, it searches for all mangas that have matching keywords. If you want to only search for a specific keyword (such as author name only), pass in an object containing all or either values: `author`, `artist`, `title`
+   * @param title - Title of manga. By default, it searches for all mangas that have matching keywords. If you want to only search for a specific keyword (such as author name only), pass in an object with the key `keywords` containing either values: `author`, `artist`, `title`.
+   * ```js
+   * await manganato.search({ keywords: 'title', search: 'YOUR TITLE' });
+   * ```
    * @param filters - Filters to apply when searching up the manga.
+   * ```js
+   * await manganato.search(null, { genres: { include: ["Comedy"], exclude: ["Action"] } });
+   * ```
    * @param callback - Callback function
    * @returns Returns an array of manga from manganato
    * @example
@@ -181,7 +187,9 @@ export default class Manganato {
     filters: MangaFilters<Manganato> = {},
     callback: MangaCallback<Manga<Manganato>[]> = () => {},
   ): Promise<Manga<Manganato>[]> {
-    const { genre = null, status = '', orderBy = 'latest_updates', page = 1 } = filters;
+    if (filters === null) filters = {};
+    if (title === null) title = '';
+    const { genre = {}, status = '', orderBy = 'latest_updates', page = 1 } = filters;
 
     function generateURL(): string {
       let g_i: string = ''; // short for genre_includes
@@ -216,7 +224,7 @@ export default class Manganato {
       })(); // short for Order By
 
       /** Check if there is a genre object */
-      if (genre) {
+      if (genre !== null && typeof genre !== 'undefined') {
         /** Put each genre from 'includes' into 'genre_includes' */
         g_i = (genre.include && `g_i=_${genre.include.map((genre) => ManganatoGenres[genre]).join('_')}_`) || '';
 
