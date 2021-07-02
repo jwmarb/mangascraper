@@ -378,7 +378,6 @@ export default class Mangakakalot {
    * Get a list of manga from mangakakalot
    *
    * @param filters - Filters to apply based on mangakakalot's query system
-   * @param page - Page # for Pagination
    * @param callback - Callback function
    * @returns Returns a list of manga from mangakakalot
    * @example
