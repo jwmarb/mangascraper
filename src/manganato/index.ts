@@ -263,7 +263,7 @@ export default class Manganato {
           `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-author`,
         ).each((_, element) => {
           const author = $(element).text();
-          if (typeof author !== 'undefined') authors.push(author.split(','));
+          if (typeof author !== 'undefined') authors.push(author.split(',').map((author) => author.trim()));
         });
 
         /** Get manga date */
@@ -619,7 +619,7 @@ export default class Manganato {
           `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-author`,
         ).each((_, el) => {
           const author = $(el).text();
-          if (typeof author !== 'undefined') authors.push(author.split(','));
+          if (typeof author !== 'undefined') authors.push(author.split(',').map((author) => author.trim()));
         });
 
         /** Get manga cover image */
