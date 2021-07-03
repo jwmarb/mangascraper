@@ -1,6 +1,6 @@
 {
   "name": "@specify_/mangascraper",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A mangascraper for fetching manga from a variety of manga sources (mangakakalot, manganato, and etc.)",
   "private": false,
   "main": "lib/index.js",
