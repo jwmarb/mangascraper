@@ -30,7 +30,7 @@ export default class Manganato {
    * Get a list of manga.
    * This uses MangaNato's advanced search. You can sort by most views.
    *
-   * @deprecated This method has been superseded by `search()` and will no longer be updated. It will be removed by v3.0.0
+   * @deprecated This method has been superseded by `search()` and will no longer be updated. It will be removed by `v3.0.0`
    * @param title - Title of the manga
    * @param callback - Callback function
    * @returns Returns an array of manga from manganato
