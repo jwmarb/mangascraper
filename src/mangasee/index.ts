@@ -8,10 +8,11 @@ export default class MangaSee {
     this.options = options;
   }
 
-  public async search(query: string): Promise<any> {
+  public async search(query: string) {
     return await automateBrowser(this.options, async (page) => {
       await page.goto('https://mangasee123.com/search/', { waitUntil: 'networkidle2' });
-      await page.waitForTimeout(5000);
+      const html = await page.evaluate(() => document.querySelector('*')?.outerHTML);
+      return html;
     });
   }
 }

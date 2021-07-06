@@ -10,7 +10,7 @@ export { default as MangaSee } from './mangasee';
 
 export type MangaCallback<T> = (error?: Error | undefined, result?: T) => void;
 
-export type AutomatedCallback = (page: Page) => Promise<void>;
+export type AutomatedCallback<T> = (page: Page) => Promise<T>;
 
 export interface MangaBase {
   title: string;
