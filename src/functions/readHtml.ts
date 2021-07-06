@@ -10,7 +10,7 @@ export default async function readHtml(
   options: ScrapingOptions = {},
   method: ScrapeMethod = 'normal',
 ): Promise<CheerioAPI> {
-  const { proxy, debug } = options;
+  const { proxy, debug = false } = options;
 
   switch (method) {
     case 'normal':
