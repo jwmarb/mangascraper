@@ -55,15 +55,15 @@ export default class Manganato {
     filters: MangaFilters<Manganato> = {},
     callback: MangaCallback<Manga<Manganato>[]> = () => {},
   ): Promise<Manga<Manganato>[]> {
-    if (filters === null) filters = {};
-    if (title === null) title = '';
+    if (filters == null) filters = {};
+    if (title == null) title = '';
     const { genre = {}, status = '', orderBy = 'latest_updates', page = 1 } = filters;
 
     function generateURL(): string {
       let g_i: string = ''; // short for genre_includes
       let g_e: string = ''; // short for genre_excludes
       const keyw: string = (() => {
-        if (typeof title === 'undefined' || title === null) return '';
+        if (title == null) return '';
         if (typeof title === 'string') return `keyw=${title.replace(/[^a-zA-Z0-9]/g, '_')}`;
         const { search, keywords } = title;
         if (keywords === 'title') return `keyw=${search.replace(/[^a-zA-Z0-9]/g, '_')}`;
@@ -92,7 +92,7 @@ export default class Manganato {
       })(); // short for Order By
 
       /** Check if there is a genre object */
-      if (genre !== null && typeof genre !== 'undefined') {
+      if (genre != null) {
         /** Put each genre from 'includes' into 'genre_includes' */
         g_i = (genre.include && `g_i=_${genre.include.map((genre) => ManganatoGenres[genre]).join('_')}_`) || '';
 
