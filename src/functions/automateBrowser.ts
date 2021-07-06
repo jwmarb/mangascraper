@@ -11,7 +11,7 @@ export default async function automateBrowser<T>(options: ScrapingOptions, callb
   const puppeteer_args = [args_proxy_server].filter((item) => Boolean(item)) as string[];
 
   try {
-    const browser = await puppeteer.launch({ headless: debug, args: puppeteer_args });
+    const browser = await puppeteer.launch({ headless: !debug, args: puppeteer_args });
     const page = await browser.newPage();
     return await callback(page).finally(async () => await browser.close());
   } catch (e) {
