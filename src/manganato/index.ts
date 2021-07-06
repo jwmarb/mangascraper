@@ -14,16 +14,23 @@ import {
   MangaSearch,
   Manga,
   MangaGenreFilters,
+  ScrapingOptions,
 } from '../';
 import moment from 'moment';
 import splitAltTitles from '../functions/splitAltTitles';
 
 export default class Manganato {
+  private options: ScrapingOptions = {};
+
+  constructor(options: ScrapingOptions = {}) {
+    this.options = options;
+  }
+
   /**
    * Get a list of manga.
    * This uses MangaNato's advanced search. You can sort by most views.
    *
-   * @deprecated This method has been superseded by `search()` and will no longer be updated
+   * @deprecated This method has been superseded by `search()` and will no longer be updated. It will be removed by v3.0.0
    * @param title - Title of the manga
    * @param callback - Callback function
    * @returns Returns an array of manga from manganato
@@ -240,7 +247,7 @@ export default class Manganato {
 
       try {
         /** Parse HTML document */
-        const $ = await readHtml(generateURL());
+        const $ = await readHtml(generateURL(), this.options);
         const titles: string[] = [];
         const urls: string[] = [];
         const authors: string[][] = [];
@@ -333,7 +340,7 @@ export default class Manganato {
       if (typeof url === 'undefined') return failure(new Error("Argument 'url' is required"));
       try {
         /** Parse HTML Document */
-        const $ = await readHtml(url);
+        const $ = await readHtml(url, this.options);
         let mainTitle: string = '';
         let altTitles: string[] = [];
         let authors: MangaAuthors[] = [];
@@ -522,7 +529,7 @@ export default class Manganato {
 
       try {
         /** Parse HTML Document */
-        const $ = await readHtml(url);
+        const $ = await readHtml(url, this.options);
         const pages: string[] = [];
 
         /** Get each page url */
@@ -582,7 +589,7 @@ export default class Manganato {
 
       try {
         /** Parse HTML document */
-        const $ = await readHtml(generateURL());
+        const $ = await readHtml(generateURL(), this.options);
         const titles: string[] = [];
         const urls: string[] = [];
         const authors: string[][] = [];

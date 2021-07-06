@@ -11,6 +11,7 @@ import {
   MangaMeta,
   MangaRating,
   MangaChapters,
+  ScrapingOptions,
 } from '..';
 import failure from '../functions/failure';
 import numberSeperator from '../functions/numberSeperator';
@@ -19,6 +20,11 @@ import splitAltTitles from '../functions/splitAltTitles';
 import success from '../functions/success';
 
 export default class Mangahasu {
+  private options: ScrapingOptions = {};
+
+  constructor(options: ScrapingOptions = {}) {
+    this.options = options;
+  }
   /**
    *
    * @param title - Search manga, name of author and artist. If you only want to search for a specific characteristic of a manga (such as searching for author name only), use an object which has the fields `author`, `artist`, and `title`
@@ -91,7 +97,7 @@ export default class Mangahasu {
 
       try {
         /** Parse HTML Document */
-        const $ = await readHtml(generateURL());
+        const $ = await readHtml(generateURL(), this.options);
         const titles: string[] = [];
         const urls: string[] = [];
         const coverImages: MangaCoverImage[] = [];
@@ -151,7 +157,7 @@ export default class Mangahasu {
       if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
       try {
         /** Parse HTML document */
-        const $ = await readHtml(url);
+        const $ = await readHtml(url, this.options);
         let title: string = '';
         let altTitles: string[] = [];
         let summary: string = '';
@@ -275,7 +281,7 @@ export default class Mangahasu {
       if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
       try {
         /** parse HTML document */
-        const $ = await readHtml(url);
+        const $ = await readHtml(url, this.options);
         const pages: string[] = [];
 
         /** Get URLs of each img element */

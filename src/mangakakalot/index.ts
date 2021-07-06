@@ -15,10 +15,17 @@ import {
   MangakakalotGenres,
   MangaFilters,
   Manga,
+  ScrapingOptions,
 } from '../';
 import splitAltTitles from '../functions/splitAltTitles';
 
 export default class Mangakakalot {
+  private options: ScrapingOptions = {};
+
+  constructor(options: ScrapingOptions = {}) {
+    this.options = options;
+  }
+
   /**
    * Get a list of manga that match the title
    *
@@ -152,7 +159,7 @@ export default class Mangakakalot {
 
       try {
         /** Load HTML Document to cheerio to extract HTML data */
-        const $ = await readHtml(generateURL());
+        const $ = await readHtml(generateURL(), this.options);
         const links: string[] = [];
         const titles: string[] = [];
         const authors: string[][] = [];
@@ -241,7 +248,7 @@ export default class Mangakakalot {
       if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
       try {
         /** Load HTML Document to cheerio to extract HTML data */
-        const $ = await readHtml(url);
+        const $ = await readHtml(url, this.options);
         let mainTitle: string = '';
         let altTitles: string[] = [];
         let status: string = '';
@@ -410,6 +417,7 @@ export default class Mangakakalot {
           `https://mangakakalot.com/manga_list?type=${type === 'updated' ? 'latest' : 'newest'}&category=${
             MangakakalotGenres[genre || 'All']
           }&state=${status}&page=${page}`,
+          this.options,
         );
         const titles: string[] = [];
         const urls: string[] = [];
@@ -485,7 +493,7 @@ export default class Mangakakalot {
 
       try {
         /** Parse HTML document */
-        const $ = await readHtml(url);
+        const $ = await readHtml(url, this.options);
         const pages: string[] = [];
 
         /** Get image URLs */

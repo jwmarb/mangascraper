@@ -68,6 +68,14 @@ export type MangaGenre<T> = T extends Mangakakalot
   ? MangahasuGenre
   : never;
 
+export interface ScrapingOptions {
+  proxy?: {
+    host: string;
+    port: number;
+  };
+  debug?: boolean;
+}
+
 export type MangaMeta<T> = T extends Mangakakalot | Manganato
   ? {
       title: {
