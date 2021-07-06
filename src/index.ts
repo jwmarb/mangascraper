@@ -1,3 +1,4 @@
+import { Page } from 'puppeteer';
 import Mangahasu from './mangahasu';
 import Mangakakalot from './mangakakalot';
 import Manganato from './manganato';
@@ -7,6 +8,8 @@ export { default as Manganato } from './manganato';
 export { default as Mangahasu } from './mangahasu';
 
 export type MangaCallback<T> = (error?: Error | undefined, result?: T) => void;
+
+export type AutomatedCallback = (page: Page) => Promise<void>;
 
 export interface MangaBase {
   title: string;
