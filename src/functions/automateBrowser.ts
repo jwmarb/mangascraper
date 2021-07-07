@@ -1,11 +1,15 @@
-import { Page } from 'puppeteer';
+import { BrowserEmittedEvents, Page } from 'puppeteer';
 import randomUserAgent from 'random-useragent';
 import preload from './preload';
 
 import puppeteer from 'puppeteer';
 import { AutomatedCallback, ScrapingOptions } from '..';
 
-export default async function automateBrowser<T>(options: ScrapingOptions, callback: AutomatedCallback<T>): Promise<T> {
+export default async function automateBrowser<T>(
+  options: ScrapingOptions,
+  callback: AutomatedCallback<T>,
+  requestURLs?: string[],
+) {
   const { proxy, debug = false } = options;
 
   const args_proxy_server = typeof proxy !== 'undefined' && `--proxy-server=${proxy.host}:${proxy.port}`;
@@ -33,7 +37,22 @@ export default async function automateBrowser<T>(options: ScrapingOptions, callb
     const page = (await browser.pages())[0];
     await page.setViewport({ width: 1920, height: 1080 });
     await page.evaluateOnNewDocument(preload);
-    return await callback(page).finally(async () => await browser.close());
+    if (requestURLs != null) {
+      await page.setRequestInterception(true);
+      await page.on('request', (request) => {
+        if (
+          ['image', 'stylesheet', 'font'].indexOf(request.resourceType()) !== -1 ||
+          !requestURLs.some((url) => request.url().startsWith(url))
+        ) {
+          request.abort();
+        } else request.continue();
+      });
+    }
+    return await callback(page).finally(async () => {
+      const pages = await browser.pages();
+      await Promise.all(pages.map((page) => page.close()));
+      await browser.close();
+    });
   } catch (e) {
     throw Error(e);
   }
