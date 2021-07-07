@@ -54,17 +54,13 @@ export default class Mangahasu {
     function generateURL(): string {
       const keyword: string = (() => {
         if (typeof title === 'string') return `keyword=${encodeURIComponent(title)}`;
-        return typeof title.title !== 'undefined' ? `keyword=${encodeURIComponent(title.title)}` : '';
+        return title.title != null ? `keyword=${encodeURIComponent(title.title)}` : '';
       })();
 
       const author: string =
-        typeof title !== 'string' && typeof title.author !== 'undefined'
-          ? `author=${encodeURIComponent(title.author)}`
-          : '';
+        typeof title !== 'string' && title.author != null ? `author=${encodeURIComponent(title.author)}` : '';
       const artist: string =
-        typeof title !== 'string' && typeof title.artist !== 'undefined'
-          ? `artist=${encodeURIComponent(title.artist)}`
-          : '';
+        typeof title !== 'string' && title.artist != null ? `artist=${encodeURIComponent(title.artist)}` : '';
 
       const typeid: string = type !== 'any' ? `typeid=${MangahasuTypes[type]}` : '';
 
@@ -87,41 +83,44 @@ export default class Mangahasu {
 
     return new Promise(async (res) => {
       if (page <= 0) return failure(new Error('"page" must be greater than 0'), callback);
-      if (
-        typeof title !== 'string' &&
-        typeof title.artist === 'undefined' &&
-        typeof title.title === 'undefined' &&
-        typeof title.author === 'undefined'
-      )
-        title = '';
+      if (typeof title !== 'string' && title.artist == null && title.title == null && title.author == null) title = '';
 
       try {
         /** Parse HTML Document */
         const $ = await readHtml(generateURL(), this.options);
-        const titles: string[] = [];
-        const urls: string[] = [];
-        const coverImages: MangaCoverImage[] = [];
 
         /** Get manga titles and URLs */
-        $(`ul.list_manga > li > div.div_item > div.info-manga > a.name-manga`).each((_, el) => {
-          const title = $(el).text();
-          const url = $(el).attr('href');
-          if (typeof url !== 'undefined' && typeof title !== 'undefined') {
-            urls.push(url);
-            titles.push(title.trim());
-          }
-        });
+        const titlesURL = $(`ul.list_manga > li > div.div_item > div.info-manga > a.name-manga`)
+          .map((_, el) => {
+            const title = $(el).text();
+            const url = $(el).attr('href');
+            if (typeof url !== 'undefined' && typeof title !== 'undefined') {
+              return {
+                title: title.trim(),
+                url,
+              };
+            }
+          })
+          .get();
 
         /** Get manga covers */
-        $(`ul.list_manga > li > div.div_item > div.wrapper_imgage > a > img`).each((_, el) => {
-          const img = $(el).attr('src');
-          const alt = $(el).attr('alt');
-          if (typeof alt !== 'undefined') coverImages.push({ url: img, alt });
-        });
+        const coverImages: MangaCoverImage[] = $(`ul.list_manga > li > div.div_item > div.wrapper_imgage > a > img`)
+          .map((_, el) => {
+            const img = $(el).attr('src');
+            const alt = $(el).attr('alt');
+            if (typeof alt !== 'undefined') return { url: img, alt };
+          })
+          .get();
 
-        const mangaList: Manga<Mangahasu>[] = new Array(titles.length).fill('').map((_, i) => ({
-          title: titles[i],
-          url: urls[i],
+        // const mangaList: Manga<Mangahasu>[] = [];
+
+        // for (let i = 0; i < titlesURL.length; i++) {
+        //   mangaList.push({ title: titlesURL[i].title, url: titlesURL[i].url, coverImage: coverImages[i] });
+        // }
+
+        const mangaList: Manga<Mangahasu>[] = titlesURL.map(({ title, url }, i) => ({
+          title,
+          url,
           coverImage: coverImages[i],
         }));
 
@@ -154,7 +153,7 @@ export default class Mangahasu {
     callback: MangaCallback<MangaMeta<Mangahasu>> = () => {},
   ): Promise<MangaMeta<Mangahasu>> {
     return new Promise(async (res) => {
-      if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
+      if (url == null) return failure(new Error('Argument "url" is required'), callback);
       try {
         /** Parse HTML document */
         const $ = await readHtml(url, this.options);
@@ -169,7 +168,6 @@ export default class Mangahasu {
         let views: string = '';
         let rating: MangaRating = {} as MangaRating;
         let coverImage: MangaCoverImage = {} as MangaCoverImage;
-        const chapters: MangaChapters[] = [];
 
         /** Get manga title */
         title = $(`div.info-title > h1`).text();
@@ -226,14 +224,16 @@ export default class Mangahasu {
         coverImage = { url: img, alt: typeof alt !== 'undefined' ? alt : '' };
 
         /** Get manga chapters */
-        $(`div.content-info > div.list-chapter > table.table > tbody > tr`).each((_, el) => {
-          const anchorEl = $(el).children('td.name').children('a');
-          const chapter_name = anchorEl.text().replace(title, '').trim();
-          const chapter_url = anchorEl.attr('href');
-          const chapter_date = moment($(el).children('td.date-updated').text().trim(), 'MMM DD, YYYY').toDate();
-          if (typeof chapter_url !== 'undefined')
-            chapters.push({ name: chapter_name, url: chapter_url, uploadDate: chapter_date });
-        });
+        const chapters: MangaChapters[] = $(`div.content-info > div.list-chapter > table.table > tbody > tr`)
+          .map((_, el) => {
+            const anchorEl = $(el).children('td.name').children('a');
+            const chapter_name = anchorEl.text().replace(title, '').trim();
+            const chapter_url = anchorEl.attr('href');
+            const chapter_date = moment($(el).children('td.date-updated').text().trim(), 'MMM DD, YYYY').toDate();
+            if (typeof chapter_url !== 'undefined')
+              return { name: chapter_name, url: chapter_url, uploadDate: chapter_date };
+          })
+          .get();
 
         success(
           {
@@ -278,18 +278,19 @@ export default class Mangahasu {
    */
   public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
     return new Promise(async (res) => {
-      if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
+      if (url == null) return failure(new Error('Argument "url" is required'), callback);
       try {
         /** parse HTML document */
         const $ = await readHtml(url, this.options);
-        const pages: string[] = [];
 
         /** Get URLs of each img element */
-        $(`div.img-chapter > div.img > img`).each((_, el) => {
-          const img = $(el).attr('src');
+        const pages: string[] = $(`div.img-chapter > div.img > img`)
+          .map((_, el) => {
+            const img = $(el).attr('src');
 
-          if (typeof img !== 'undefined') pages.push(img);
-        });
+            if (typeof img !== 'undefined') return img;
+          })
+          .get();
 
         success(pages, callback, res);
       } catch (e) {

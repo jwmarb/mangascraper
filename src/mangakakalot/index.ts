@@ -16,6 +16,7 @@ import {
   MangaFilters,
   Manga,
   ScrapingOptions,
+  MangaGenre,
 } from '../';
 import splitAltTitles from '../functions/splitAltTitles';
 
@@ -64,12 +65,10 @@ export default class Mangakakalot {
       try {
         /** Load HTML Document to cheerio to extract HTML data */
         const $ = await readHtml(generateURL(), this.options);
-        const links: string[] = [];
-        const titles: string[] = [];
+
         const authors: string[][] = [];
         const views: string[] = [];
         const updatedAt: Date[] = [];
-        const coverImage: MangaCoverImage[] = [];
 
         /** Simple string date converter to Date type */
         function convertToDate(date: string): Date {
@@ -77,24 +76,30 @@ export default class Mangakakalot {
         }
 
         /** Gets all URLs to their respected manga */
-        $(`div.story_item > div.story_item_right > h3.story_name > a`).each((index, element) => {
-          const link = $(element).attr('href');
+        const links: string[] = $(`div.story_item > div.story_item_right > h3.story_name > a`)
+          .map((index, element) => {
+            const link = $(element).attr('href');
 
-          if (typeof link !== 'undefined') links.push(link);
-        });
+            if (typeof link !== 'undefined') return link;
+          })
+          .get();
 
         /** Gets all Titles */
-        $(`div.story_item > div.story_item_right > h3.story_name > a`).each((index, element) => {
-          const title = $(element).text();
-          if (typeof title !== 'undefined') titles.push(title);
-        });
+        const titles: string[] = $(`div.story_item > div.story_item_right > h3.story_name > a`)
+          .map((index, element) => {
+            const title = $(element).text();
+            if (typeof title !== 'undefined') return title;
+          })
+          .get();
 
         /** Gets all cover images */
-        $(`div.story_item > a[rel="nofollow"] > img`).each((index, element) => {
-          const image = $(element).attr('src');
-          const alt = $(element).attr('alt');
-          if (typeof alt !== 'undefined') coverImage.push({ url: image, alt: alt });
-        });
+        const coverImage: MangaCoverImage[] = $(`div.story_item > a[rel="nofollow"] > img`)
+          .map((index, element) => {
+            const image = $(element).attr('src');
+            const alt = $(element).attr('alt');
+            if (typeof alt !== 'undefined') return { url: image, alt: alt };
+          })
+          .get();
 
         /** Gets all Authors, Dates, and View Count */
         $(`div.story_item > div.story_item_right > span`).each((index, element) => {
@@ -149,17 +154,16 @@ export default class Mangakakalot {
     callback: MangaCallback<MangaMeta<Mangakakalot>> = () => {},
   ): Promise<MangaMeta<Mangakakalot>> {
     return new Promise(async (res, rej) => {
-      if (typeof url === 'undefined') return failure(new Error('Argument "url" is required'), callback);
+      if (url == null) return failure(new Error('Argument "url" is required'), callback);
       try {
         /** Load HTML Document to cheerio to extract HTML data */
         const $ = await readHtml(url, this.options);
         let mainTitle: string = '';
-        let altTitles: string[] = [];
+
         let status: string = '';
         let updatedAt: Date = new Date();
         let views: string = '';
-        const genres: string[] = [];
-        const authors: MangaAuthors[] = [];
+
         let rating: MangaRating = {
           sourceRating: '',
           rating_stars: '',
@@ -167,7 +171,7 @@ export default class Mangakakalot {
           voteCount: NaN,
         };
         let coverImage: MangaCoverImage = { alt: '', url: undefined };
-        const chaptersNameURL: Array<{ name: string; url: string }> = [];
+
         const chaptersViews: string[] = [];
         const chaptersDate: Date[] = [];
 
@@ -177,11 +181,13 @@ export default class Mangakakalot {
         });
 
         /** Get alternate titles */
-        $(`div.manga-info-top > ul.manga-info-text > li > h2.story-alternative`).each((_, element) => {
-          const alt_titles_string = $(element).text();
-          if (typeof alt_titles_string === 'undefined') return;
-          altTitles = splitAltTitles(alt_titles_string);
-        });
+        let altTitles: string[] = $(`div.manga-info-top > ul.manga-info-text > li > h2.story-alternative`)
+          .map((_, element) => {
+            const alt_titles_string = $(element).text();
+            if (typeof alt_titles_string === 'undefined') return;
+            return splitAltTitles(alt_titles_string);
+          })
+          .get();
 
         /** Get manga status, update date, views */
         $(`div.manga-info-top > ul > li`).each((_, element) => {
@@ -194,56 +200,60 @@ export default class Mangakakalot {
         });
 
         /** Get manga authors */
-        $(`div.manga-info-top > ul > li:contains("Author(s)") > a`).each((_, element) => {
-          const author = $(element).text();
-          const url = $(element).attr('href');
-          if (typeof author === 'undefined' || typeof url === 'undefined') return;
-          authors.push({ name: author, url });
-        });
+        const authors: MangaAuthors[] = $(`div.manga-info-top > ul > li:contains("Author(s)") > a`)
+          .map((_, element) => {
+            const author = $(element).text();
+            const url = $(element).attr('href');
+            if (typeof author === 'undefined' || typeof url === 'undefined') return;
+            return { name: author, url };
+          })
+          .get();
 
         /** Get manga genres */
-        $(`div.manga-info-top > ul > li:contains("Genres") > a`).each((_, element) => {
-          const genre = $(element).text();
+        const genres: string[] = $(`div.manga-info-top > ul > li:contains("Genres") > a`)
+          .map((_, element) => {
+            const genre = $(element).text();
 
-          if (typeof genre !== 'undefined') genres.push(genre);
-        });
+            if (typeof genre !== 'undefined') return genre;
+          })
+          .get();
 
         /** Get manga rating */
-        $(
+        const ratingText = $(
           `div.manga-info-top > ul > li[style="line-height: 20px; font-size: 11px; font-style: italic; padding: 0px 0px 0px 44px;"] > em#rate_row_cmd`,
-        ).each((_, element) => {
-          const el = $(element).text();
-          if (typeof el === 'undefined') return;
-          const string_array = el.split(' ');
-          const src = string_array[0].trim();
-          const voteCount = Number(string_array[7]);
-          const rating_stars = `${string_array[3]} / ${string_array[5]}`;
-          const rating_percentage = `${((Number(string_array[3]) / Number(string_array[5])) * 100).toFixed(2)}%`;
+        ).text();
+        const string_array = ratingText.split(' ');
+        const src = string_array[0].trim();
+        const voteCount = Number(string_array[7]);
+        const rating_stars = `${string_array[3]} / ${string_array[5]}`;
+        const rating_percentage = `${((Number(string_array[3]) / Number(string_array[5])) * 100).toFixed(2)}%`;
 
-          rating = { sourceRating: src, voteCount, rating_percentage, rating_stars };
-        });
+        rating = { sourceRating: src, voteCount, rating_percentage, rating_stars };
 
         /** Remove all children and get summary text */
         const summary = $(`div#noidungm`).clone().children().remove().end().text().trim();
 
         /** Get image URL and alt */
-        $(`div.manga-info-top > div.manga-info-pic > img`).each((_, element) => {
-          const imgURL = $(element).attr('src');
-          const alt = $(element).attr('alt');
-          if (typeof alt === 'undefined') return;
-          coverImage = { url: imgURL, alt };
-        });
+        const imgEl = $(`div.manga-info-top > div.manga-info-pic > img`);
+        const imgURL = $(imgEl).attr('src');
+        const alt = $(imgEl).attr('alt');
+        if (typeof alt === 'undefined') return;
+        coverImage = { url: imgURL, alt };
 
         /** Get manga chapters */
         const chaptersLength = $(`div.manga-info-chapter > div.chapter-list > div.row`).length;
 
         /** Get manga chapter name and url */
-        $(`div.manga-info-chapter > div.chapter-list > div.row > span > a`).each((_, element) => {
-          const chapterName = $(element).text();
-          const chapterURL = $(element).attr('href');
-          if (typeof chapterName === 'undefined' || typeof chapterURL === 'undefined') return;
-          chaptersNameURL.push({ name: chapterName, url: chapterURL });
-        });
+        const chaptersNameURL: Array<{ name: string; url: string }> = $(
+          `div.manga-info-chapter > div.chapter-list > div.row > span > a`,
+        )
+          .map((_, element) => {
+            const chapterName = $(element).text();
+            const chapterURL = $(element).attr('href');
+            if (typeof chapterName === 'undefined' || typeof chapterURL === 'undefined') return;
+            return { name: chapterName, url: chapterURL };
+          })
+          .get();
 
         /** Get views of every manga chapter */
         $(`div.manga-info-chapter > div.chapter-list > div.row > span:not(:has(a))`).each((_, element) => {
@@ -270,7 +280,7 @@ export default class Mangakakalot {
             updatedAt,
             views,
             authors,
-            genres,
+            genres: (<unknown>genres) as MangaGenre<Mangakakalot>[],
             rating,
             summary,
             coverImage,
@@ -309,9 +319,9 @@ export default class Mangakakalot {
     filters: MangaFilters<Mangakakalot> = {},
     callback: MangaCallback<MangaList[]> = () => {},
   ): Promise<MangaList[]> {
-    const { page = 1, genre = 'All', status = 'all', type = 'updated' } = filters;
+    const { page = 1, genre = 'any', status = 'all', type = 'updated' } = filters;
     return new Promise(async (res, rej) => {
-      if (typeof page === 'undefined') return failure(new Error("Argument 'page' is required"));
+      if (page == null) return failure(new Error("Argument 'page' is required"));
       if (typeof page !== 'number') return failure(new Error("Argument 'page' must be a number"), callback);
       if (page <= 0) return failure(new Error("'page' must be greater than 0"), callback);
 
@@ -319,46 +329,46 @@ export default class Mangakakalot {
         /** Parse HTML Document */
         const $ = await readHtml(
           `https://mangakakalot.com/manga_list?type=${type === 'updated' ? 'latest' : 'newest'}&category=${
-            MangakakalotGenres[genre || 'All']
+            genre != null && genre !== 'any' ? MangakakalotGenres[genre] : ''
           }&state=${status}&page=${page}`,
           this.options,
         );
-        const titles: string[] = [];
-        const urls: string[] = [];
-        const views: string[] = [];
-        const covers: MangaCoverImage[] = [];
 
         /** Get manga titles */
-        $(`div.list-truyen-item-wrap > h3 > a`).each((_, element) => {
-          const title = $(element).text();
-          const url = $(element).attr('href');
-          if (typeof title === 'undefined' || typeof url === 'undefined') return;
-          titles.push(title);
-          urls.push(url);
-        });
+        const titleURLs = $(`div.list-truyen-item-wrap > h3 > a`)
+          .map((_, element) => {
+            const title = $(element).text();
+            const url = $(element).attr('href');
+            if (typeof title === 'undefined' || typeof url === 'undefined') return;
+            return { title, url };
+          })
+          .get();
 
         /** Get manga views */
-        $(`div.list-truyen-item-wrap > div > span.aye_icon`).each((_, element) => {
-          const viewerCount = $(element).text();
-          if (typeof views === 'undefined') return;
-          views.push(viewerCount);
-        });
+        const views: string[] = $(`div.list-truyen-item-wrap > div > span.aye_icon`)
+          .map((_, element) => {
+            const viewerCount = $(element).text();
+            if (typeof views === 'undefined') return;
+            return viewerCount;
+          })
+          .get();
 
         /** Get manga cover img */
-        $(`div.list-truyen-item-wrap > a > img`).each((_, element) => {
-          const img = $(element).attr('src');
-          const alt = $(element).attr('alt');
-          if (typeof img === 'undefined' || typeof alt === 'undefined') return;
-          covers.push({ url: img, alt });
-        });
+        const covers: MangaCoverImage[] = $(`div.list-truyen-item-wrap > a > img`)
+          .map((_, element) => {
+            const img = $(element).attr('src');
+            const alt = $(element).attr('alt');
+            if (typeof img === 'undefined' || typeof alt === 'undefined') return;
+            return { url: img, alt };
+          })
+          .get();
 
-        const mangaList: MangaList[] = new Array(titles.length)
-          .fill('')
-          .map((_, index) => ({
-            title: titles[index],
-            url: urls[index],
-            coverImage: covers[index],
-            views: views[index],
+        const mangaList: MangaList[] = titleURLs
+          .map(({ title, url }, i) => ({
+            title,
+            url,
+            views: views[i],
+            coverImage: covers[i],
           }))
           /** Yeah... mangakakalot redirects to this website */
           .filter((manga) => !manga.url.startsWith('https://readmanganato.com/'));
@@ -393,18 +403,19 @@ export default class Mangakakalot {
    */
   public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
     return new Promise(async (res, rej) => {
-      if (typeof url === 'undefined') return failure(new Error("Argument 'chapter_url' is required"), callback);
+      if (url == null) return failure(new Error("Argument 'chapter_url' is required"), callback);
 
       try {
         /** Parse HTML document */
         const $ = await readHtml(url, this.options);
-        const pages: string[] = [];
 
         /** Get image URLs */
-        $(`div.container-chapter-reader > img[src]`).each((_, element) => {
-          const page = $(element).attr('src');
-          if (typeof page !== 'undefined') pages.push(page);
-        });
+        const pages: string[] = $(`div.container-chapter-reader > img[src]`)
+          .map((_, element) => {
+            const page = $(element).attr('src');
+            if (typeof page !== 'undefined') return page;
+          })
+          .get();
 
         success(pages, callback, res);
       } catch (e) {

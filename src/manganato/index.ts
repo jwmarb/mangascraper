@@ -109,61 +109,55 @@ export default class Manganato {
       try {
         /** Parse HTML document */
         const $ = await readHtml(generateURL(), this.options);
-        const titles: string[] = [];
-        const urls: string[] = [];
-        const authors: string[][] = [];
-        const updatedAt: Date[] = [];
-        const views: string[] = [];
-        const coverImage: MangaCoverImage[] = [];
 
         /** Get manga URLs and titles */
-        $(`div.panel-content-genres > div.content-genres-item > div.genres-item-info > h3 > a`).each((_, element) => {
-          const title = $(element).text();
-          const url = $(element).attr('href');
-          if (typeof title !== 'undefined' && typeof url !== 'undefined') {
-            urls.push(url);
-            titles.push(title);
-          }
-        });
+        const titleURLs = $(`div.panel-content-genres > div.content-genres-item > div.genres-item-info > h3 > a`)
+          .map((_, element) => {
+            const title = $(element).text();
+            const url = $(element).attr('href');
+            if (title != null && url != null) return { title, url };
+          })
+          .get();
 
         /** Get manga author(s) */
-        $(
+        const authors: string[][] = $(
           `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-author`,
-        ).each((_, element) => {
-          const author = $(element).text();
-          if (typeof author !== 'undefined') authors.push(author.split(', '));
-        });
+        )
+          .map((_, element) => [$(element).text().split(', ')])
+          .get();
 
         /** Get manga date */
-        $(
+        const updatedAt: Date[] = $(
           `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-time`,
-        ).each((_, element) => {
-          const updated_at = $(element).text();
-          if (typeof updated_at !== 'undefined') updatedAt.push(moment(updated_at, 'MMM DD,YY').toDate());
-        });
+        )
+          .map((_, element) => moment($(element).text(), 'MMM DD,YY').toDate())
+          .get();
 
         /** Get manga views */
-        $(
+        const views: string[] = $(
           `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-view`,
-        ).each((_, element) => {
-          const viewCount = $(element).text();
-          if (typeof viewCount !== 'undefined') views.push(viewCount);
-        });
+        )
+          .map((_, element) => $(element).text())
+          .get();
 
         /** Get manga cover image */
-        $(`div.panel-content-genres > div.content-genres-item > a.genres-item-img > img`).each((_, element) => {
-          const img = $(element).attr('src');
-          const alt = $(element).attr('alt');
-          if (typeof alt !== 'undefined') coverImage.push({ url: img, alt });
-        });
+        const coverImage: MangaCoverImage[] = $(
+          `div.panel-content-genres > div.content-genres-item > a.genres-item-img > img`,
+        )
+          .map((_, element) => {
+            const img = $(element).attr('src');
+            const alt = $(element).attr('alt');
+            if (alt != null) return { url: img, alt };
+          })
+          .get();
 
-        const mangaList: Manga<Manganato>[] = new Array(titles.length).fill('').map((_, index) => ({
-          title: titles[index],
-          url: urls[index],
-          authors: authors[index],
-          updatedAt: updatedAt[index],
-          views: views[index],
-          coverImage: coverImage[index],
+        const mangaList: Manga<Manganato>[] = titleURLs.map(({ title, url }, i) => ({
+          title,
+          url,
+          authors: authors[i],
+          coverImage: coverImage[i],
+          updatedAt: updatedAt[i],
+          views: views[i],
         }));
 
         success(mangaList, callback, res);
@@ -202,93 +196,70 @@ export default class Manganato {
       try {
         /** Parse HTML Document */
         const $ = await readHtml(url, this.options);
-        let mainTitle: string = '';
-        let altTitles: string[] = [];
-        let authors: MangaAuthors[] = [];
-        let status: string = '';
-        let updatedAt: Date = new Date();
-        let views: string = '';
-        const genres: string[] = [];
-        let coverImage: MangaCoverImage = { url: '', alt: '' };
-        let summary: string = '';
-        const chapters_names: string[] = [];
-        const chapters_urls: string[] = [];
-        const chapters_views: string[] = [];
-        const chapters_dates: Date[] = [];
 
         /** Get manga title */
-        $(`div.panel-story-info > div.story-info-right > h1`).each((_, element) => {
-          const main_title = $(element).text();
-          if (typeof main_title !== 'undefined') mainTitle = main_title;
-        });
+        const mainTitle: string = $(`div.panel-story-info > div.story-info-right > h1`).text();
 
         /** Get manga alternate titles */
-        $(`div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-value > h2`).each((_, el) => {
-          const alternate_titles = $(el).text();
-          if (typeof alternate_titles === 'undefined') return;
-          altTitles = splitAltTitles(alternate_titles);
-        });
+        const altTitles: string[] = $(
+          `div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-value > h2`,
+        )
+          .map((_, el) => {
+            const alternate_titles = $(el).text();
+            if (typeof alternate_titles === 'undefined') return;
+            return splitAltTitles(alternate_titles);
+          })
+          .get();
 
         /** Get manga author(s) */
-        $(`div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-value > a[rel="nofollow"]`).each(
-          (_, el) => {
+        const authors: MangaAuthors[] = $(
+          `div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-value > a[rel="nofollow"]`,
+        )
+          .map((_, el) => {
             const author = $(el).text();
             const url = $(el).attr('href');
 
-            if (typeof author !== 'undefined' && typeof url !== 'undefined') authors.push({ name: author, url });
-          },
-        );
+            if (typeof author !== 'undefined' && typeof url !== 'undefined') return { name: author, url };
+          })
+          .get();
 
         /** Get manga status */
-        $(`div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-label > i.info-status`)
+        const status = $(
+          `div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-label > i.info-status`,
+        )
           .parent()
           .siblings('td.table-value')
-          .each((_, el) => {
-            const manga_status = $(el).text();
-            if (typeof manga_status !== 'undefined') status = manga_status;
-          });
+          .text();
 
         /** Get manga genres */
-        $(`div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-label > i.info-genres`)
+        const genres: string[] = $(
+          `div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-label > i.info-genres`,
+        )
           .parent()
           .siblings('td.table-value')
           .children(`a`)
-          .each((_, el) => {
-            const genre = $(el).text();
-
-            if (typeof genre !== 'undefined') {
-              genres.push(genre);
-            }
-          });
+          .map((_, el) => $(el).text())
+          .get();
 
         /** Get manga updated date */
-        $(`div.story-info-right-extent > p > span.stre-label > i.info-time`)
-          .parent()
-          .siblings('span.stre-value')
-          .each((_, el) => {
-            const date = $(el).text();
-            if (typeof date !== 'undefined') updatedAt = moment(date, 'MMM DD,YYYY - hh:mm A').toDate();
-          });
+        const updatedAt = moment(
+          $(`div.story-info-right-extent > p > span.stre-label > i.info-time`)
+            .parent()
+            .siblings('span.stre-value')
+            .text(),
+          'MMM DD,YYYY - HH:mm A',
+        ).toDate();
 
         /** Get manga views */
-        $(`div.story-info-right-extent > p > span.stre-label > i.info-view`)
+        const views: string = $(`div.story-info-right-extent > p > span.stre-label > i.info-view`)
           .parent()
           .siblings('span.stre-value')
-          .each((_, el) => {
-            const viewCount = $(el).text();
-            if (typeof views !== 'undefined') views = viewCount;
-          });
+          .text();
 
         /** Get manga rating */
-        let rating_text: string[] = [];
-        $(`div.story-info-right-extent > p > em#rate_row_cmd > em > em`).each((_, el) => {
-          const string = $(el).text();
-          if (typeof string !== 'undefined') {
-            const rate_text = string.trim().split(' ').join('').split('\n');
-
-            rate_text.forEach((text) => rating_text.push(text));
-          }
-        });
+        const rating_text = $(`div.story-info-right-extent > p > em#rate_row_cmd > em > em`)
+          .map((_, el) => $(el).text().trim().split(' ').join('').split('\n'))
+          .get();
         let rating: MangaRating = {
           sourceRating: rating_text[0],
           voteCount: Number(rating_text[4]),
@@ -297,45 +268,44 @@ export default class Manganato {
         };
 
         /** Get manga summary */
-        summary = $(`div.panel-story-info-description`).clone().children().remove().end().text().trim();
+        const summary = $(`div.panel-story-info-description`).clone().children().remove().end().text().trim();
 
         /** Get manga cover image */
-        $(`div.story-info-left > span.info-image > img`).each((_, el) => {
-          const img = $(el).attr('src');
-          const alt = $(el).attr('alt');
-
-          if (typeof alt !== 'undefined') coverImage = { url: img, alt };
-        });
+        const imgEl = $(`div.story-info-left > span.info-image > img`);
+        const img = imgEl.attr('src');
+        const alt = imgEl.attr('alt');
+        const coverImage: MangaCoverImage = { url: img, alt: alt || '' };
 
         /** Get manga chapters */
         // Get chapter names and URLs
-        $(`div.panel-story-chapter-list > ul.row-content-chapter > li > a.chapter-name`).each((_, el) => {
-          const chapter_name = $(el).text();
-          const chapter_url = $(el).attr('href');
-          if (typeof chapter_name !== 'undefined' && typeof chapter_url !== 'undefined') {
-            chapters_names.push(chapter_name);
-            chapters_urls.push(chapter_url);
-          }
-        });
+        const chapterNameURL = $(`div.panel-story-chapter-list > ul.row-content-chapter > li > a.chapter-name`)
+          .map((_, el) => {
+            const chapter_name = $(el).text();
+            const chapter_url = $(el).attr('href');
+            if (typeof chapter_name !== 'undefined' && typeof chapter_url !== 'undefined')
+              return { name: chapter_name, url: chapter_url };
+          })
+          .get();
 
         // Get chapter views
-        $(`div.panel-story-chapter-list > ul.row-content-chapter > li > span.chapter-view`).each((_, el) => {
-          const chapter_views = $(el).text();
-          if (typeof chapter_views !== 'undefined') chapters_views.push(chapter_views);
-        });
+        const chapterViews = $(`div.panel-story-chapter-list > ul.row-content-chapter > li > span.chapter-view`)
+          .map((_, el) => {
+            const chapter_views = $(el).text();
+            if (typeof chapter_views !== 'undefined') return chapter_views;
+          })
+          .get();
 
         // Get chapter dates
-        $(`div.panel-story-chapter-list > ul.row-content-chapter > li > span.chapter-time`).each((_, el) => {
-          const chapter_dates = $(el).text();
-          if (typeof chapter_dates !== 'undefined') chapters_dates.push(moment(chapter_dates, 'MMM DD,YY').toDate());
-        });
+        const chapterDates = $(`div.panel-story-chapter-list > ul.row-content-chapter > li > span.chapter-time`)
+          .map((_, el) => moment($(el).text(), 'MMM DD,YY').toDate())
+          .get();
 
         /** Get data from chapters and arrange them into JSON-like data */
-        const chapters: MangaChapters[] = new Array(chapters_names.length).fill('').map((_, index) => ({
-          name: chapters_names[index],
-          url: chapters_urls[index],
-          views: chapters_views[index],
-          uploadDate: chapters_dates[index],
+        const chapters: MangaChapters[] = chapterNameURL.map(({ name, url }, i) => ({
+          name,
+          url,
+          uploadDate: chapterDates[i],
+          views: chapterViews[i],
         }));
 
         success(
@@ -348,7 +318,7 @@ export default class Manganato {
             authors,
             status,
             summary,
-            genres,
+            genres: (<unknown>genres) as MangaGenre<Manganato>[],
             rating,
             updatedAt,
             views,
@@ -391,13 +361,14 @@ export default class Manganato {
       try {
         /** Parse HTML Document */
         const $ = await readHtml(url, this.options);
-        const pages: string[] = [];
 
         /** Get each page url */
-        $(`div.container-chapter-reader > img`).each((_, el) => {
-          const img = $(el).attr('src');
-          if (typeof img !== 'undefined') pages.push(img);
-        });
+        const pages: string[] = $(`div.container-chapter-reader > img`)
+          .map((_, el) => {
+            const img = $(el).attr('src');
+            if (img != null) return img;
+          })
+          .get();
 
         success(pages, callback, res);
       } catch (e) {
