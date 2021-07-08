@@ -1,14 +1,40 @@
-import { BrowserEmittedEvents, Page } from 'puppeteer';
+import { BrowserEmittedEvents, HTTPRequest, Page } from 'puppeteer';
 import randomUserAgent from 'random-useragent';
 import preload from './preload';
-
 import puppeteer from 'puppeteer';
 import { AutomatedCallback, ScrapingOptions } from '..';
 
 export default async function automateBrowser<T>(
   options: ScrapingOptions,
   callback: AutomatedCallback<T>,
-  requestURLs?: string[],
+  network?: {
+    domains?: {
+      method: 'block' | 'unblock';
+      value: string[];
+    };
+    resource?: {
+      method: 'block' | 'unblock';
+      type: (
+        | 'document'
+        | 'stylesheet'
+        | 'image'
+        | 'media'
+        | 'font'
+        | 'script'
+        | 'texttrack'
+        | 'xhr'
+        | 'fetch'
+        | 'eventsource'
+        | 'websocket'
+        | 'manifest'
+        | 'signedexchange'
+        | 'ping'
+        | 'cspviolationreport'
+        | 'preflight'
+        | 'other'
+      )[];
+    };
+  },
 ) {
   const { proxy, debug = false } = options;
 
@@ -29,6 +55,7 @@ export default async function automateBrowser<T>(
     '--lang=en-US,en',
     '--window-size=1920x1080',
     '--disable-extensions',
+    '--disable-gpu',
     `--user-agent=${randomUserAgent.getRandom((ua) => ua.osName === 'Windows' && ua.browserName === 'Chrome')}`,
   ].filter((item) => Boolean(item)) as string[];
 
@@ -37,17 +64,30 @@ export default async function automateBrowser<T>(
     const page = (await browser.pages())[0];
     await page.setViewport({ width: 1920, height: 1080 });
     await page.evaluateOnNewDocument(preload);
-    if (requestURLs != null) {
-      await page.setRequestInterception(true);
-      await page.on('request', (request) => {
-        if (
-          ['image', 'stylesheet', 'font'].indexOf(request.resourceType()) !== -1 ||
-          !requestURLs.some((url) => request.url().startsWith(url))
-        ) {
-          request.abort();
-        } else request.continue();
-      });
-    }
+    await page.setRequestInterception(true);
+    await page.on('request', (request) => {
+      if (network != null) {
+        if (network.resource) {
+          switch (network.resource.method) {
+            case 'block':
+              if (network.resource.type.indexOf(request.resourceType()) !== -1) return request.abort();
+            case 'unblock':
+              if (network.resource.type.indexOf(request.resourceType()) === -1) return request.abort();
+          }
+        }
+        if (network.domains) {
+          switch (network.domains.method) {
+            case 'unblock':
+              if (!network.domains.value.some((url) => request.url().startsWith(url))) return request.abort();
+            case 'block':
+              if (network.domains.value.some((url) => request.url().startsWith(url))) return request.abort();
+          }
+        }
+
+        return request.continue();
+      }
+      request.continue();
+    });
     return await callback(page).finally(async () => {
       const pages = await browser.pages();
       await Promise.all(pages.map((page) => page.close()));
