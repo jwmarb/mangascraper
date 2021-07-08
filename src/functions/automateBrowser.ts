@@ -49,7 +49,11 @@ export default async function automateBrowser<T>(
   try {
     const browser =
       puppeteerInstance.instance === 'default'
-        ? await puppeteer.launch({ ...initPuppeteer, headless: !debug, args: puppeteer_args })
+        ? await puppeteer.launch(
+            puppeteerInstance.launch
+              ? puppeteerInstance.launch
+              : { ...initPuppeteer, headless: !debug, args: puppeteer_args },
+          )
         : await puppeteer.connect({ browserWSEndpoint: puppeteerInstance.wsEndpoint });
     const page = (await browser.pages())[0];
     await page.setViewport({ width: 1920, height: 1080 });

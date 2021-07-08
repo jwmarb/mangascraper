@@ -20,7 +20,11 @@ export default async function automateBrowsers(options: ScrapingOptions, instanc
   try {
     const browser =
       puppeteerInstance.instance === 'default'
-        ? await puppeteer.launch({ ...initPuppeteer, headless: !debug, args: puppeteer_args })
+        ? await puppeteer.launch(
+            puppeteerInstance.launch
+              ? puppeteerInstance.launch
+              : { ...initPuppeteer, headless: !debug, args: puppeteer_args },
+          )
         : await puppeteer.connect({ browserWSEndpoint: puppeteerInstance.wsEndpoint });
     const pages = await browser.pages();
     return Promise.all(
