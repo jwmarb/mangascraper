@@ -59,6 +59,10 @@ which outputs...
 ]
 ```
 
+## Configuring with puppeteer
+
+If you already have
+
 ### Mangakakalot
 
 Get a list of manga that match the title **Black Clover**
