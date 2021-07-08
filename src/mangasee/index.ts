@@ -1,7 +1,6 @@
 import {
   Manga,
   MangaCallback,
-  MangaChapters,
   MangaFilters,
   MangaMeta,
   MangaSearch,
@@ -16,7 +15,6 @@ import jquery from 'jquery';
 import cheerio from 'cheerio';
 import success from '../functions/success';
 import failure from '../functions/failure';
-import readHtml from '../functions/readHtml';
 import moment from 'moment';
 import automateBrowsers from '../functions/automateBrowsers';
 
