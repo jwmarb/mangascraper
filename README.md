@@ -16,7 +16,7 @@ This installs the [`mangascraper`]("https://github.com/EGGaming/mangascraper") p
 | [Mangakakalot]("https://mangakakalot.com/") | ✔️         |                             |
 | [Manganato]("https://manganato.com/")       | ✔️         |                             |
 | [Mangaparkv2]("https://v2.mangapark.net")   | ❌         | Cloudflare is a hassle      |
-| [Mangasee]("https://mangasee123.com/")      | ❌         | Requires browser automation |
+| [Mangasee]("https://mangasee123.com/")      | ✔️         | Uses puppeteer              |
 | [Readmng]("https://www.readmng.com/")       | ❌         | Requires browser automation |
 
 I will be looking forward to adding more sources to scrape from.
