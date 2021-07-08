@@ -224,7 +224,7 @@ export default class Mangahasu {
         coverImage = { url: img, alt: typeof alt !== 'undefined' ? alt : '' };
 
         /** Get manga chapters */
-        const chapters: MangaChapters[] = $(`div.content-info > div.list-chapter > table.table > tbody > tr`)
+        const chapters: MangaChapters<Mangahasu>[] = $(`div.content-info > div.list-chapter > table.table > tbody > tr`)
           .map((_, el) => {
             const anchorEl = $(el).children('td.name').children('a');
             const chapter_name = anchorEl.text().replace(title, '').trim();

@@ -264,7 +264,7 @@ export default class Mangakakalot {
           else chaptersViews.push(chapters_views_date);
         });
 
-        const chapters: MangaChapters[] = new Array(chaptersLength).fill('').map((_, index) => {
+        const chapters: MangaChapters<Mangakakalot>[] = new Array(chaptersLength).fill('').map((_, index) => {
           return {
             name: chaptersNameURL[index].name,
             url: chaptersNameURL[index].url,

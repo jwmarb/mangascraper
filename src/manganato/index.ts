@@ -301,7 +301,7 @@ export default class Manganato {
           .get();
 
         /** Get data from chapters and arrange them into JSON-like data */
-        const chapters: MangaChapters[] = chapterNameURL.map(({ name, url }, i) => ({
+        const chapters: MangaChapters<Manganato>[] = chapterNameURL.map(({ name, url }, i) => ({
           name,
           url,
           uploadDate: chapterDates[i],
