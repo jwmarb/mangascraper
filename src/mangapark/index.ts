@@ -1,11 +1,7 @@
-import cheerio from 'cheerio';
 import { Manga, MangaCallback, MangaCoverImage, MangaRating, ScrapingOptions } from '..';
-import automateBrowser from '../functions/automateBrowser';
 import failure from '../functions/failure';
 import readHtml from '../functions/readHtml';
 import success from '../functions/success';
-import jquery from 'jquery';
-import numberSeperator from '../functions/numberSeperator';
 
 export type MangaParkManga = {
   title: {
