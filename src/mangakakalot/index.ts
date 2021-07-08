@@ -8,17 +8,36 @@ import {
   MangaCallback,
   MangaCoverImage,
   MangaMeta,
-  MangaAuthors,
   MangaRating,
   MangaChapters,
-  MangaList,
   MangakakalotGenres,
   MangaFilters,
   Manga,
   ScrapingOptions,
   MangaGenre,
+  MangaBase,
+  MangaAge,
+  MangaStatus,
 } from '../';
 import splitAltTitles from '../functions/splitAltTitles';
+
+export interface MangakakalotManga extends MangaBase {}
+
+export interface MangakakalotAlt {
+  title: string;
+  url: string;
+  views: string;
+  coverImage: MangaCoverImage;
+}
+
+export type MangakakalotGenre = keyof typeof MangakakalotGenres | 'any';
+
+export interface MangakakalotOptions {
+  genre?: MangaGenre<Mangakakalot>;
+  status?: MangaStatus<Mangakakalot>;
+  type?: MangaAge;
+  page?: number;
+}
 
 export default class Mangakakalot {
   private options: ScrapingOptions = {};
@@ -200,13 +219,8 @@ export default class Mangakakalot {
         });
 
         /** Get manga authors */
-        const authors: MangaAuthors[] = $(`div.manga-info-top > ul > li:contains("Author(s)") > a`)
-          .map((_, element) => {
-            const author = $(element).text();
-            const url = $(element).attr('href');
-            if (typeof author === 'undefined' || typeof url === 'undefined') return;
-            return { name: author, url };
-          })
+        const authors: string[] = $(`div.manga-info-top > ul > li:contains("Author(s)") > a`)
+          .map((_, element) => $(element).text())
           .get();
 
         /** Get manga genres */
@@ -317,9 +331,9 @@ export default class Mangakakalot {
 
   public getMangas(
     filters: MangaFilters<Mangakakalot> = {},
-    callback: MangaCallback<MangaList[]> = () => {},
-  ): Promise<MangaList[]> {
-    const { page = 1, genre = 'any', status = 'all', type = 'updated' } = filters;
+    callback: MangaCallback<Manga<Mangakakalot, 'alt'>[]> = () => {},
+  ): Promise<Manga<Mangakakalot, 'alt'>[]> {
+    const { page = 1, genre = 'any', status = 'any', type = 'updated' } = filters;
     return new Promise(async (res, rej) => {
       if (page == null) return failure(new Error("Argument 'page' is required"));
       if (typeof page !== 'number') return failure(new Error("Argument 'page' must be a number"), callback);
@@ -330,7 +344,7 @@ export default class Mangakakalot {
         const $ = await readHtml(
           `https://mangakakalot.com/manga_list?type=${type === 'updated' ? 'latest' : 'newest'}&category=${
             genre != null && genre !== 'any' ? MangakakalotGenres[genre] : ''
-          }&state=${status}&page=${page}`,
+          }&state=${status === 'any' ? 'all' : status}&page=${page}`,
           this.options,
         );
 
@@ -363,7 +377,7 @@ export default class Mangakakalot {
           })
           .get();
 
-        const mangaList: MangaList[] = titleURLs
+        const mangaList: Manga<Mangakakalot, 'alt'>[] = titleURLs
           .map(({ title, url }, i) => ({
             title,
             url,

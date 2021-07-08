@@ -3,11 +3,12 @@ import {
   MangaCallback,
   MangaFilters,
   MangaMeta,
+  MangaOrder,
   MangaSearch,
   MangaSeeGenres,
-  MangaSeeMangaDirectory,
   MangaSeeOrderBy,
-  MangaSeeStatus,
+  MangaStatus,
+  MangaType,
   ScrapingOptions,
 } from '..';
 import automateBrowser from '../functions/automateBrowser';
@@ -19,6 +20,42 @@ import moment from 'moment';
 import automateBrowsers from '../functions/automateBrowsers';
 
 type WindowJquery = typeof window & { $: typeof jquery };
+
+export interface MangaSeeOptions {
+  orderBy?: MangaOrder<MangaSee>;
+  orderType?: 'ascending' | 'descending';
+  translationGroup?: 'any' | 'official';
+  status?: {
+    scan?: MangaStatus<MangaSee>;
+    publish?: MangaStatus<MangaSee>;
+  };
+  type?: MangaType<MangaSee>;
+  genre?: {
+    include?: Array<keyof typeof MangaSeeGenres>;
+    exclude?: Array<keyof typeof MangaSeeGenres>;
+  };
+}
+
+export type MangaSeeGenre = keyof typeof MangaSeeGenres;
+
+export interface MangaSeeMangaAlt {
+  title: string;
+  url: string;
+  genres: string[];
+  coverImage: string;
+  status: 'Ongoing' | 'Complete';
+}
+export interface MangaSeeManga {
+  title: string;
+  url: string;
+  status: {
+    scan: MangaStatus<MangaSee>;
+    publish: MangaStatus<MangaSee>;
+  };
+  genres: keyof typeof MangaSeeGenres;
+  coverImage: string;
+  updatedAt: Date;
+}
 
 export default class MangaSee {
   private options: ScrapingOptions = {};
@@ -249,8 +286,8 @@ export default class MangaSee {
           url,
           coverImage: img[i],
           status: {
-            scan: statuses[i].scan as MangaSeeStatus,
-            publish: statuses[i].publish as MangaSeeStatus,
+            scan: statuses[i].scan as MangaStatus<MangaSee>,
+            publish: statuses[i].publish as MangaStatus<MangaSee>,
           },
           genres: (<unknown>genres[i]) as keyof typeof MangaSeeGenres,
           updatedAt: updatedAt[i],
@@ -273,7 +310,7 @@ export default class MangaSee {
    * const mangas = await mangasee.directory();
    * ```
    */
-  public directory(callback: MangaCallback<MangaSeeMangaDirectory[]> = () => {}): Promise<MangaSeeMangaDirectory[]> {
+  public directory(callback: MangaCallback<MangaSeeMangaAlt[]> = () => {}): Promise<MangaSeeMangaAlt[]> {
     return new Promise(async (res) => {
       try {
         const data = await automateBrowser(

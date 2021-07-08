@@ -4,7 +4,6 @@ import success from '../functions/success';
 import {
   MangaCallback,
   MangaCoverImage,
-  MangaAuthors,
   MangaChapters,
   MangaMeta,
   MangaFilters,
@@ -15,9 +14,26 @@ import {
   Manga,
   MangaGenreFilters,
   ScrapingOptions,
+  MangaBase,
+  MangaSeeGenres,
+  MangaOrder,
+  MangaStatus,
 } from '../';
 import moment from 'moment';
 import splitAltTitles from '../functions/splitAltTitles';
+
+export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'everything'; search: string } | string;
+
+export interface ManganatoManga extends MangaBase {}
+
+export interface ManganatoOptions {
+  genre?: { include?: ManganatoGenre[]; exclude?: ManganatoGenre[] } | null;
+  status?: MangaStatus<Manganato>;
+  orderBy?: MangaOrder<Manganato>;
+  page?: number;
+}
+
+export type ManganatoGenre = keyof typeof ManganatoGenres;
 
 export default class Manganato {
   private options: ScrapingOptions = {};
@@ -57,7 +73,7 @@ export default class Manganato {
   ): Promise<Manga<Manganato>[]> {
     if (filters == null) filters = {};
     if (title == null) title = '';
-    const { genre = {}, status = '', orderBy = 'latest_updates', page = 1 } = filters;
+    const { genre = {}, status = 'any', orderBy = 'latest_updates', page = 1 } = filters;
 
     function generateURL(): string {
       let g_i: string = ''; // short for genre_includes
@@ -71,7 +87,7 @@ export default class Manganato {
         if (keywords === 'alt_title') return `keyw=${search.replace(/[^a-zA-Z0-9]/g, '_')}&keyt=alternative`;
         return `keyw=${search.replace(/[^a-zA-Z0-9]/g, '_')}`;
       })(); // Basically search query for manganato
-      const sts = `sts=${status}` || ''; // short for status
+      const sts = `sts=${status === 'any' ? 'all' : status}` || ''; // short for status
       const orby = (() => {
         /** Converts 'orderBy' into an argument manganato can use for its filters */
         switch (orderBy) {
@@ -212,15 +228,10 @@ export default class Manganato {
           .get();
 
         /** Get manga author(s) */
-        const authors: MangaAuthors[] = $(
+        const authors: string[] = $(
           `div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-value > a[rel="nofollow"]`,
         )
-          .map((_, el) => {
-            const author = $(el).text();
-            const url = $(el).attr('href');
-
-            if (typeof author !== 'undefined' && typeof url !== 'undefined') return { name: author, url };
-          })
+          .map((_, el) => $(el).text())
           .get();
 
         /** Get manga status */

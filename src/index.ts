@@ -1,17 +1,56 @@
-import { Browser, Page } from 'puppeteer';
-import Mangahasu from './mangahasu';
-import Mangakakalot from './mangakakalot';
-import Manganato from './manganato';
-import MangaSee from './mangasee';
+import Mangahasu, { MangahasuGenre, MangahasuManga, MangahasuOptions } from './mangahasu';
+import Mangakakalot, {
+  MangakakalotAlt,
+  MangakakalotGenre,
+  MangakakalotManga,
+  MangakakalotOptions,
+} from './mangakakalot';
+import Manganato, { ManganatoGenre, ManganatoManga, ManganatoOptions, ManganatoQuery } from './manganato';
+import MangaSee, { MangaSeeGenre, MangaSeeManga, MangaSeeMangaAlt, MangaSeeOptions } from './mangasee';
+import MangaPark, { MangaParkManga } from './mangapark';
+import randomUserAgent from 'random-useragent';
 
 export { default as Mangakakalot } from './mangakakalot';
 export { default as Manganato } from './manganato';
 export { default as Mangahasu } from './mangahasu';
 export { default as MangaSee } from './mangasee';
+export { default as MangaPark } from './mangapark';
+
+export interface ScrapingOptions {
+  proxy?: {
+    host: string;
+    port: number;
+  };
+  debug?: boolean;
+  puppeteerInstance?: PuppeteerInstance;
+}
+
+type PuppeteerDefault = { instance: 'default' };
+type PuppeteerServer = { instance: 'server'; wsEndpoint: string };
+type PuppeteerInstance = PuppeteerDefault | PuppeteerServer;
+
+export const initPuppeteer = {
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-accelerated-2d-canvas',
+    '--no-zygote',
+    '--renderer-process-limit=1',
+    '--no-first-run',
+    '--ignore-certificate-errors',
+    '--ignore-certificate-errors-spki-list',
+    '--disable-dev-shm-usage',
+    '--disable-infobars',
+    '--lang=en-US,en',
+    '--window-size=1920x1080',
+    '--disable-extensions',
+    '--disable-gpu',
+    `--user-agent=${randomUserAgent.getRandom((ua) => ua.osName === 'Windows' && ua.browserName === 'Chrome')}`,
+  ],
+  ignoreHTTPSErrors: true,
+};
 
 export type MangaCallback<T> = (error?: Error | undefined, result?: T) => void;
-
-export type AutomatedCallback<T> = (page: Page) => Promise<T>;
 
 export interface MangaBase {
   title: string;
@@ -22,43 +61,21 @@ export interface MangaBase {
   coverImage: MangaCoverImage;
 }
 
-export interface MangakakalotManga extends MangaBase {}
-export interface ManganatoManga extends MangaBase {}
-export interface MangahasuManga {
-  title: string;
-  url: string;
-  coverImage: MangaCoverImage;
-}
-export interface MangaSeeMangaDirectory {
-  title: string;
-  url: string;
-  genres: string[];
-  coverImage: string;
-  status: 'Ongoing' | 'Complete';
-}
-export interface MangaSeeManga {
-  title: string;
-  url: string;
-  status: {
-    scan: MangaSeeStatus;
-    publish: MangaSeeStatus;
-  };
-  genres: keyof typeof MangaSeeGenres;
-  coverImage: string;
-  updatedAt: Date;
-}
-
-export type Manga<T> = T extends Mangakakalot
-  ? MangakakalotManga
+export type Manga<T, S extends 'main' | 'alt' = 'main'> = T extends Mangakakalot
+  ? S extends 'main'
+    ? MangakakalotManga
+    : MangakakalotAlt
   : T extends Manganato
   ? ManganatoManga
   : T extends Mangahasu
   ? MangahasuManga
   : T extends MangaSee
-  ? MangaSeeManga
+  ? S extends 'main'
+    ? MangaSeeManga
+    : MangaSeeMangaAlt
+  : T extends MangaPark
+  ? MangaParkManga
   : never;
-
-export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'everything'; search: string } | string;
 
 export type MangaSearch<T> = T extends Manganato
   ? ManganatoQuery
@@ -80,13 +97,6 @@ export type MangaFilters<T> = T extends Manganato
   ? MangaSeeOptions
   : never;
 
-export interface MangaList {
-  title: string;
-  url: string;
-  views: string;
-  coverImage: MangaCoverImage;
-}
-
 export type MangaGenre<T> = T extends Mangakakalot
   ? MangakakalotGenre
   : T extends Manganato
@@ -97,21 +107,13 @@ export type MangaGenre<T> = T extends Mangakakalot
   ? MangaSeeGenre
   : never;
 
-export interface ScrapingOptions {
-  proxy?: {
-    host: string;
-    port: number;
-  };
-  debug?: boolean;
-}
-
 export type MangaMeta<T> = T extends Mangakakalot | Manganato
   ? {
       title: {
         main: string;
         alt: string[];
       };
-      authors: MangaAuthors[];
+      authors: string[];
       status: string;
       updatedAt: Date;
       views: string;
@@ -147,19 +149,14 @@ export type MangaMeta<T> = T extends Mangakakalot | Manganato
       summary: string;
       genres: MangaGenre<T>[];
       coverImage: string;
-      type: MangaSeeType;
+      type: MangaType<MangaSee>;
       status: {
-        scan: MangaSeeStatus;
-        publish: MangaSeeStatus;
+        scan: MangaStatus<MangaSee>;
+        publish: MangaStatus<MangaSee>;
       };
       chapters: MangaChapters<T>[];
     }
   : never;
-
-export type MangaAuthors = {
-  name: string;
-  url: string;
-};
 
 export type MangaChapters<T> = T extends Manganato | Mangakakalot
   ? {
@@ -168,9 +165,7 @@ export type MangaChapters<T> = T extends Manganato | Mangakakalot
       views: string;
       uploadDate: Date;
     }
-  : T extends Mangahasu
-  ? { name: string; url: string; uploadDate: Date }
-  : T extends MangaSee
+  : T extends Mangahasu | MangaSee
   ? { name: string; url: string; uploadDate: Date }
   : never;
 
@@ -181,24 +176,16 @@ export type MangaRating = {
   rating_stars: string;
 };
 
-export type MangaAttribute = {
-  index: number;
-  item: string | string[];
-};
-
 export type MangaCoverImage = {
-  url: string | undefined;
+  url?: string;
   alt: string;
 };
 
-export type MangaOrder = 'latest_updates' | 'top_view' | 'new_manga' | 'A-Z';
-
-interface MangakakalotOptions {
-  genre?: MangaGenre<Mangakakalot>;
-  status?: MangaStatus;
-  type?: MangaAge;
-  page?: number;
-}
+export type MangaOrder<T> = T extends Manganato | Mangakakalot
+  ? 'latest_updates' | 'top_view' | 'new_manga' | 'A-Z'
+  : T extends MangaSee
+  ? keyof typeof MangaSeeOrderBy
+  : never;
 
 export enum MangaSeeOrderBy {
   'A-Z' = 's',
@@ -207,8 +194,6 @@ export enum MangaSeeOrderBy {
   'popularity(all_time)' = 'v',
   'popularity(monthly)' = 'vm',
 }
-
-export type MangaSeeGenre = keyof typeof MangaSeeGenres;
 
 export enum MangaSeeGenres {
   'Action',
@@ -251,68 +236,34 @@ export enum MangaSeeGenres {
   'Yuri',
 }
 
-export type MangaSeeStatus = 'any' | 'cancelled' | 'complete' | 'discontinued' | 'paused' | 'ongoing';
+export type MangaGenreFilters<T> = T extends Mangakakalot | Manganato ? BaseMangaGenreOptions<T> : never;
 
-export type MangaSeeType = 'doujinshi' | 'manga' | 'manhua' | 'manhwa';
-
-export interface MangaSeeOptions {
-  orderBy?: keyof typeof MangaSeeOrderBy;
-  orderType?: 'ascending' | 'descending';
-  translationGroup?: 'any' | 'official';
-  status?: {
-    scan?: MangaSeeStatus;
-    publish?: MangaSeeStatus;
-  };
-  type?: MangaSeeType | 'any';
-  genre?: {
-    include?: Array<keyof typeof MangaSeeGenres>;
-    exclude?: Array<keyof typeof MangaSeeGenres>;
-  };
-}
-
-export interface ManganatoOptions {
-  genre?: { include?: ManganatoGenre[]; exclude?: ManganatoGenre[] } | null;
-  status?: MangaStatus | null;
-  orderBy?: MangaOrder;
-  page?: number;
-}
-
-export type MangaGenreFilters<T> = T extends Mangakakalot | Manganato ? BaseMangaGenreOptions : never;
-
-export interface BaseMangaGenreOptions {
+export interface BaseMangaGenreOptions<T> {
   age?: MangaAge;
-  status?: MangaStatus;
+  status?: MangaStatus<T>;
   page?: number;
 }
 
-export type MangaStatus = 'ongoing' | 'completed' | 'all';
+export type MangaStatus<T> = T extends Mangakakalot | Mangahasu | Manganato
+  ? 'ongoing' | 'completed' | 'any'
+  : T extends MangaSee
+  ? 'any' | 'cancelled' | 'complete' | 'discontinued' | 'paused' | 'ongoing'
+  : never;
+
+export type MangaType<T> = T extends MangaSee
+  ? 'any' | 'doujinshi' | 'manga' | 'manhua' | 'manhwa'
+  : T extends Mangahasu
+  ? keyof typeof MangahasuTypes
+  : never;
 
 export type MangaAge = 'new' | 'updated';
 
-export interface MangahasuOptions {
-  genres?: {
-    include?: MangahasuGenre[];
-    exclude?: MangahasuGenre[];
-  };
-  status?: MangaStatus;
-  type?: MangahasuType;
-  page?: number;
-}
-
-export type MangahasuType = keyof typeof MangahasuTypes;
-
 export enum MangahasuTypes {
-  'Any' = '',
-  'Manga' = '10',
-  'Manhwa' = '12',
-  'Manhua' = '19',
+  'any' = '',
+  'manga' = '10',
+  'manhwa' = '12',
+  'manhua' = '19',
 }
-
-type MangakakalotGenre = keyof typeof MangakakalotGenres | 'any';
-
-type ManganatoGenre = keyof typeof ManganatoGenres;
-
-type MangahasuGenre = keyof typeof MangahasuGenres;
 
 export enum MangahasuGenres {
   '4-koma' = '46',

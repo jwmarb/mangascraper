@@ -3,7 +3,6 @@ import {
   MangaCallback,
   Manga,
   MangaSearch,
-  MangahasuType,
   MangahasuTypes,
   MangaFilters,
   MangahasuGenres,
@@ -12,12 +11,32 @@ import {
   MangaRating,
   MangaChapters,
   ScrapingOptions,
+  MangaStatus,
+  MangaGenre,
+  MangaType,
 } from '..';
 import failure from '../functions/failure';
 import numberSeperator from '../functions/numberSeperator';
 import readHtml from '../functions/readHtml';
 import splitAltTitles from '../functions/splitAltTitles';
 import success from '../functions/success';
+
+export interface MangahasuManga {
+  title: string;
+  url: string;
+  coverImage: MangaCoverImage;
+}
+
+export interface MangahasuOptions {
+  genres?: {
+    include?: MangaGenre<Mangahasu>[];
+    exclude?: MangaGenre<Mangahasu>[];
+  };
+  status?: MangaStatus<Mangahasu>;
+  type?: MangaType<Mangahasu>;
+  page?: number;
+}
+export type MangahasuGenre = keyof typeof MangahasuGenres;
 
 export default class Mangahasu {
   private options: ScrapingOptions = {};
@@ -49,7 +68,7 @@ export default class Mangahasu {
   ): Promise<Manga<Mangahasu>[]> {
     if (filters == null) filters = {};
     if (title == null) title = '';
-    const { genres = {}, status = 'all', type = 'any', page = 1 } = filters;
+    const { genres = {}, status = 'any', type = 'any', page = 1 } = filters;
 
     function generateURL(): string {
       const keyword: string = (() => {
@@ -71,7 +90,7 @@ export default class Mangahasu {
         ? `g_e[]=${genres.exclude.map((genre) => MangahasuGenres[genre])}`
         : '';
 
-      const manga_status = status !== 'all' ? `status=${status === 'completed' ? '1' : '2'}` : '';
+      const manga_status = status !== 'any' ? `status=${status === 'completed' ? '1' : '2'}` : '';
 
       const url_args = [keyword, author, artist, typeid, include_genres, exclude_genres, manga_status]
         .filter((arg) => arg.length > 0)
