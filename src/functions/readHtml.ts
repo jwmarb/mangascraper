@@ -22,10 +22,14 @@ export default async function readHtml(url: string, options: ScrapingOptions): P
   } catch (e) {
     if (debug) console.log(`Failed to fetch HTML from ${url}. Using puppeteer...`);
     try {
-      const html = await automateBrowser(options, async (page) => {
-        await page.goto(url);
-        return await page.evaluate(() => document.querySelector('*')?.outerHTML || '');
-      });
+      const html = await automateBrowser(
+        options,
+        async (page) => {
+          await page.goto(url, { waitUntil: 'load' });
+          return await page.evaluate(() => document.querySelector('*')?.outerHTML || '');
+        },
+        { resource: { method: 'unblock', type: ['document'] } },
+      );
       if (debug) console.log('Successfully retrieved html after failed GET request');
       return cheerio.load(html);
     } catch (e) {
