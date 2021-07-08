@@ -9,6 +9,7 @@ import Manganato, { ManganatoGenre, ManganatoManga, ManganatoOptions, ManganatoQ
 import MangaSee, { MangaSeeGenre, MangaSeeManga, MangaSeeMangaAlt, MangaSeeOptions } from './mangasee';
 import MangaPark, { MangaParkManga } from './mangapark';
 import randomUserAgent from 'random-useragent';
+import { LaunchOptions, BrowserLaunchArgumentOptions, BrowserConnectOptions, Product } from 'puppeteer';
 
 export { default as Mangakakalot } from './mangakakalot';
 export { default as Manganato } from './manganato';
@@ -25,7 +26,15 @@ export interface ScrapingOptions {
   puppeteerInstance?: PuppeteerInstance;
 }
 
-type PuppeteerDefault = { instance: 'default' };
+type PuppeteerDefault = {
+  instance: 'default';
+  launch?: LaunchOptions &
+    BrowserLaunchArgumentOptions &
+    BrowserConnectOptions & {
+      product?: Product;
+      extraPrefsFirefox?: Record<string, unknown>;
+    };
+};
 type PuppeteerServer = { instance: 'server'; wsEndpoint: string };
 type PuppeteerInstance = PuppeteerDefault | PuppeteerServer;
 
