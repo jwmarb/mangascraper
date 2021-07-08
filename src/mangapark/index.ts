@@ -25,6 +25,8 @@ export default class MangaPark {
   }
 
   search(title: string, callback: MangaCallback<Manga<MangaPark>[]> = () => {}): Promise<Manga<MangaPark>[]> {
+    function generateURL() {}
+
     return new Promise(async (res) => {
       try {
         // Parse HTML document
