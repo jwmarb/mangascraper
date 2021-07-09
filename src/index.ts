@@ -160,8 +160,8 @@ export type MangaChapters<T> = T extends Manganato | Mangakakalot
 export type MangaRating = {
   sourceRating: string;
   voteCount: number;
-  rating_percentage: string;
-  rating_stars: string;
+  rating_percentage?: string;
+  rating_stars?: string;
 };
 
 export type MangaCoverImage = {
