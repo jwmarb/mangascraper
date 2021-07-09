@@ -1,4 +1,4 @@
-import Mangahasu, { MangahasuGenre, MangahasuManga, MangahasuOptions } from './mangahasu';
+import Mangahasu, { MangahasuGenre, MangahasuManga, MangahasuMeta, MangahasuOptions } from './mangahasu';
 import Mangakakalot, {
   MangakakalotAlt,
   MangakakalotGenre,
@@ -6,8 +6,8 @@ import Mangakakalot, {
   MangakakalotOptions,
 } from './mangakakalot';
 import Manganato, { ManganatoGenre, ManganatoManga, ManganatoOptions, ManganatoQuery } from './manganato';
-import MangaSee, { MangaSeeGenre, MangaSeeManga, MangaSeeMangaAlt, MangaSeeOptions } from './mangasee';
-import MangaPark, { MangaParkManga, MangaParkGenre, MangaParkOptions } from './mangapark';
+import MangaSee, { MangaSeeGenre, MangaSeeManga, MangaSeeMangaAlt, MangaSeeMeta, MangaSeeOptions } from './mangasee';
+import MangaPark, { MangaParkManga, MangaParkGenre, MangaParkOptions, MangaParkMeta } from './mangapark';
 import randomUserAgent from 'random-useragent';
 import { LaunchOptions, BrowserLaunchArgumentOptions, BrowserConnectOptions, Product } from 'puppeteer';
 
@@ -137,38 +137,11 @@ export type MangaMeta<T> = T extends Mangakakalot | Manganato
       chapters: MangaChapters<T>[];
     }
   : T extends Mangahasu
-  ? {
-      title: {
-        main: string;
-        alt: string[];
-      };
-      summary: string;
-      authors: string[];
-      artists: string[];
-      type: string;
-      status: string;
-      views: string;
-      rating: MangaRating;
-      coverImage: MangaCoverImage;
-      chapters: MangaChapters<T>[];
-    }
+  ? MangahasuMeta
   : T extends MangaSee
-  ? {
-      title: {
-        main: string;
-        alt: string;
-      };
-      authors: string[];
-      summary: string;
-      genres: MangaGenre<T>[];
-      coverImage: string;
-      type: MangaType<MangaSee>;
-      status: {
-        scan: MangaStatus<MangaSee>;
-        publish: MangaStatus<MangaSee>;
-      };
-      chapters: MangaChapters<T>[];
-    }
+  ? MangaSeeMeta
+  : T extends MangaPark
+  ? MangaParkMeta
   : never;
 
 export type MangaChapters<T> = T extends Manganato | Mangakakalot
@@ -180,6 +153,8 @@ export type MangaChapters<T> = T extends Manganato | Mangakakalot
     }
   : T extends Mangahasu | MangaSee
   ? { name: string; url: string; uploadDate: Date }
+  : T extends MangaPark
+  ? { name: string; url: string; uploadWhen: string }
   : never;
 
 export type MangaRating = {
