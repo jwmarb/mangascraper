@@ -7,7 +7,7 @@ import Mangakakalot, {
 } from './mangakakalot';
 import Manganato, { ManganatoGenre, ManganatoManga, ManganatoOptions, ManganatoQuery } from './manganato';
 import MangaSee, { MangaSeeGenre, MangaSeeManga, MangaSeeMangaAlt, MangaSeeOptions } from './mangasee';
-import MangaPark, { MangaParkManga } from './mangapark';
+import MangaPark, { MangaParkManga, MangaParkGenre, MangaParkOptions } from './mangapark';
 import randomUserAgent from 'random-useragent';
 import { LaunchOptions, BrowserLaunchArgumentOptions, BrowserConnectOptions, Product } from 'puppeteer';
 
@@ -91,7 +91,7 @@ export type MangaSearch<T> = T extends Manganato
   :
       | {
           title?: string;
-          author?: T extends Mangahasu | MangaSee ? string : never;
+          author?: T extends Mangahasu | MangaSee | MangaPark ? string : never;
           artist?: T extends Mangahasu ? string : never;
         }
       | string;
@@ -104,6 +104,8 @@ export type MangaFilters<T> = T extends Manganato
   ? MangahasuOptions
   : T extends MangaSee
   ? MangaSeeOptions
+  : T extends MangaPark
+  ? MangaParkOptions
   : never;
 
 export type MangaGenre<T> = T extends Mangakakalot
@@ -114,6 +116,8 @@ export type MangaGenre<T> = T extends Mangakakalot
   ? MangahasuGenre
   : T extends MangaSee
   ? MangaSeeGenre
+  : T extends MangaPark
+  ? MangaParkGenre
   : never;
 
 export type MangaMeta<T> = T extends Mangakakalot | Manganato
@@ -253,7 +257,7 @@ export interface BaseMangaGenreOptions<T> {
   page?: number;
 }
 
-export type MangaStatus<T> = T extends Mangakakalot | Mangahasu | Manganato
+export type MangaStatus<T> = T extends Mangakakalot | Mangahasu | Manganato | MangaPark
   ? 'ongoing' | 'completed' | 'any'
   : T extends MangaSee
   ? 'any' | 'cancelled' | 'complete' | 'discontinued' | 'paused' | 'ongoing'
@@ -263,9 +267,114 @@ export type MangaType<T> = T extends MangaSee
   ? 'any' | 'doujinshi' | 'manga' | 'manhua' | 'manhwa'
   : T extends Mangahasu
   ? keyof typeof MangahasuTypes
+  : T extends MangaPark
+  ? 'manhua' | 'manga' | 'manhwa'
   : never;
 
 export type MangaAge = 'new' | 'updated';
+
+export enum MangaParkGenres {
+  '4 koma' = '4-koma',
+  'Action' = 'action',
+  'Adaptation' = 'adaptation',
+  'Adult' = 'adult',
+  'Adventure' = 'adventure',
+  'Aliens' = 'aliens',
+  'Animals' = 'animals',
+  'Anthology' = 'anthology',
+  'Award winning' = 'award-winning',
+  'Comedy' = 'comedy',
+  'Cooking' = 'cooking',
+  'Crime' = 'crime',
+  'Crossdressing' = 'crossdressing',
+  'Delinquents' = 'delinquents',
+  'Demons' = 'demons',
+  'Doujinshi' = 'doujinshi',
+  'Drama' = 'drama',
+  'Ecchi' = 'ecchi',
+  'Fan colored' = 'fan-colored',
+  'Fantasy' = 'fantasy',
+  'Food' = 'food',
+  'Full color' = 'full-color',
+  'Game' = 'game',
+  'Gender bender' = 'gender-bender',
+  'Genderswap' = 'genderswap',
+  'Ghosts' = 'ghosts',
+  'Gore' = 'gore',
+  'Gossip' = 'gossip',
+  'Gyaru' = 'gyaru',
+  'Harem' = 'harem',
+  'Historical' = 'historical',
+  'Horror' = 'horror',
+  'Incest' = 'incest',
+  'Isekai' = 'isekai',
+  'Josei' = 'josei',
+  'Kids' = 'kids',
+  'Loli' = 'loli',
+  'Lolicon' = 'lolicon',
+  'Long strip' = 'long-strip',
+  'Mafia' = 'mafia',
+  'Magic' = 'magic',
+  'Magical girls' = 'magical-girls',
+  'Manhwa' = 'manhwa',
+  'Martial arts' = 'martial-arts',
+  'Mature' = 'mature',
+  'Mecha' = 'mecha',
+  'Medical' = 'medical',
+  'Military' = 'military',
+  'Monster girls' = 'monster-girls',
+  'Monsters' = 'monsters',
+  'Music' = 'music',
+  'Mystery' = 'mystery',
+  'Ninja' = 'ninja',
+  'Office workers' = 'office-workers',
+  'Official colored' = 'official-colored',
+  'One shot' = 'one-shot',
+  'Parody' = 'parody',
+  'Philosophical' = 'philosophical',
+  'Police' = 'police',
+  'Post apocalyptic' = 'post-apocalyptic',
+  'Psychological' = 'psychological',
+  'Reincarnation' = 'reincarnation',
+  'Reverse harem' = 'reverse-harem',
+  'Romance' = 'romance',
+  'Samurai' = 'samurai',
+  'School life' = 'school-life',
+  'Sci fi' = 'sci-fi',
+  'Seinen' = 'seinen',
+  'Shota' = 'shota',
+  'Shotacon' = 'shotacon',
+  'Shoujo' = 'shoujo',
+  'Shoujo ai' = 'shoujo-ai',
+  'Shounen' = 'shounen',
+  'Shounen ai' = 'shounen-ai',
+  'Slice of life' = 'slice-of-life',
+  'Smut' = 'smut',
+  'Space' = 'space',
+  'Sports' = 'sports',
+  'Super power' = 'super-power',
+  'Superhero' = 'superhero',
+  'Supernatural' = 'supernatural',
+  'Survival' = 'survival',
+  'Suspense' = 'suspense',
+  'Thriller' = 'thriller',
+  'Time travel' = 'time-travel',
+  'Toomics' = 'toomics',
+  'Traditional games' = 'traditional-games',
+  'Tragedy' = 'tragedy',
+  'User created' = 'user-created',
+  'Vampire' = 'vampire',
+  'Vampires' = 'vampires',
+  'Video games' = 'video-games',
+  'Villainess' = 'villainess',
+  'Virtual reality' = 'virtual-reality',
+  'Web comic' = 'web-comic',
+  'Webtoon' = 'webtoon',
+  'Wuxia' = 'wuxia',
+  'Yaoi' = 'yaoi',
+  'Yuri' = 'yuri',
+  'Zombies' = 'zombies',
+}
 
 export enum MangahasuTypes {
   'any' = '',
