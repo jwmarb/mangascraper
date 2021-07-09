@@ -10,7 +10,17 @@
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json"
   },
-  "keywords": [],
+  "keywords": [
+    "scraper",
+    "manga",
+    "anime",
+    "manhua",
+    "manhwa"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EGGaming/mangascraper.git"
+  },
   "files": [
     "lib/**/*"
   ],
