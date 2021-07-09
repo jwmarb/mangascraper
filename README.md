@@ -1,4 +1,26 @@
-## Install
+[![npm package](https://img.shields.io/npm/v/@specify_/mangascraper)]("https://www.npmjs.com/package/@specify_/mangascraper") [![license](https://img.shields.io/npm/l/@specify_/mangascraper)]("https://github.com/EGGaming/mangascraper/blob/main/LICENSE")
+
+Mangascraper is a package used to scrape mangas. It is a solution to retrieving mangas that do not offer an API.
+
+---
+
+#### Table of Contents
+
+1. [Installation](#installation)
+   - [npm](#npm)
+2. [Sources](#manga-sources)
+3. [Usage](#usage)
+4. [Configuring puppeteer](#configuring-puppeteer)
+5. [Examples](#examples)
+   - [Mangakakalot](#mangakakalot)
+   - [Manganato](#manganato)
+   - [Mangahasu](#mangahasu)
+   - [MangaSee](#mangasee)
+   - [MangaParkv2](#mangapark)
+
+---
+
+## Installation
 
 ### npm
 
@@ -6,20 +28,26 @@
 npm install @specify_/mangascraper
 ```
 
-This installs the [`mangascraper`]("https://github.com/EGGaming/mangascraper") package which scrapes manga from the following sources:
+---
 
-| Source                                      | Supported? | Notes                       |
-| ------------------------------------------- | ---------- | --------------------------- |
-| [Kissmanga]("https://kissmanga.org")        | ❌         | Not enough information      |
-| [Mangafreak]("https://w11.mangafreak.net/") | ❌         | Cannot GET request          |
-| [Mangahasu]("https://mangahasu.se/")        | ✔️         |                             |
-| [Mangakakalot]("https://mangakakalot.com/") | ✔️         |                             |
-| [Manganato]("https://manganato.com/")       | ✔️         |                             |
-| [Mangaparkv2]("https://v2.mangapark.net")   | ❌         | Cloudflare is a hassle      |
-| [Mangasee]("https://mangasee123.com/")      | ✔️         | Uses puppeteer              |
-| [Readmng]("https://www.readmng.com/")       | ❌         | Requires browser automation |
+## Sources
 
-I will be looking forward to adding more sources to scrape from.
+Currently, mangascraper **supports 5 sources** as of right now, but will support more in the future.
+
+| Source                                      | Supported? | Uses **puppeteer**? | Uses **axios**? |
+| ------------------------------------------- | ---------- | ------------------- | --------------- |
+| [Mangakakalot]("https://mangakakalot.com/") | ✔️         | ---                 | ✔️              |
+| [Manganato]("https://manganato.com/")       | ✔️         | ---                 | ✔️              |
+| [Mangahasu]("https://mangahasu.se/")        | ✔️         | ---                 | ✔️              |
+| [Mangaparkv2]("https://v2.mangapark.net")   | ✔️         | ✔️                  | ❌              |
+| [Mangasee]("https://mangasee123.com/")      | ✔️         | ✔️                  | ❌              |
+| [Readmng]("https://www.readmng.com/")       | ❌         | ---                 | ---             |
+| [Kissmanga]("https://kissmanga.org")        | ❌         | ---                 | ---             |
+| [Mangafreak]("https://w11.mangafreak.net/") | ❌         | ---                 | ---             |
+
+If a supported source uses [axios]("https://github.com/axios/axios"), mangascraper will try to use axios as much as possible to save computer resources. If the network request is blocked by Cloudflare, mangascraper **will resort to using puppeteer**.
+
+---
 
 ## Usage
 
@@ -59,9 +87,35 @@ which outputs...
 ]
 ```
 
-## Configuring with puppeteer
+---
 
-If you already have
+## Configuring puppeteer
+
+If you already have an existing [puppeteer]("https://github.com/puppeteer/puppeteer") endpoint, mangascraper can connect to that endpoint instead.
+
+Mangascraper also includes its own puppeteer launch arguments, and it is **recommended to use them** for scraping to go smoothly.
+
+```js
+import puppeteer from 'puppeteer';
+import { initPuppeteer, MangaSee } from '@specify_/mangascraper';
+
+(async () => {
+  const browser = await puppeteer.launch({ ...initPuppeteer });
+  const endpoint = browser.wsEndpoint();
+
+  const mangasee = new MangaSee({ puppeteerInstance: { instance: 'server', wsEndpoint: endpoint } });
+
+  const mangas = await mangasee.search('Haikyu!');
+})();
+```
+
+However, if you want to **override the launch options**, you can add this to any manga class such as MangaSee.
+
+```js
+const mangasee = new MangaSee({ puppeteerInstance: { instance: 'default', launch: { ...myCustomLaunchOptions } } });
+```
+
+## Examples
 
 ### Mangakakalot
 
@@ -194,5 +248,61 @@ const mangahasu = new Mangahasu();
   const pages = await mangahasu.getPages(meta.chapters[0].url);
 
   console.log(pages);
+})();
+```
+
+---
+
+### MangaSee
+
+Get a list of manga that match the title **the melancholy of haruhi suzumiya**, and as well open puppeteer in headful mode (useful for debugging);
+
+```js
+import { MangaSee } from '@specify_/mangascraper';
+
+const mangasee = new MangaSee({ debug: true }); // Opens puppeteer in headful mode
+
+(async () => {
+  const mangas = await mangasee.search('the melancholy of haruhi suzumiya');
+  console.log(mangas);
+})();
+```
+
+Get all mangas from the MangaSee directory.
+
+```js
+import { MangaSee } from '@specify_/mangascraper';
+
+const mangasee = new MangaSee();
+
+(async () => {
+  const mangas = await mangasee.directory();
+  console.log(mangas);
+})();
+```
+
+Get the metadata of the **Berserk** manga
+
+```js
+import { MangaSee } from '@specify_/mangascraper';
+
+const mangasee = new MangaSee();
+
+(async () => {
+  const berserk = await mangasee.getMangaMeta('https://mangasee123.com/manga/Berserk');
+  console.log(berserk);
+})();
+```
+
+Get the Chapter 363 pages of the **Berserk** manga
+
+```js
+import { MangaSee } from '@specify_/mangascraper';
+
+const mangasee = new MangaSee();
+
+(async () => {
+  const chapter363 = await mangasee.getPages('https://mangasee123.com/read-online/Berserk-chapter-363-index-2.html');
+  console.log(chapter363);
 })();
 ```
