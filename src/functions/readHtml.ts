@@ -1,12 +1,16 @@
 import cheerio, { CheerioAPI } from 'cheerio';
 import axios from 'axios';
 import { ScrapingOptions } from '..';
-import puppeteer, { ElementHandle, Page } from 'puppeteer';
-import jqueryImport from 'jquery';
+import puppeteer from 'puppeteer';
 import randomUserAgent from 'random-useragent';
-import automateBrowser from './automateBrowser';
+import automateBrowser, { BrowserNetworkOptions } from './automateBrowser';
 
-export default async function readHtml(url: string, options: ScrapingOptions): Promise<CheerioAPI> {
+export default async function readHtml(
+  url: string,
+  options: ScrapingOptions,
+  network?: BrowserNetworkOptions,
+  waitUntil?: puppeteer.PuppeteerLifeCycleEvent | puppeteer.PuppeteerLifeCycleEvent[],
+): Promise<CheerioAPI> {
   const { proxy, debug = false } = options;
 
   if (debug) console.log(`Fetching HTML from ${url}`);
@@ -25,10 +29,10 @@ export default async function readHtml(url: string, options: ScrapingOptions): P
       const html = await automateBrowser(
         options,
         async (page) => {
-          await page.goto(url, { waitUntil: 'load' });
+          await page.goto(url, { waitUntil: waitUntil ? waitUntil : 'load' });
           return await page.evaluate(() => document.body.innerHTML);
         },
-        { resource: { method: 'unblock', type: ['document'] } },
+        network ? network : { resource: { method: 'unblock', type: ['document'] } },
       );
       if (debug) console.log('Successfully retrieved html after failed GET request');
       return cheerio.load(html);
