@@ -119,7 +119,7 @@ export default class Manganato {
       return `https://manganato.com/advanced_search?s=all&${url_args.join('&')}&page=${page}`;
     }
     return new Promise(async (res, rej) => {
-      if (page <= 0) return failure(new Error('"page" must be greater than 0'));
+      if (page <= 0) return failure(new Error('"page" must be greater than 0'), callback);
 
       try {
         /** Parse HTML document */
@@ -177,7 +177,7 @@ export default class Manganato {
 
         success(mangaList, callback, res);
       } catch (e) {
-        failure(new Error(e));
+        failure(new Error(e), callback);
       }
     });
   }
@@ -207,7 +207,7 @@ export default class Manganato {
     callback: MangaCallback<MangaMeta<Manganato>> = () => {},
   ): Promise<MangaMeta<Manganato>> {
     return new Promise(async (res, rej) => {
-      if (typeof url === 'undefined') return failure(new Error("Argument 'url' is required"));
+      if (typeof url === 'undefined') return failure(new Error("Argument 'url' is required"), callback);
       try {
         /** Parse HTML Document */
         const $ = await readHtml(url, this.options);
