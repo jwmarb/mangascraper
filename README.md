@@ -33,7 +33,7 @@ npm install @specify_/mangascraper
 
 ## Sources
 
-Currently, mangascraper **supports 5 sources** as of right now, but will support more in the future.
+Currently, mangascraper **supports 5 sources**, but will support more in the future.
 
 | Source                                    | Supported? | Uses **puppeteer**? | Uses **axios**? |
 | ----------------------------------------- | ---------- | ------------------- | --------------- |
