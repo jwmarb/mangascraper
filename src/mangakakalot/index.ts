@@ -89,7 +89,7 @@ export default class Mangakakalot {
 
         /** Simple string date converter to Date type */
         function convertToDate(date: string): Date {
-          return parse(date, 'MMM-DD-YYYY HH:mm:ss', new Date());
+          return parse(date, 'MMM-dd-yyyy HH:mm:ss', new Date());
         }
 
         /** Gets all URLs to their respected manga */
@@ -212,7 +212,7 @@ export default class Mangakakalot {
           if (typeof unknown_li === 'undefined') return;
           if (unknown_li.startsWith('Status :')) status = unknown_li.substring(9);
           if (unknown_li.startsWith('Last updated :'))
-            updatedAt = parse(unknown_li.substring(15), 'MMM-DD-YYYY hh:mm:ss A', new Date());
+            updatedAt = parse(unknown_li.substring(15), 'MMM-dd-yyyy hh:mm:ss A', new Date());
           if (unknown_li.startsWith('View :')) views = unknown_li.substring(7);
         });
 
@@ -272,7 +272,7 @@ export default class Mangakakalot {
           const chapters_views_date: string = $(element).text();
           if (typeof chapters_views_date === 'undefined') return;
           if (chapters_views_date.match(/[a-zA-Z]/g))
-            chaptersDate.push(parse(chapters_views_date, 'MMM-DD-YY', new Date()));
+            chaptersDate.push(parse(chapters_views_date, 'MMM-dd-yy', new Date()));
           else chaptersViews.push(chapters_views_date);
         });
 

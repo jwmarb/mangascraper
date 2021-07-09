@@ -264,7 +264,7 @@ export default class Mangahasu {
             const anchorEl = $(el).children('td.name').children('a');
             const chapter_name = anchorEl.text().replace(title, '').trim();
             const chapter_url = anchorEl.attr('href');
-            const chapter_date = parse($(el).children('td.date-updated').text().trim(), 'MMM DD, YYYY', new Date());
+            const chapter_date = parse($(el).children('td.date-updated').text().trim(), 'MMM dd, yyyy', new Date());
             if (typeof chapter_url !== 'undefined')
               return { name: chapter_name, url: chapter_url, uploadDate: chapter_date };
           })

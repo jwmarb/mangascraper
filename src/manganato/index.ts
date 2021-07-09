@@ -145,7 +145,7 @@ export default class Manganato {
         const updatedAt: Date[] = $(
           `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-time`,
         )
-          .map((_, element) => parse($(element).text(), 'MMM DD,YY', new Date()))
+          .map((_, element) => parse($(element).text(), 'MMM dd,yy', new Date()))
           .get();
 
         /** Get manga views */
@@ -257,7 +257,7 @@ export default class Manganato {
             .parent()
             .siblings('span.stre-value')
             .text(),
-          'MMM DD,YYYY - HH:mm A',
+          'MMM dd,yyyy - HH:mm A',
           new Date(),
         );
 
@@ -308,7 +308,7 @@ export default class Manganato {
 
         // Get chapter dates
         const chapterDates = $(`div.panel-story-chapter-list > ul.row-content-chapter > li > span.chapter-time`)
-          .map((_, el) => parse($(el).text(), 'MMM DD,YY', new Date()))
+          .map((_, el) => parse($(el).text(), 'MMM dd,yy', new Date()))
           .get();
 
         /** Get data from chapters and arrange them into JSON-like data */
@@ -461,7 +461,7 @@ export default class Manganato {
           `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-time`,
         ).each((_, el) => {
           const time_string = $(el).text();
-          if (typeof time_string !== 'undefined') updatedAt.push(parse(time_string, 'MMM DD,YY', new Date()));
+          if (typeof time_string !== 'undefined') updatedAt.push(parse(time_string, 'MMM dd,yy', new Date()));
         });
 
         /** Get manga authors */

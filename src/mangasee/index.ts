@@ -274,7 +274,7 @@ export default class MangaSee {
           .trim()
           .slice(2)
           .split('· ')
-          .map((date) => parse(date, 'MM/DD/YYYY', new Date()));
+          .map((date) => parse(date, 'MM/dd/yyyy', new Date()));
 
         // Get manga genres
         const genres: string[][] = [];
