@@ -238,11 +238,13 @@ export default class Mangahasu {
         );
 
         /** Get manga rating */
-        let rating_stars = `${$(`div[class="div-evaluate detail_item"] > span.info > span.ratings`).text().trim()}/5`;
-        let rating_percentage = `${(
-          (Number($(`div[class="div-evaluate detail_item"] > span.info > span.ratings`).text().trim()) / 5) *
-          100
-        ).toFixed(2)}%`;
+        const spanRatings = $(`div[class="div-evaluate detail_item"] > span.info > span.ratings`).text().trim();
+        let rating_stars;
+        let rating_percentage;
+        if (spanRatings.length !== 0) {
+          rating_stars = `${spanRatings}/5`;
+          rating_percentage = `${((Number(spanRatings) / 5) * 100).toFixed(2)}%`;
+        }
         let voteCount = Number(
           $(`div[class="div-evaluate detail_item"] > span.info > span.div_evaluate`).text().trim(),
         );
