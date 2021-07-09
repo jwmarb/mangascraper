@@ -77,7 +77,7 @@ export default class Mangakakalot {
 
     return new Promise(async (res, rej) => {
       /** Param Validation */
-      if (keyword == null) return failure(new Error('Missing argument "keyword" is required'), callback);
+      if (keyword == null) return failure('Missing argument "keyword" is required', callback);
 
       try {
         /** Load HTML Document to cheerio to extract HTML data */
@@ -142,7 +142,7 @@ export default class Mangakakalot {
 
         success(mangaList, callback, res);
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }
@@ -171,7 +171,7 @@ export default class Mangakakalot {
     callback: MangaCallback<MangaMeta<Mangakakalot>> = () => {},
   ): Promise<MangaMeta<Mangakakalot>> {
     return new Promise(async (res, rej) => {
-      if (url == null) return failure(new Error('Argument "url" is required'), callback);
+      if (url == null) return failure('Argument "url" is required', callback);
       try {
         /** Load HTML Document to cheerio to extract HTML data */
         const $ = await readHtml(url, this.options);
@@ -302,7 +302,7 @@ export default class Mangakakalot {
           res,
         );
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }
@@ -333,9 +333,9 @@ export default class Mangakakalot {
   ): Promise<Manga<Mangakakalot, 'alt'>[]> {
     const { page = 1, genre = 'any', status = 'any', type = 'updated' } = filters;
     return new Promise(async (res, rej) => {
-      if (page == null) return failure(new Error("Argument 'page' is required"), callback);
-      if (typeof page !== 'number') return failure(new Error("Argument 'page' must be a number"), callback);
-      if (page <= 0) return failure(new Error("'page' must be greater than 0"), callback);
+      if (page == null) return failure('Missing argument "page" is required', callback);
+      if (typeof page !== 'number') return failure('"page" must be a number', callback);
+      if (page <= 0) return failure('"page" must be a number greater than 0', callback);
 
       try {
         /** Parse HTML Document */
@@ -387,7 +387,7 @@ export default class Mangakakalot {
 
         success(mangaList, callback, res);
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }
@@ -415,7 +415,7 @@ export default class Mangakakalot {
    */
   public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
     return new Promise(async (res, rej) => {
-      if (url == null) return failure(new Error("Argument 'chapter_url' is required"), callback);
+      if (url == null) return failure('Argument "url" is required', callback);
 
       try {
         /** Parse HTML document */
@@ -431,7 +431,7 @@ export default class Mangakakalot {
 
         success(pages, callback, res);
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }

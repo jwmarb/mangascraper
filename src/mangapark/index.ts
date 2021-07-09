@@ -159,8 +159,8 @@ export default class MangaPark {
     })();
 
     return new Promise(async (res) => {
-      if (typeof page !== 'number') return failure(new Error('"page" must be a number'), callback);
-      if (page == null) return failure(new Error('"page" is required'), callback);
+      if (typeof page !== 'number') return failure('"page" must be a number', callback);
+      if (page == null) return failure('Missing argument "page" is required', callback);
       try {
         // Parse HTML document
         const $ = await readHtml(url, this.options);
@@ -239,7 +239,7 @@ export default class MangaPark {
 
         success(data, callback, res);
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }
@@ -414,7 +414,7 @@ export default class MangaPark {
           res,
         );
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }
@@ -471,7 +471,7 @@ export default class MangaPark {
         );
         success(data, callback, res);
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }

@@ -314,7 +314,7 @@ export default class MangaSee {
 
         success(data as any, callback, res);
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }
@@ -390,7 +390,7 @@ export default class MangaSee {
         });
         success(mangas as any, callback, res);
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }
@@ -404,7 +404,7 @@ export default class MangaSee {
     })();
 
     return new Promise(async (res) => {
-      if (url == null) return failure(new Error('"url" is required'), callback);
+      if (url == null) return failure('Missing argument "url" is required', callback);
       try {
         /**
          * Runs tabs in parallization. Pretty cool, right?
@@ -486,7 +486,7 @@ export default class MangaSee {
           res,
         );
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }
@@ -519,7 +519,7 @@ export default class MangaSee {
         );
         success(pages, callback, res);
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }

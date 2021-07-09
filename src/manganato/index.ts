@@ -119,7 +119,8 @@ export default class Manganato {
       return `https://manganato.com/advanced_search?s=all&${url_args.join('&')}&page=${page}`;
     }
     return new Promise(async (res, rej) => {
-      if (page <= 0) return failure(new Error('"page" must be greater than 0'), callback);
+      if (page == null) return failure('Missing argument "page" is required', callback);
+      if (page <= 0) return failure('"page" must be greater than 0', callback);
 
       try {
         /** Parse HTML document */
@@ -177,7 +178,7 @@ export default class Manganato {
 
         success(mangaList, callback, res);
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }
@@ -207,7 +208,7 @@ export default class Manganato {
     callback: MangaCallback<MangaMeta<Manganato>> = () => {},
   ): Promise<MangaMeta<Manganato>> {
     return new Promise(async (res, rej) => {
-      if (typeof url === 'undefined') return failure(new Error("Argument 'url' is required"), callback);
+      if (typeof url == null) return failure('Missing argument "url" is required', callback);
       try {
         /** Parse HTML Document */
         const $ = await readHtml(url, this.options);
@@ -339,7 +340,7 @@ export default class Manganato {
           res,
         );
       } catch (e) {
-        failure(new Error(e), callback);
+        failure(e, callback);
       }
     });
   }
@@ -366,8 +367,8 @@ export default class Manganato {
    * ```
    */
   public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
-    return new Promise(async (res, rej) => {
-      if (typeof url === 'undefined') return failure(new Error("Argument 'url' is required"), callback);
+    return new Promise(async (res) => {
+      if (url == null) return failure('Argument "url" is required', callback);
 
       try {
         /** Parse HTML Document */
@@ -383,7 +384,7 @@ export default class Manganato {
 
         success(pages, callback, res);
       } catch (e) {
-        return failure(new Error(e), callback);
+        return failure(e, callback);
       }
     });
   }
@@ -427,8 +428,9 @@ export default class Manganato {
     }
 
     return new Promise(async (res, rej) => {
-      if (typeof genre === 'undefined') return failure(new Error("Argument 'genres' is required"), callback);
-      if (page <= 0) return failure(new Error("'page' must be greater than 0"), callback);
+      if (genre == null) return failure('Missing argument "genres" is required', callback);
+      if (page == null) return failure('Missing argument "page" is required', callback);
+      if (page <= 0) return failure('"page" must be greater than 0', callback);
 
       try {
         /** Parse HTML document */
@@ -496,7 +498,7 @@ export default class Manganato {
 
         success(mangas, callback, res);
       } catch (e) {
-        return failure(new Error(e), callback);
+        return failure(e, callback);
       }
     });
   }

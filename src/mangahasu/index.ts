@@ -117,7 +117,8 @@ export default class Mangahasu {
     }
 
     return new Promise(async (res) => {
-      if (page <= 0) return failure(new Error('"page" must be greater than 0'), callback);
+      if (page == null) return failure('Missing argument "page" is required', callback);
+      if (page <= 0) return failure('"page" must be greater than 0', callback);
       if (typeof title !== 'string' && title.artist == null && title.title == null && title.author == null) title = '';
 
       try {
@@ -161,7 +162,7 @@ export default class Mangahasu {
 
         success(mangaList, callback, res);
       } catch (e) {
-        return failure(new Error(e), callback);
+        return failure(e, callback);
       }
     });
   }
@@ -188,7 +189,7 @@ export default class Mangahasu {
     callback: MangaCallback<MangaMeta<Mangahasu>> = () => {},
   ): Promise<MangaMeta<Mangahasu>> {
     return new Promise(async (res) => {
-      if (url == null) return failure(new Error('Argument "url" is required'), callback);
+      if (url == null) return failure('Missing argument "url" is required', callback);
       try {
         /** Parse HTML document */
         const $ = await readHtml(url, this.options);
@@ -290,7 +291,7 @@ export default class Mangahasu {
           res,
         );
       } catch (e) {
-        return failure(new Error(e), callback);
+        return failure(e, callback);
       }
     });
   }
@@ -315,7 +316,7 @@ export default class Mangahasu {
    */
   public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
     return new Promise(async (res) => {
-      if (url == null) return failure(new Error('Argument "url" is required'), callback);
+      if (url == null) return failure('Missing argument "url" is required', callback);
       try {
         /** parse HTML document */
         const $ = await readHtml(url, this.options);
@@ -331,7 +332,7 @@ export default class Mangahasu {
 
         success(pages, callback, res);
       } catch (e) {
-        return failure(new Error(e), callback);
+        return failure(e, callback);
       }
     });
   }
