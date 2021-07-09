@@ -16,7 +16,7 @@ Mangascraper is a package used to scrape mangas. It is a solution to retrieving 
    - [Manganato](#manganato)
    - [Mangahasu](#mangahasu)
    - [MangaSee](#mangasee)
-   - [MangaParkv2](#mangapark)
+   - [MangaPark v2](#mangapark-v2)
 
 ---
 
@@ -304,5 +304,29 @@ const mangasee = new MangaSee();
 (async () => {
   const chapter363 = await mangasee.getPages('https://mangasee123.com/read-online/Berserk-chapter-363-index-2.html');
   console.log(chapter363);
+})();
+```
+
+---
+
+### MangaPark v2
+
+Search for a manga that matches the title **noragami**.
+
+Get the first result and get the meta
+
+Then get the pages of the latest chapter
+
+```js
+import { MangaPark } from '@specify_/mangascraper';
+
+const mangapark = new MangaPark();
+
+(async () => {
+  const mangas = await mangapark.search('noragami');
+  const meta = await mangapark.getMangaMeta(mangas[0].url);
+  const pages = await mangapark.getPages(meta.chapters[meta.chapters.recentlyUpdated][0].pages);
+
+  console.log(pages);
 })();
 ```
