@@ -1,7 +1,9 @@
 import {
   Manga,
   MangaCallback,
+  MangaChapters,
   MangaFilters,
+  MangaGenre,
   MangaMeta,
   MangaOrder,
   MangaSearch,
@@ -20,6 +22,23 @@ import moment from 'moment';
 import automateBrowsers from '../functions/automateBrowsers';
 
 type WindowJquery = typeof window & { $: typeof jquery };
+
+export type MangaSeeMeta = {
+  title: {
+    main: string;
+    alt: string;
+  };
+  authors: string[];
+  summary: string;
+  genres: MangaGenre<MangaSee>[];
+  coverImage: string;
+  type: MangaType<MangaSee>;
+  status: {
+    scan: MangaStatus<MangaSee>;
+    publish: MangaStatus<MangaSee>;
+  };
+  chapters: MangaChapters<MangaSee>[];
+};
 
 export interface MangaSeeOptions {
   orderBy?: MangaOrder<MangaSee>;
