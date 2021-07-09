@@ -15,11 +15,10 @@ import {
   MangaGenreFilters,
   ScrapingOptions,
   MangaBase,
-  MangaSeeGenres,
   MangaOrder,
   MangaStatus,
 } from '../';
-import { parse, format } from 'date-fns';
+import { parse } from 'date-fns';
 import splitAltTitles from '../functions/splitAltTitles';
 
 export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'everything'; search: string } | string;

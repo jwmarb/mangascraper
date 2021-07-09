@@ -18,8 +18,8 @@ import jquery from 'jquery';
 import cheerio from 'cheerio';
 import success from '../functions/success';
 import failure from '../functions/failure';
-import moment from 'moment';
 import automateBrowsers from '../functions/automateBrowsers';
+import { parse } from 'date-fns';
 
 type WindowJquery = typeof window & { $: typeof jquery };
 
@@ -274,7 +274,7 @@ export default class MangaSee {
           .trim()
           .slice(2)
           .split('· ')
-          .map((date) => moment(date, 'MM/DD/YYYY').toDate());
+          .map((date) => parse(date, 'MM/DD/YYYY', new Date()));
 
         // Get manga genres
         const genres: string[][] = [];
@@ -471,7 +471,7 @@ export default class MangaSee {
         const title = $('title').first().text() + ' ';
 
         const chapterTitles = $('item > title').map((_, el) => $(el).text().replace(title, ''));
-        const chapterDates = $('pubDate').map((_, el) => moment($(el).text()).toDate());
+        const chapterDates = $('pubDate').map((_, el) => new Date($(el).text()));
 
         success(
           {

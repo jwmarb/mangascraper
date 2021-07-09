@@ -1,4 +1,3 @@
-import moment from 'moment';
 import {
   MangaCallback,
   Manga,
@@ -15,6 +14,7 @@ import {
   MangaGenre,
   MangaType,
 } from '..';
+import { parse } from 'date-fns';
 import failure from '../functions/failure';
 import numberSeperator from '../functions/numberSeperator';
 import readHtml from '../functions/readHtml';
@@ -264,7 +264,7 @@ export default class Mangahasu {
             const anchorEl = $(el).children('td.name').children('a');
             const chapter_name = anchorEl.text().replace(title, '').trim();
             const chapter_url = anchorEl.attr('href');
-            const chapter_date = moment($(el).children('td.date-updated').text().trim(), 'MMM DD, YYYY').toDate();
+            const chapter_date = parse($(el).children('td.date-updated').text().trim(), 'MMM DD, YYYY', new Date());
             if (typeof chapter_url !== 'undefined')
               return { name: chapter_name, url: chapter_url, uploadDate: chapter_date };
           })
