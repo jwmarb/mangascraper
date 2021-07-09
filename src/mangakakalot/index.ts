@@ -77,7 +77,7 @@ export default class Mangakakalot {
 
     return new Promise(async (res, rej) => {
       /** Param Validation */
-      if (typeof keyword === 'undefined') return failure(new Error('Missing argument "keyword" is required'), callback);
+      if (keyword == null) return failure(new Error('Missing argument "keyword" is required'), callback);
 
       try {
         /** Load HTML Document to cheerio to extract HTML data */
