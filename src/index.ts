@@ -170,10 +170,20 @@ export type MangaCoverImage = {
 };
 
 export type MangaOrder<T> = T extends Manganato | Mangakakalot
-  ? 'latest_updates' | 'top_view' | 'new_manga' | 'A-Z'
+  ? 'latest_updates' | 'most_views' | 'new_manga' | 'A-Z'
   : T extends MangaSee
   ? keyof typeof MangaSeeOrderBy
+  : T extends MangaPark
+  ? keyof typeof MangaParkOrderBy
   : never;
+
+export enum MangaParkOrderBy {
+  'A-Z' = 'a-z',
+  'latest_updates' = 'update',
+  'rating' = 'rating',
+  'new_manga' = 'create',
+  'views' = 'views',
+}
 
 export enum MangaSeeOrderBy {
   'A-Z' = 's',
