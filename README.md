@@ -17,6 +17,7 @@ Mangascraper is a package used to scrape mangas. It is a solution to retrieving 
    - [Mangahasu](#mangahasu)
    - [MangaSee](#mangasee)
    - [MangaPark v2](#mangapark-v2)
+6. [License](#license)
 
 ---
 
