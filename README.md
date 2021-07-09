@@ -35,18 +35,18 @@ npm install @specify_/mangascraper
 
 Currently, mangascraper **supports 5 sources** as of right now, but will support more in the future.
 
-| Source                                      | Supported? | Uses **puppeteer**? | Uses **axios**? |
-| ------------------------------------------- | ---------- | ------------------- | --------------- |
-| [Mangakakalot]("https://mangakakalot.com/") | ✔️         | ---                 | ✔️              |
-| [Manganato]("https://manganato.com/")       | ✔️         | ---                 | ✔️              |
-| [Mangahasu]("https://mangahasu.se/")        | ✔️         | ---                 | ✔️              |
-| [Mangaparkv2]("https://v2.mangapark.net")   | ✔️         | ✔️                  | ❌              |
-| [Mangasee]("https://mangasee123.com/")      | ✔️         | ✔️                  | ❌              |
-| [Readmng]("https://www.readmng.com/")       | ❌         | ---                 | ---             |
-| [Kissmanga]("https://kissmanga.org")        | ❌         | ---                 | ---             |
-| [Mangafreak]("https://w11.mangafreak.net/") | ❌         | ---                 | ---             |
+| Source                                    | Supported? | Uses **puppeteer**? | Uses **axios**? |
+| ----------------------------------------- | ---------- | ------------------- | --------------- |
+| [Mangakakalot](https://mangakakalot.com/) | ✔️         | ---                 | ✔️              |
+| [Manganato](https://manganato.com/)       | ✔️         | ---                 | ✔️              |
+| [Mangahasu](https://mangahasu.se/)        | ✔️         | ---                 | ✔️              |
+| [Mangaparkv2](https://v2.mangapark.net)   | ✔️         | ✔️                  | ❌              |
+| [Mangasee](https://mangasee123.com/)      | ✔️         | ✔️                  | ❌              |
+| [Readmng](https://www.readmng.com/)       | ❌         | ---                 | ---             |
+| [Kissmanga](https://kissmanga.org)        | ❌         | ---                 | ---             |
+| [Mangafreak](https://w11.mangafreak.net/) | ❌         | ---                 | ---             |
 
-If a supported source uses [axios]("https://github.com/axios/axios"), mangascraper will try to use axios as much as possible to save computer resources. If the network request is blocked by Cloudflare, mangascraper **will resort to using puppeteer**.
+If a supported source uses [axios](https://github.com/axios/axios), mangascraper will try to use axios as much as possible to save computer resources. If the network request is blocked by Cloudflare, mangascraper **will resort to using puppeteer**.
 
 ---
 
@@ -92,7 +92,7 @@ which outputs...
 
 ## Configuring puppeteer
 
-If you already have an existing [puppeteer]("https://github.com/puppeteer/puppeteer") endpoint, mangascraper can connect to that endpoint instead.
+If you already have an existing [puppeteer](https://github.com/puppeteer/puppeteer) endpoint, mangascraper can connect to that endpoint instead.
 
 Mangascraper also includes its own puppeteer launch arguments, and it is **recommended to use them** for scraping to go smoothly.
 
@@ -336,4 +336,4 @@ const mangapark = new MangaPark();
 
 ## License
 
-Distributed under [MIT © Joseph Marbella]("https://github.com/EGGaming/mangascraper/blob/main/LICENSE")
+Distributed under [MIT © Joseph Marbella](https://github.com/EGGaming/mangascraper/blob/main/LICENSE)
