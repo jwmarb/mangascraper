@@ -96,7 +96,7 @@ export default class Manganato {
             return 'orby=newest';
           case 'latest_updates':
             return '';
-          case 'top_view':
+          case 'most_views':
             return 'orby=topview';
           default:
             console.warn(
@@ -345,7 +345,7 @@ export default class Manganato {
   }
 
   /**
-   * Get raw image URLs from a chapter URL. Since readmanganato uses cloudflare, make sure
+   * Get raw image URLs from a chapter URL. Since readmanganato uses Cloudflare, make sure
    * to attach `referer: https://readmanganato.com/` to the request headers when fetching images
    * or else the images will not load.
    *
