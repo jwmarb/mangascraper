@@ -330,3 +330,9 @@ const mangapark = new MangaPark();
   console.log(pages);
 })();
 ```
+
+---
+
+## License
+
+Distributed under [MIT © Joseph Marbella]("https://github.com/EGGaming/mangascraper/blob/main/LICENSE")
