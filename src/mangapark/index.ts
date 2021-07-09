@@ -35,7 +35,7 @@ export type MangaParkMeta = {
   status: Omit<MangaStatus<MangaPark>, 'any'>;
   rating: MangaRating;
   chapters: {
-    recentlyUpdated: 'duck' | 'fox' | 'rock' | 'panda' | 'mini';
+    recentlyUpdated?: 'duck' | 'fox' | 'rock' | 'panda' | 'mini';
     duck: MangaChapters<MangaPark>[];
     fox: MangaChapters<MangaPark>[];
     rock: MangaChapters<MangaPark>[];
@@ -376,7 +376,9 @@ export default class MangaPark {
           }
         });
 
-        const recommendedSource = <MangaMeta<MangaPark>['chapters']['recentlyUpdated']>$('div#list > div.stream')
+        const recommendedSource = <NonNullable<MangaMeta<MangaPark>['chapters']['recentlyUpdated']>>$(
+          'div#list > div.stream',
+        )
           .filter((_, el) => !$(el).hasClass('collapsed'))
           .find('div > div > a > span')
           .text()
@@ -384,7 +386,7 @@ export default class MangaPark {
           .toLowerCase();
 
         const chapters: MangaMeta<MangaPark>['chapters'] = {
-          recentlyUpdated: recommendedSource,
+          recentlyUpdated: recommendedSource.length === 0 ? undefined : recommendedSource,
           duck: memo[0],
           fox: memo[1],
           rock: memo[2],
