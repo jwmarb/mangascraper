@@ -19,7 +19,7 @@ import {
   MangaOrder,
   MangaStatus,
 } from '../';
-import moment from 'moment';
+import { parse, format } from 'date-fns';
 import splitAltTitles from '../functions/splitAltTitles';
 
 export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'everything'; search: string } | string;
@@ -43,7 +43,7 @@ export default class Manganato {
   }
 
   /**
-   * Search up a manga from Manganato (uses built-in advanced search)
+   * Search up a manga from Manganato
    *
    * @param title - Title of manga. By default, it searches for all mangas that have matching keywords. If you want to only search for a specific keyword (such as author name only), pass in an object with the key `keywords` containing either values: `author`, `artist`, `title`.
    * ```js
@@ -146,7 +146,7 @@ export default class Manganato {
         const updatedAt: Date[] = $(
           `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-time`,
         )
-          .map((_, element) => moment($(element).text(), 'MMM DD,YY').toDate())
+          .map((_, element) => parse($(element).text(), 'MMM DD,YY', new Date()))
           .get();
 
         /** Get manga views */
@@ -253,13 +253,14 @@ export default class Manganato {
           .get();
 
         /** Get manga updated date */
-        const updatedAt = moment(
+        const updatedAt = parse(
           $(`div.story-info-right-extent > p > span.stre-label > i.info-time`)
             .parent()
             .siblings('span.stre-value')
             .text(),
           'MMM DD,YYYY - HH:mm A',
-        ).toDate();
+          new Date(),
+        );
 
         /** Get manga views */
         const views: string = $(`div.story-info-right-extent > p > span.stre-label > i.info-view`)
@@ -308,7 +309,7 @@ export default class Manganato {
 
         // Get chapter dates
         const chapterDates = $(`div.panel-story-chapter-list > ul.row-content-chapter > li > span.chapter-time`)
-          .map((_, el) => moment($(el).text(), 'MMM DD,YY').toDate())
+          .map((_, el) => parse($(el).text(), 'MMM DD,YY', new Date()))
           .get();
 
         /** Get data from chapters and arrange them into JSON-like data */
@@ -461,7 +462,7 @@ export default class Manganato {
           `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-time`,
         ).each((_, el) => {
           const time_string = $(el).text();
-          if (typeof time_string !== 'undefined') updatedAt.push(moment(time_string, 'MMM DD,YY').toDate());
+          if (typeof time_string !== 'undefined') updatedAt.push(parse(time_string, 'MMM DD,YY', new Date()));
         });
 
         /** Get manga authors */
