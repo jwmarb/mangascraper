@@ -26,7 +26,7 @@ export default async function readHtml(url: string, options: ScrapingOptions): P
         options,
         async (page) => {
           await page.goto(url, { waitUntil: 'load' });
-          return await page.evaluate(() => document.querySelector('*')?.outerHTML || '');
+          return await page.evaluate(() => document.body.innerHTML);
         },
         { resource: { method: 'unblock', type: ['document'] } },
       );
