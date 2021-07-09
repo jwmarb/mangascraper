@@ -15,7 +15,7 @@
     "lib/**/*"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/jquery": "^3.5.5",
     "@types/random-useragent": "^0.3.0",
