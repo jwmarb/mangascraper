@@ -27,6 +27,22 @@ export interface MangahasuManga {
   coverImage: MangaCoverImage;
 }
 
+export type MangahasuMeta = {
+  title: {
+    main: string;
+    alt: string[];
+  };
+  summary: string;
+  authors: string[];
+  artists: string[];
+  type: string;
+  status: string;
+  views: string;
+  rating: MangaRating;
+  coverImage: MangaCoverImage;
+  chapters: MangaChapters<Mangahasu>[];
+};
+
 export interface MangahasuOptions {
   genres?: {
     include?: MangaGenre<Mangahasu>[];
