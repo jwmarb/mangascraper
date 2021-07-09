@@ -1,4 +1,4 @@
-[![npm package](https://img.shields.io/npm/v/@specify_/mangascraper)]("https://www.npmjs.com/package/@specify_/mangascraper") [![license](https://img.shields.io/npm/l/@specify_/mangascraper)]("https://github.com/EGGaming/mangascraper/blob/main/LICENSE")
+[![npm package](https://img.shields.io/npm/v/@specify_/mangascraper)](https://www.npmjs.com/package/@specify_/mangascraper) [![license](https://img.shields.io/npm/l/@specify_/mangascraper)](https://github.com/EGGaming/mangascraper/blob/main/LICENSE)
 
 Mangascraper is a package used to scrape mangas. It is a solution to retrieving mangas that do not offer an API.
 
