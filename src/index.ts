@@ -59,7 +59,7 @@ export const initPuppeteer = {
   ignoreHTTPSErrors: true,
 };
 
-export type MangaCallback<T> = (error?: Error | undefined, result?: T) => void;
+export type MangaCallback<T> = (error?: Error, result?: T) => void;
 
 export interface MangaBase {
   title: string;
