@@ -35,12 +35,13 @@ export type MangaParkMeta = {
   status: Omit<MangaStatus<MangaPark>, 'any'>;
   rating: MangaRating;
   chapters: {
-    recentlyUpdated?: 'duck' | 'fox' | 'rock' | 'panda' | 'mini';
+    recentlyUpdated?: 'duck' | 'fox' | 'rock' | 'panda' | 'mini' | 'toon';
     duck: MangaChapters<MangaPark>[];
     fox: MangaChapters<MangaPark>[];
     rock: MangaChapters<MangaPark>[];
     panda: MangaChapters<MangaPark>[];
     mini: MangaChapters<MangaPark>[];
+    toon: MangaChapters<MangaPark>[];
   };
 };
 
@@ -328,7 +329,7 @@ export default class MangaPark {
           };
         })();
 
-        let memo: MangaChapters<MangaPark>[][] = [[], [], [], [], []];
+        let memo: MangaChapters<MangaPark>[][] = [[], [], [], [], [], []];
         $('div.volumes').each((_, el) => {
           const container = $(el);
           const version = <MangaMeta<MangaPark>['chapters']['recentlyUpdated']>(
@@ -371,6 +372,8 @@ export default class MangaPark {
             case 'mini':
               memo[4] = data;
               break;
+            case 'toon':
+              memo[5] = data;
             default:
               break;
           }
@@ -392,6 +395,7 @@ export default class MangaPark {
           rock: memo[2],
           panda: memo[3],
           mini: memo[4],
+          toon: memo[5],
         };
 
         success(
