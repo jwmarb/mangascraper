@@ -9,7 +9,7 @@ import Manganato, { ManganatoGenre, ManganatoManga, ManganatoOptions, ManganatoQ
 import MangaSee, { MangaSeeGenre, MangaSeeManga, MangaSeeMangaAlt, MangaSeeMeta, MangaSeeOptions } from './mangasee';
 import MangaPark, { MangaParkManga, MangaParkGenre, MangaParkOptions, MangaParkMeta } from './mangapark';
 import randomUserAgent from 'random-useragent';
-import { LaunchOptions, BrowserLaunchArgumentOptions, BrowserConnectOptions, Product } from 'puppeteer';
+import { LaunchOptions, BrowserLaunchArgumentOptions, BrowserConnectOptions, Product, Browser } from 'puppeteer';
 
 export { default as Mangakakalot } from './mangakakalot';
 export { default as Manganato } from './manganato';
@@ -17,15 +17,22 @@ export { default as Mangahasu } from './mangahasu';
 export { default as MangaSee } from './mangasee';
 export { default as MangaPark } from './mangapark';
 
-export interface ScrapingOptions {
+export type ScrapingOptions = {
   proxy?: {
     host: string;
     port: number;
   };
   debug?: boolean;
   puppeteerInstance?: PuppeteerInstance;
-}
+};
 
+type PuppeteerCustom = {
+  instance: 'custom';
+  browser: Browser;
+  options?: {
+    closeAfterOperation?: boolean;
+  };
+};
 type PuppeteerDefault = {
   instance: 'default';
   launch?: LaunchOptions &
@@ -35,8 +42,8 @@ type PuppeteerDefault = {
       extraPrefsFirefox?: Record<string, unknown>;
     };
 };
-type PuppeteerServer = { instance: 'server'; wsEndpoint: string };
-type PuppeteerInstance = PuppeteerDefault | PuppeteerServer;
+type PuppeteerServer = { instance: 'endpoint'; wsEndpoint: string };
+type PuppeteerInstance = PuppeteerDefault | PuppeteerServer | PuppeteerCustom;
 
 export const initPuppeteer = {
   args: [
