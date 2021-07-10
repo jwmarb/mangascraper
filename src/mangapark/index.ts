@@ -402,12 +402,12 @@ export default class MangaPark {
           {
             title: {
               main: title,
-              alt: altTitles,
+              alt: altTitles.filter((title) => title.length !== 0),
             },
             summary,
             coverImage,
             authors,
-            artists,
+            artists: artists.filter((artist) => artist.length !== 0),
             genres,
             rating,
             type,
