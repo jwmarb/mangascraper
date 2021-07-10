@@ -149,7 +149,7 @@ export default class MangaPark {
         mangaType,
         year,
         order,
-        '&st-ss=0',
+        'st-ss=0',
         `page=${page}`,
       ]
         .filter((i) => i.length !== 0)
