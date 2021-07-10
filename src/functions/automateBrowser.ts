@@ -1,8 +1,7 @@
-import { BrowserEmittedEvents, HTTPRequest, Page } from 'puppeteer';
+import puppeteer, { BrowserEmittedEvents, HTTPRequest, Page } from 'puppeteer-core';
 import randomUserAgent from 'random-useragent';
 import preload from './preload';
-import puppeteer from 'puppeteer';
-import { ScrapingOptions, initPuppeteer } from '..';
+import { ScrapingOptions } from '..';
 
 export type AutomatedCallback<T> = (page: Page) => Promise<T>;
 

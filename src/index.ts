@@ -9,7 +9,7 @@ import Manganato, { ManganatoGenre, ManganatoManga, ManganatoOptions, ManganatoQ
 import MangaSee, { MangaSeeGenre, MangaSeeManga, MangaSeeMangaAlt, MangaSeeMeta, MangaSeeOptions } from './mangasee';
 import MangaPark, { MangaParkManga, MangaParkGenre, MangaParkOptions, MangaParkMeta } from './mangapark';
 import randomUserAgent from 'random-useragent';
-import { LaunchOptions, BrowserLaunchArgumentOptions, BrowserConnectOptions, Product, Browser } from 'puppeteer';
+import { Browser } from 'puppeteer-core';
 
 export { default as Mangakakalot } from './mangakakalot';
 export { default as Manganato } from './manganato';

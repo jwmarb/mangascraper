@@ -1,8 +1,6 @@
-import { BrowserEmittedEvents, Page } from 'puppeteer';
-import randomUserAgent from 'random-useragent';
 import preload from './preload';
-import puppeteer from 'puppeteer';
-import { initPuppeteer, ScrapingOptions } from '..';
+import puppeteer from 'puppeteer-core';
+import { ScrapingOptions } from '..';
 import { AutomatedCallback, BrowserNetworkOptions } from './automateBrowser';
 
 type Instances<T> = {
