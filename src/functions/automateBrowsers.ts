@@ -59,7 +59,8 @@ export default async function automateBrowsers(options: ScrapingOptions, instanc
         });
 
         return callback(page).finally(async () => {
-          await page.close();
+          if (puppeteerInstance.instance === 'server' && index !== 0) await page.close();
+          else await page.close();
         });
       }),
     ).finally(async () => {
