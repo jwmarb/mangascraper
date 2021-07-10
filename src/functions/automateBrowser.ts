@@ -34,14 +34,12 @@ export interface BrowserNetworkOptions {
   };
 }
 
-let queue = [];
-
 export default async function automateBrowser<T>(
   options: ScrapingOptions,
   callback: AutomatedCallback<T>,
   network?: BrowserNetworkOptions,
 ) {
-  const { debug = false, puppeteerInstance } = options;
+  const { puppeteerInstance } = options;
 
   try {
     const browser = await (async () => {

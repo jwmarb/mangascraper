@@ -9,7 +9,7 @@ type Instances<T> = {
 };
 
 export default async function automateBrowsers(options: ScrapingOptions, instances: Instances<any>[]): Promise<any> {
-  const { proxy, debug = false, puppeteerInstance } = options;
+  const { puppeteerInstance } = options;
 
   try {
     const browser = await (async () => {
