@@ -23,7 +23,7 @@ export type ScrapingOptions = {
     port: number;
   };
   debug?: boolean;
-  puppeteerInstance?: PuppeteerInstance;
+  puppeteerInstance: PuppeteerInstance;
 };
 
 type PuppeteerCustom = {
@@ -33,17 +33,8 @@ type PuppeteerCustom = {
     closeAfterOperation?: boolean;
   };
 };
-type PuppeteerDefault = {
-  instance: 'default';
-  launch?: LaunchOptions &
-    BrowserLaunchArgumentOptions &
-    BrowserConnectOptions & {
-      product?: Product;
-      extraPrefsFirefox?: Record<string, unknown>;
-    };
-};
 type PuppeteerServer = { instance: 'endpoint'; wsEndpoint: string };
-type PuppeteerInstance = PuppeteerDefault | PuppeteerServer | PuppeteerCustom;
+type PuppeteerInstance = PuppeteerServer | PuppeteerCustom;
 
 export const initPuppeteer = {
   args: [
