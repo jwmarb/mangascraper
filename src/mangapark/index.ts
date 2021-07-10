@@ -108,15 +108,15 @@ export default class MangaPark {
     const url = (() => {
       const query = (() => {
         if (title == null || (typeof title === 'string' && title.length === 0)) return '';
-        if (typeof title === 'string') return `q=${title}`;
+        if (typeof title === 'string') return `q=${encodeURIComponent(title)}`;
 
         let author;
         let query;
 
         if (title.author == null) author = '';
-        else author = `autart=${title.author}`;
-        if (query == null) query = '';
-        else query = `q=${title.title}`;
+        else author = `autart=${encodeURIComponent(title.author)}`;
+        if (title.title == null) query = '';
+        else query = `q=${encodeURIComponent(title.title)}`;
         return [query, author].filter((item) => item.length !== 0).join('');
       })();
 
