@@ -55,9 +55,9 @@ export interface MangahasuOptions {
 export type MangahasuGenre = keyof typeof MangahasuGenres;
 
 export default class Mangahasu {
-  private options: ScrapingOptions = {};
+  private options: ScrapingOptions;
 
-  constructor(options: ScrapingOptions = {}) {
+  constructor(options: ScrapingOptions) {
     this.options = options;
   }
   /**

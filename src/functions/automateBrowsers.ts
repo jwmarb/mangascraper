@@ -11,33 +11,15 @@ type Instances<T> = {
 };
 
 export default async function automateBrowsers(options: ScrapingOptions, instances: Instances<any>[]): Promise<any> {
-  const { proxy, debug = false, puppeteerInstance = { instance: 'default' } } = options;
-
-  const args_proxy_server = proxy != null && `--proxy-server=${proxy.host}:${proxy.port}`;
-
-  const puppeteer_args = [...initPuppeteer.args, args_proxy_server].filter((item) => Boolean(item)) as string[];
+  const { proxy, debug = false, puppeteerInstance } = options;
 
   try {
     const browser = await (async () => {
       switch (puppeteerInstance.instance) {
         case 'endpoint':
           return await puppeteer.connect({ browserWSEndpoint: puppeteerInstance.wsEndpoint });
-        case 'default':
-        default:
-          return await puppeteer.launch(
-            puppeteerInstance.launch
-              ? {
-                  ...puppeteerInstance.launch,
-                  headless: !debug,
-                  args: puppeteerInstance.launch.args
-                    ? ([...puppeteerInstance.launch.args, args_proxy_server].filter((item) =>
-                        Boolean(item),
-                      ) as string[])
-                    : ([args_proxy_server].filter((item) => Boolean(item)) as string[]),
-                }
-              : { ...initPuppeteer, headless: !debug, args: puppeteer_args },
-          );
         case 'custom':
+        default:
           return puppeteerInstance.browser;
       }
     })();
@@ -46,8 +28,6 @@ export default async function automateBrowsers(options: ScrapingOptions, instanc
       instances.map(async ({ network, callback }, index) => {
         const page = await (async () => {
           switch (puppeteerInstance.instance) {
-            case 'default':
-              return (await browser.pages())[0];
             case 'custom':
             default:
               return await browser.newPage();
@@ -83,9 +63,6 @@ export default async function automateBrowsers(options: ScrapingOptions, instanc
 
         return callback(page).finally(async () => {
           switch (puppeteerInstance.instance) {
-            case 'default':
-              await page.close();
-              break;
             case 'endpoint':
               await page.close();
               break;
@@ -97,10 +74,6 @@ export default async function automateBrowsers(options: ScrapingOptions, instanc
       }),
     ).finally(async () => {
       switch (puppeteerInstance.instance) {
-        case 'default':
-          await Promise.all((await browser.pages()).map((page) => page.close()));
-          await browser.close();
-          break;
         case 'endpoint':
           browser.disconnect();
           break;

@@ -77,7 +77,7 @@ export interface MangaSeeManga {
 }
 
 export default class MangaSee {
-  private options: ScrapingOptions = {};
+  private options: ScrapingOptions;
 
   protected BLOCKED_DOMAINS = [
     'https://static.cloudflareinsights.com/beacon.min.js',
@@ -87,7 +87,7 @@ export default class MangaSee {
     'https://www.google.com/',
   ];
 
-  constructor(options: ScrapingOptions = {}) {
+  constructor(options: ScrapingOptions) {
     this.options = options;
   }
 

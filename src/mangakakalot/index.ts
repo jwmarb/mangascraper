@@ -38,9 +38,9 @@ export interface MangakakalotOptions {
 }
 
 export default class Mangakakalot {
-  private options: ScrapingOptions = {};
+  private options: ScrapingOptions;
 
-  constructor(options: ScrapingOptions = {}) {
+  constructor(options: ScrapingOptions) {
     this.options = options;
   }
 
