@@ -182,7 +182,7 @@ export enum MangaParkOrderBy {
   'latest_updates' = 'update',
   'rating' = 'rating',
   'new_manga' = 'create',
-  'views' = 'views',
+  'views' = 'views_a',
 }
 
 export enum MangaSeeOrderBy {
