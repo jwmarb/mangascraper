@@ -11,6 +11,9 @@ Mangascraper is a package used to scrape mangas. It is a solution to retrieving 
 2. [Sources](#manga-sources)
 3. [Usage](#usage)
 4. [Configuring puppeteer](#configuring-puppeteer)
+   - [Connecting to an endpoint](#connecting-to-an-endpoint)
+   - [Using an existing puppeteer package](#using-an-existing-browser-installation)
+   - [Overriding mangascraper's puppeteer launch arguments](#overriding-mangascrapers-puppeteer-launch-arguments)
 5. [Examples](#examples)
    - [Mangakakalot](#mangakakalot)
    - [Manganato](#manganato)
@@ -92,7 +95,9 @@ which outputs...
 
 ## Configuring puppeteer
 
-If you already have an existing [puppeteer](https://github.com/puppeteer/puppeteer) endpoint, mangascraper can connect to that endpoint instead.
+### Connecting to an endpoint
+
+If you already have an existing [puppeteer](https://github.com/puppeteer/puppeteer) endpoint, mangascraper can connect to that endpoint instead and perform faster concurrent operations.
 
 Mangascraper also includes its own puppeteer launch arguments, and it is **recommended to use them** for scraping to go smoothly.
 
@@ -103,18 +108,97 @@ import { initPuppeteer, MangaSee } from '@specify_/mangascraper';
 (async () => {
   const browser = await puppeteer.launch({ ...initPuppeteer });
   const endpoint = browser.wsEndpoint();
+  browser.disconnect();
 
-  const mangasee = new MangaSee({ puppeteerInstance: { instance: 'server', wsEndpoint: endpoint } });
+  const mangasee = new MangaSee({ puppeteerInstance: { instance: 'endpoint', wsEndpoint: endpoint } });
 
   const mangas = await mangasee.search('Haikyu!');
 })();
 ```
 
-However, if you want to **override the launch options**, you can add this to any manga class such as MangaSee.
+Since you are using your own puppeteer package, mangascraper cannot make any modificatins to the browser such as including a proxy.
+
+```js
+const browser = await puppeteer.launch();
+const mangapark = new MangaPark({
+  proxy: { host: '127.0.0.1', port: 8080 },
+  puppeteerInstance: { instance: 'custom', browser },
+}); // ❌ Mangascraper cannot include proxy
+
+const browser = await puppeteer.launch({ args: ['--proxy-server=127.0.0.1:8080'] });
+const mangapark = new MangaPark({ puppeteerInstance: { instance: 'custom', browser } }); // ✔️ Our own browser instance will launch with a proxy
+```
+
+Because mangascraper is connecting to an existing endpoint, you must do all your browser arguments outside of mangascraper. See [this](#using-an-existing-puppeteer-package) for more on this.
+
+### Overriding mangascraper's puppeteer launch arguments
+
+If you want to **override the launch arguments** mangascraper uses, you can add this to any manga class such as MangaSee as long as you are using the default instance. Any other instance will require you to implement your own or inherit mangascraper's puppeteer options with `initPuppeteer`
 
 ```js
 const mangasee = new MangaSee({ puppeteerInstance: { instance: 'default', launch: { ...myCustomLaunchOptions } } });
 ```
+
+If you want to include a proxy:
+
+```js
+const manganato = new Mangahasu({
+  proxy: { host: 'proxy_host', port: 8080 },
+  puppeteerInstance: { instance: 'default' },
+});
+```
+
+### Using an existing puppeteer package
+
+By using an existing puppeteer package in your app, this will enable mangascraper to use one browser instead of opening new browsers per operation. In addition, mangascraper will be able to scrape manga **concurrently**. With this approach, **resources will be less intensive on chromium**, and it can save you a lot of time if you are handling a lot of scraping operations. This is the best approach if you do not want to connect to an existing endpoint.
+
+This is the most basic setup:
+
+```js
+import puppeteer from 'puppeteer';
+import { MangaPark, initPuppeteer } from '@specify_/mangascraper';
+
+(async () => {
+  const browser = await puppeteer.launch(initPuppeteer);
+  const mangapark = new MangaPark({ puppeteerInstance: { instance: 'custom', browser } });
+})();
+```
+
+Since you are using your own puppeteer package, mangascraper cannot add any modifications to the browser such as including a proxy.
+
+```js
+const browser = await puppeteer.launch();
+const mangapark = new MangaPark({
+  proxy: { host: '127.0.0.1', port: 8080 },
+  puppeteerInstance: { instance: 'custom', browser },
+}); // ❌ Mangascraper cannot include proxy
+
+const browser = await puppeteer.launch({ args: ['--proxy-server=127.0.0.1:8080'] });
+const mangapark = new MangaPark({ puppeteerInstance: { instance: 'custom', browser } }); // ✔️ Our own browser instance will launch with a proxy
+```
+
+By default, mangascraper does not close the browser after the end of operation. If by any means you want to close the browser after an operation has finished. You can add the following to `puppeteerInstance`
+
+```js
+puppeteerInstance: {
+  instance: 'custom',
+  browser: browser,
+  options: {
+    closeAfterOperation: true // After an operation is finished, close the browser
+  }
+}
+```
+
+However, this will prevent mangascraper from proceeding to another operation after one is finished such as this example:
+
+```js
+const mangapark = new MangaPark({ puppeteerInstance: 'custom', browser, options: { closeAfterOperation: true } });
+await mangapark
+  .search('Naruto', { orderBy: 'latest_updates' })
+  .then(async (mangas) => await Promise.all(mangas.map((manga) => mangapark.getMangaMeta(manga.url)))); // ❌ Browser will close after gathering results of mangas that match the title Naruto and will not gather metadata from each source.
+```
+
+---
 
 ## Examples
 
