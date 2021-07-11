@@ -1,12 +1,12 @@
 # Notice
 
-> **Mangascraper no longer uses puppeteer since version ~3.1.0**. You must install either [puppeteer](https://www.npmjs.com/package/puppeteer) or [puppeteer-core](https://www.npmjs.com/package/puppeteer-core)
+> **Mangascraper no longer comes with puppeteer since version ~3.1.0**. You must install either [puppeteer](https://www.npmjs.com/package/puppeteer) or [puppeteer](https://www.npmjs.com/package/puppeteer)
 
 ---
 
 [![npm package](https://img.shields.io/npm/v/@specify_/mangascraper)](https://www.npmjs.com/package/@specify_/mangascraper) [![license](https://img.shields.io/npm/l/@specify_/mangascraper)](https://github.com/EGGaming/mangascraper/blob/main/LICENSE)
 
-Mangascraper is a package used to scrape mangas. It is a solution to retrieving mangas that do not offer an API.
+Mangascraper is a package used to scrape mangas. It is a solution to retrieving mangas that do not offer an API. Mangascraper can run either **asynchronously**, returning `Promises`, or **synchronously** if a `callback` function is provided.
 
 ---
 
@@ -21,13 +21,14 @@ Mangascraper is a package used to scrape mangas. It is a solution to retrieving 
    - [Using an existing puppeteer package](#using-an-existing-browser-installation)
    - [Overriding mangascraper's puppeteer launch arguments](#overriding-mangascrapers-puppeteer-launch-arguments)
 5. [Examples](#examples)
+   - [Running asynchronously](#running-asynchronously)
+   - [Running synchronously](#running-synchronously)
    - [Mangakakalot](#mangakakalot)
    - [Manganato](#manganato)
    - [Mangahasu](#mangahasu)
    - [MangaSee](#mangasee)
    - [MangaPark v2](#mangapark-v2)
-6. [Documentation](#documentation)
-   - [Mangakakalot](#mangakakalot)
+6. [API Reference](#api-reference)
 7. [License](#license)
 
 ---
@@ -210,6 +211,22 @@ await mangapark
 ---
 
 ## Examples
+
+### Running asynchronously
+
+```js
+const mangas = await mangahasu.search('Fairytail');
+console.log(mangas);
+```
+
+### Running synchronously
+
+```js
+mangahasu.search('Fairytail', null, (err, mangas) => {
+  if (err) return console.error(err);
+  console.log(mangas);
+});
+```
 
 ### Mangakakalot
 
@@ -428,9 +445,17 @@ import { MangaPark, initPuppeteer } from '@specify_/mangascraper';
 
 ---
 
-## Documentation
+## API Reference
 
 - [Mangakakalot](/docs/Mangakakalot.md)
+
+- [Manganato](/docs/Manganato.md)
+
+- [MangaSee](/docs/MangaSee.md)
+
+- [Mangahasu](/docs/Mangahasu.md)
+
+- [MangaPark](/docs/MangaParkv2.md)
 
 ---
 
