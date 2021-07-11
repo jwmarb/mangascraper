@@ -56,7 +56,7 @@ export type MangaParkManga = {
 };
 
 export interface MangaParkOptions {
-  genre?: {
+  genres?: {
     include?: MangaGenre<MangaPark>[];
     exclude?: MangaGenre<MangaPark>[];
   };
@@ -82,7 +82,7 @@ export default class MangaPark {
   /**
    * Search up a manga from MangaParkv2
    *
-   * @param title - Title of manga. By default, it searches for titles matching this value. If you want to search for author and/or title, pass in an object containing either/both `author` and/or `title`.
+   * @param query - Title of manga. By default, it searches for titles matching this value. If you want to search for author and/or title, pass in an object containing either/both `author` and/or `title`.
    * @param filters - Filters to apply to query
    * @param callback - Callback function
    * @returns Returns an array of mangas from MangaPark (v2)
@@ -101,25 +101,27 @@ export default class MangaPark {
    * ```
    */
   search(
-    title: MangaSearch<MangaPark>,
+    query: MangaSearch<MangaPark>,
     filters: MangaFilters<MangaPark> = {},
     callback: MangaCallback<Manga<MangaPark>[]> = () => {},
   ): Promise<Manga<MangaPark>[]> {
-    const { genre, status = 'any', rating, type, yearReleased, orderBy = 'views', page = 1 } = filters;
+    if (filters == null) filters = {};
+    if (query == null) query = '';
+    const { genres: genre, status = 'any', rating, type, yearReleased, orderBy = 'views', page = 1 } = filters;
 
     const url = (() => {
-      const query = (() => {
-        if (title == null || (typeof title === 'string' && title.length === 0)) return '';
-        if (typeof title === 'string') return `q=${encodeURIComponent(title)}`;
+      const query_param = (() => {
+        if (query == null || (typeof query === 'string' && query.length === 0)) return '';
+        if (typeof query === 'string') return `q=${encodeURIComponent(query)}`;
 
         let author;
-        let query;
+        let _query;
 
-        if (title.author == null) author = '';
-        else author = `autart=${encodeURIComponent(title.author)}`;
-        if (title.title == null) query = '';
-        else query = `q=${encodeURIComponent(title.title)}`;
-        return [query, author].filter((item) => item.length !== 0).join('');
+        if (query.author == null) author = '';
+        else author = `autart=${encodeURIComponent(query.author)}`;
+        if (query.title == null) _query = '';
+        else _query = `q=${encodeURIComponent(query.title)}`;
+        return [_query, author].filter((item) => item.length !== 0).join('');
       })();
 
       const includeGenres =
@@ -143,7 +145,7 @@ export default class MangaPark {
       const order = `orderby=${MangaParkOrderBy[orderBy]}`;
 
       const args = [
-        query,
+        query_param,
         includeGenres,
         excludeGenres,
         mangaRating,

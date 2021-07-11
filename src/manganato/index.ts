@@ -27,7 +27,7 @@ export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'eve
 export interface ManganatoManga extends MangaBase {}
 
 export interface ManganatoOptions {
-  genre?: { include?: ManganatoGenre[]; exclude?: ManganatoGenre[] };
+  genres?: { include?: ManganatoGenre[]; exclude?: ManganatoGenre[] };
   status?: MangaStatus<Manganato>;
   orderBy?: MangaOrder<Manganato>;
   page?: number;
@@ -45,7 +45,7 @@ export default class Manganato {
   /**
    * Search up a manga from Manganato
    *
-   * @param title - Title of manga. By default, it searches for all mangas that have matching keywords. If you want to only search for a specific keyword (such as author name only), pass in an object with the key `keywords` containing either values: `author`, `artist`, `title`.
+   * @param query - Title of manga. By default, it searches for all mangas that have matching keywords. If you want to only search for a specific keyword (such as author name only), pass in an object with the key `keywords` containing either values: `author`, `artist`, `title`.
    * ```js
    * await manganato.search({ keywords: 'title', search: 'YOUR TITLE' });
    * ```
@@ -67,21 +67,21 @@ export default class Manganato {
    * ```
    */
   public search(
-    title?: MangaSearch<Manganato>,
+    query?: MangaSearch<Manganato>,
     filters: MangaFilters<Manganato> = {},
     callback: MangaCallback<Manga<Manganato>[]> = () => {},
   ): Promise<Manga<Manganato>[]> {
     if (filters == null) filters = {};
-    if (title == null) title = '';
-    const { genre = {}, status = 'any', orderBy = 'latest_updates', page = 1 } = filters;
+    if (query == null) query = '';
+    const { genres: genre = {}, status = 'any', orderBy = 'latest_updates', page = 1 } = filters;
 
     function generateURL(): string {
       let g_i: string = ''; // short for genre_includes
       let g_e: string = ''; // short for genre_excludes
       const keyw: string = (() => {
-        if (title == null) return '';
-        if (typeof title === 'string') return `keyw=${title.replace(/[^a-zA-Z0-9]/g, '_')}`;
-        const { search, keywords } = title;
+        if (query == null) return '';
+        if (typeof query === 'string') return `keyw=${query.replace(/[^a-zA-Z0-9]/g, '_')}`;
+        const { search, keywords } = query;
         if (keywords === 'title') return `keyw=${search.replace(/[^a-zA-Z0-9]/g, '_')}`;
         if (keywords === 'author') return `keyw=${search.replace(/[^a-zA-Z0-9]/g, '_')}&keyt=author`;
         if (keywords === 'alt_title') return `keyw=${search.replace(/[^a-zA-Z0-9]/g, '_')}&keyt=alternative`;
@@ -254,13 +254,11 @@ export default class Manganato {
           .get();
 
         /** Get manga updated date */
-        const updatedAt = parse(
+        const updatedAt = new Date(
           $(`div.story-info-right-extent > p > span.stre-label > i.info-time`)
             .parent()
             .siblings('span.stre-value')
             .text(),
-          'MMM dd,yyyy - HH:mm A',
-          new Date(),
         );
 
         /** Get manga views */
@@ -302,10 +300,7 @@ export default class Manganato {
 
         // Get chapter views
         const chapterViews = $(`div.panel-story-chapter-list > ul.row-content-chapter > li > span.chapter-view`)
-          .map((_, el) => {
-            const chapter_views = $(el).text();
-            if (typeof chapter_views !== 'undefined') return chapter_views;
-          })
+          .map((_, el) => $(el).text())
           .get();
 
         // Get chapter dates
@@ -488,8 +483,8 @@ export default class Manganato {
           if (typeof url !== 'undefined') urls.push(url);
         });
 
-        const mangas: Manga<Manganato>[] = new Array(titles.length).fill('').map((_, index) => ({
-          title: titles[index],
+        const mangas: Manga<Manganato>[] = titles.map((title, index) => ({
+          title,
           url: urls[index],
           authors: authors[index],
           updatedAt: updatedAt[index],

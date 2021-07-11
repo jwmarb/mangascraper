@@ -192,10 +192,7 @@ export default class Mangakakalot {
 
         /** Get alternate titles */
         let altTitles: string[] = $(`div.manga-info-top > ul.manga-info-text > li > h2.story-alternative`)
-          .map((_, element) => {
-            const alt_titles_string = $(element).text();
-            return splitAltTitles(alt_titles_string);
-          })
+          .map((_, element) => splitAltTitles($(element).text().substring(14)))
           .get();
 
         /** Get manga status, update date, views */

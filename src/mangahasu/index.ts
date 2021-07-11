@@ -62,7 +62,7 @@ export default class Mangahasu {
   }
   /**
    *
-   * @param title - Search manga, name of author and artist. If you only want to search for a specific characteristic of a manga (such as searching for author name only), use an object which has the fields `author`, `artist`, and `title`
+   * @param query - Search manga, name of author and artist. If you only want to search for a specific characteristic of a manga (such as searching for author name only), use an object which has the fields `author`, `artist`, and `title`
    * @param filters - Filters to apply when searching up the manga such as including/excluding genres or newest releases.
    * @param callback - Callback function
    * @returns Returns an array of manga from mangahasu
@@ -78,24 +78,24 @@ export default class Mangahasu {
    * ```
    */
   public search(
-    title: MangaSearch<Mangahasu> = '',
+    query: MangaSearch<Mangahasu> = '',
     filters: MangaFilters<Mangahasu> = {},
     callback: MangaCallback<Manga<Mangahasu>[]> = () => {},
   ): Promise<Manga<Mangahasu>[]> {
     if (filters == null) filters = {};
-    if (title == null) title = '';
+    if (query == null) query = '';
     const { genres = {}, status = 'any', type = 'any', page = 1 } = filters;
 
     function generateURL(): string {
       const keyword: string = (() => {
-        if (typeof title === 'string') return `keyword=${encodeURIComponent(title)}`;
-        return title.title != null ? `keyword=${encodeURIComponent(title.title)}` : '';
+        if (typeof query === 'string') return `keyword=${encodeURIComponent(query)}`;
+        return query.title != null ? `keyword=${encodeURIComponent(query.title)}` : '';
       })();
 
       const author: string =
-        typeof title !== 'string' && title.author != null ? `author=${encodeURIComponent(title.author)}` : '';
+        typeof query !== 'string' && query.author != null ? `author=${encodeURIComponent(query.author)}` : '';
       const artist: string =
-        typeof title !== 'string' && title.artist != null ? `artist=${encodeURIComponent(title.artist)}` : '';
+        typeof query !== 'string' && query.artist != null ? `artist=${encodeURIComponent(query.artist)}` : '';
 
       const typeid: string = type !== 'any' ? `typeid=${MangahasuTypes[type]}` : '';
 
@@ -119,7 +119,7 @@ export default class Mangahasu {
     return new Promise(async (res) => {
       if (page == null) return failure('Missing argument "page" is required', callback);
       if (page <= 0) return failure('"page" must be greater than 0', callback);
-      if (typeof title !== 'string' && title.artist == null && title.title == null && title.author == null) title = '';
+      if (typeof query !== 'string' && query.artist == null && query.title == null && query.author == null) query = '';
 
       try {
         /** Parse HTML Document */
