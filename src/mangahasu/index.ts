@@ -246,7 +246,7 @@ export default class Mangahasu {
           rating_stars = `${spanRatings}/5`;
           rating_percentage = `${((Number(spanRatings) / 5) * 100).toFixed(2)}%`;
         }
-        let voteCount = Number(
+        let voteCount = numberSeperator(
           $(`div[class="div-evaluate detail_item"] > span.info > span.div_evaluate`).text().trim(),
         );
         rating = {

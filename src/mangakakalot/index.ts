@@ -18,6 +18,7 @@ import {
   MangaStatus,
 } from '../';
 import splitAltTitles from '../functions/splitAltTitles';
+import numberSeperator from '../functions/numberSeperator';
 
 export interface MangakakalotManga extends MangaBase {}
 
@@ -180,12 +181,7 @@ export default class Mangakakalot {
         let updatedAt: Date = new Date();
         let views: string = '';
 
-        let rating: MangaRating = {
-          sourceRating: '',
-          rating_stars: '',
-          rating_percentage: '',
-          voteCount: NaN,
-        };
+        let rating!: MangaRating;
         let coverImage: MangaCoverImage = { alt: '', url: undefined };
 
         const chaptersViews: string[] = [];
@@ -227,7 +223,7 @@ export default class Mangakakalot {
         ).text();
         const string_array = ratingText.split(' ');
         const src = string_array[0].trim();
-        const voteCount = Number(string_array[7]);
+        const voteCount = numberSeperator(string_array[7]);
         const rating_stars = `${string_array[3]} / ${string_array[5]}`;
         const rating_percentage = `${((Number(string_array[3]) / Number(string_array[5])) * 100).toFixed(2)}%`;
 
