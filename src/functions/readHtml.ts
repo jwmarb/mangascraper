@@ -1,7 +1,7 @@
 import cheerio, { CheerioAPI } from 'cheerio';
 import axios from 'axios';
 import { ScrapingOptions } from '..';
-import puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer';
 import randomUserAgent from 'random-useragent';
 import automateBrowser, { BrowserNetworkOptions } from './automateBrowser';
 

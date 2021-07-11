@@ -1,5 +1,5 @@
 import preload from './preload';
-import puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer';
 import { ScrapingOptions } from '..';
 import { AutomatedCallback, BrowserNetworkOptions } from './automateBrowser';
 
