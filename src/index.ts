@@ -125,13 +125,13 @@ export type MangaMeta<T> = T extends Mangakakalot | Manganato
         alt: string[];
       };
       authors: string[];
-      status: string;
+      status: MangaStatus<T>;
       updatedAt: Date;
       views: string;
       genres: MangaGenre<T>[];
       rating: MangaRating;
       coverImage: MangaCoverImage;
-      summary: string | null;
+      summary: string;
       chapters: MangaChapters<T>[];
     }
   : T extends Mangahasu

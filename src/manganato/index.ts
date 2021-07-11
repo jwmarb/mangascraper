@@ -26,7 +26,7 @@ export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'eve
 export interface ManganatoManga extends MangaBase {}
 
 export interface ManganatoOptions {
-  genre?: { include?: ManganatoGenre[]; exclude?: ManganatoGenre[] } | null;
+  genre?: { include?: ManganatoGenre[]; exclude?: ManganatoGenre[] };
   status?: MangaStatus<Manganato>;
   orderBy?: MangaOrder<Manganato>;
   page?: number;
@@ -235,12 +235,12 @@ export default class Manganato {
           .get();
 
         /** Get manga status */
-        const status = $(
-          `div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-label > i.info-status`,
-        )
-          .parent()
-          .siblings('td.table-value')
-          .text();
+        const status = <MangaStatus<Manganato>>(
+          $(`div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-label > i.info-status`)
+            .parent()
+            .siblings('td.table-value')
+            .text()
+        );
 
         /** Get manga genres */
         const genres: string[] = $(
