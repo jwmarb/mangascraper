@@ -1,3 +1,9 @@
+# Notice
+
+> **Mangascraper no longer uses puppeteer since version ~3.1.0**. You must install either [puppeteer](https://www.npmjs.com/package/puppeteer) or [puppeteer-core](https://www.npmjs.com/package/puppeteer-core)
+
+---
+
 [![npm package](https://img.shields.io/npm/v/@specify_/mangascraper)](https://www.npmjs.com/package/@specify_/mangascraper) [![license](https://img.shields.io/npm/l/@specify_/mangascraper)](https://github.com/EGGaming/mangascraper/blob/main/LICENSE)
 
 Mangascraper is a package used to scrape mangas. It is a solution to retrieving mangas that do not offer an API.
@@ -20,7 +26,9 @@ Mangascraper is a package used to scrape mangas. It is a solution to retrieving 
    - [Mangahasu](#mangahasu)
    - [MangaSee](#mangasee)
    - [MangaPark v2](#mangapark-v2)
-6. [License](#license)
+6. [Documentation](#documentation)
+   - [Mangakakalot](#mangakakalot)
+7. [License](#license)
 
 ---
 
@@ -30,6 +38,7 @@ Mangascraper is a package used to scrape mangas. It is a solution to retrieving 
 
 ```sh
 npm install @specify_/mangascraper
+npm install puppeteer
 ```
 
 ---
@@ -403,11 +412,12 @@ Get the first result and get the meta
 Then get the pages of the latest chapter
 
 ```js
-import { MangaPark } from '@specify_/mangascraper';
-
-const mangapark = new MangaPark();
+import { MangaPark, initPuppeteer } from '@specify_/mangascraper';
 
 (async () => {
+  const browser = await puppeteer.launch(initPuppeteer);
+  const mangapark = new MangaPark({ puppeteerInstance: { instance: 'custom', browser } });
+
   const mangas = await mangapark.search('noragami');
   const meta = await mangapark.getMangaMeta(mangas[0].url);
   const pages = await mangapark.getPages(meta.chapters[meta.chapters.recentlyUpdated][0].pages);
@@ -415,6 +425,12 @@ const mangapark = new MangaPark();
   console.log(pages);
 })();
 ```
+
+---
+
+## Documentation
+
+- [Mangakakalot](/docs/Mangakakalot.md)
 
 ---
 
