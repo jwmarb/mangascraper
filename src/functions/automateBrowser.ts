@@ -1,5 +1,4 @@
-import puppeteer, { BrowserEmittedEvents, HTTPRequest, Page } from 'puppeteer';
-import randomUserAgent from 'random-useragent';
+import puppeteer, { Page } from 'puppeteer';
 import preload from './preload';
 import { ScrapingOptions } from '..';
 
