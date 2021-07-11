@@ -33,7 +33,7 @@ export type MangakakalotGenre = keyof typeof MangakakalotGenres | 'any';
 export interface MangakakalotOptions {
   genre?: MangaGenre<Mangakakalot>;
   status?: MangaStatus<Mangakakalot>;
-  type?: MangaAge;
+  age?: MangaAge;
   page?: number;
 }
 
@@ -47,7 +47,7 @@ export default class Mangakakalot {
   /**
    * Get a list of manga that match the title. Unfortunately, Mangakakalot does not offer an advanced search, so this can only search manga titles only. I will be updating this if Mangakakalot introduces a better search system
    *
-   * @param title - Title of manga (e.g "Black Clover", "One Piece", "Naruto")
+   * @param keyword - Title of manga (e.g "Black Clover", "One Piece", "Naruto")
    * @param callback - Callback function
    * @returns List of Manga that match `title`
    * @example
@@ -89,7 +89,7 @@ export default class Mangakakalot {
 
         /** Simple string date converter to Date type */
         function convertToDate(date: string): Date {
-          return parse(date, 'MMM-dd-yyyy HH:mm:ss', new Date());
+          return parse(date, 'MMM-dd-yyyy HH:mm', new Date());
         }
 
         /** Gets all URLs to their respected manga */
@@ -175,9 +175,8 @@ export default class Mangakakalot {
       try {
         /** Load HTML Document to cheerio to extract HTML data */
         const $ = await readHtml(url, this.options);
-        let mainTitle: string = '';
 
-        let status: string = '';
+        let status!: MangaStatus<Mangakakalot>;
         let updatedAt: Date = new Date();
         let views: string = '';
 
@@ -193,15 +192,12 @@ export default class Mangakakalot {
         const chaptersDate: Date[] = [];
 
         /** Get main title */
-        $(`div.manga-info-top > ul.manga-info-text > li > h1`).each((_, element) => {
-          mainTitle = $(element).text();
-        });
+        let mainTitle: string = $(`h1`).text();
 
         /** Get alternate titles */
         let altTitles: string[] = $(`div.manga-info-top > ul.manga-info-text > li > h2.story-alternative`)
           .map((_, element) => {
             const alt_titles_string = $(element).text();
-            if (typeof alt_titles_string === 'undefined') return;
             return splitAltTitles(alt_titles_string);
           })
           .get();
@@ -209,10 +205,9 @@ export default class Mangakakalot {
         /** Get manga status, update date, views */
         $(`div.manga-info-top > ul > li`).each((_, element) => {
           const unknown_li = $(element).text();
-          if (typeof unknown_li === 'undefined') return;
-          if (unknown_li.startsWith('Status :')) status = unknown_li.substring(9);
-          if (unknown_li.startsWith('Last updated :'))
-            updatedAt = parse(unknown_li.substring(15), 'MMM-dd-yyyy hh:mm:ss A', new Date());
+          if (unknown_li.startsWith('Status :'))
+            status = <MangaStatus<Mangakakalot>>unknown_li.substring(9).toLowerCase();
+          if (unknown_li.startsWith('Last updated :')) updatedAt = new Date(unknown_li.substring(15));
           if (unknown_li.startsWith('View :')) views = unknown_li.substring(7);
         });
 
@@ -223,11 +218,7 @@ export default class Mangakakalot {
 
         /** Get manga genres */
         const genres: string[] = $(`div.manga-info-top > ul > li:contains("Genres") > a`)
-          .map((_, element) => {
-            const genre = $(element).text();
-
-            if (typeof genre !== 'undefined') return genre;
-          })
+          .map((_, element) => $(element).text())
           .get();
 
         /** Get manga rating */
@@ -247,43 +238,41 @@ export default class Mangakakalot {
 
         /** Get image URL and alt */
         const imgEl = $(`div.manga-info-top > div.manga-info-pic > img`);
-        const imgURL = $(imgEl).attr('src');
-        const alt = $(imgEl).attr('alt');
-        if (typeof alt === 'undefined') return;
+        const imgURL = imgEl.attr('src');
+        const alt = imgEl.attr('alt') ?? '';
         coverImage = { url: imgURL, alt };
 
         /** Get manga chapters */
-        const chaptersLength = $(`div.manga-info-chapter > div.chapter-list > div.row`).length;
+        const chapterDiv = $(`div.manga-info-chapter > div.chapter-list > div.row`);
 
         /** Get manga chapter name and url */
-        const chaptersNameURL: Array<{ name: string; url: string }> = $(
-          `div.manga-info-chapter > div.chapter-list > div.row > span > a`,
-        )
+        const chaptersNameURL: Array<{ name: string; url: string }> = chapterDiv
+          .find(`span > a`)
           .map((_, element) => {
             const chapterName = $(element).text();
-            const chapterURL = $(element).attr('href');
-            if (typeof chapterName === 'undefined' || typeof chapterURL === 'undefined') return;
+            const chapterURL = $(element).attr('href') ?? '';
             return { name: chapterName, url: chapterURL };
           })
           .get();
 
         /** Get views of every manga chapter */
-        $(`div.manga-info-chapter > div.chapter-list > div.row > span:not(:has(a))`).each((_, element) => {
+        chapterDiv.children(`span:not(:has(a))`).each((_, element) => {
           const chapters_views_date: string = $(element).text();
-          if (typeof chapters_views_date === 'undefined') return;
           if (chapters_views_date.match(/[a-zA-Z]/g))
             chaptersDate.push(parse(chapters_views_date, 'MMM-dd-yy', new Date()));
           else chaptersViews.push(chapters_views_date);
         });
 
-        const chapters: MangaChapters<Mangakakalot>[] = new Array(chaptersLength).fill('').map((_, index) => {
-          return {
-            name: chaptersNameURL[index].name,
-            url: chaptersNameURL[index].url,
-            uploadDate: chaptersDate[index],
-            views: chaptersViews[index],
-          };
-        });
+        const chapters: MangaChapters<Mangakakalot>[] = chapterDiv
+          .map((index, _) => {
+            return {
+              name: chaptersNameURL[index].name,
+              url: chaptersNameURL[index].url,
+              uploadDate: chaptersDate[index],
+              views: chaptersViews[index],
+            };
+          })
+          .get();
 
         success(
           {
@@ -331,7 +320,7 @@ export default class Mangakakalot {
     filters: MangaFilters<Mangakakalot> = {},
     callback: MangaCallback<Manga<Mangakakalot, 'alt'>[]> = () => {},
   ): Promise<Manga<Mangakakalot, 'alt'>[]> {
-    const { page = 1, genre = 'any', status = 'any', type = 'updated' } = filters;
+    const { page = 1, genre = 'any', status, age: type = 'updated' } = filters;
     return new Promise(async (res, rej) => {
       if (page == null) return failure('Missing argument "page" is required', callback);
       if (typeof page !== 'number') return failure('"page" must be a number', callback);
@@ -349,28 +338,24 @@ export default class Mangakakalot {
         /** Get manga titles */
         const titleURLs = $(`div.list-truyen-item-wrap > h3 > a`)
           .map((_, element) => {
-            const title = $(element).text();
-            const url = $(element).attr('href');
-            if (typeof title === 'undefined' || typeof url === 'undefined') return;
+            const anchorEl = $(element);
+            const title = anchorEl.text();
+            const url = anchorEl.attr('href') ?? '';
             return { title, url };
           })
           .get();
 
         /** Get manga views */
         const views: string[] = $(`div.list-truyen-item-wrap > div > span.aye_icon`)
-          .map((_, element) => {
-            const viewerCount = $(element).text();
-            if (typeof views === 'undefined') return;
-            return viewerCount;
-          })
+          .map((_, element) => $(element).text())
           .get();
 
         /** Get manga cover img */
         const covers: MangaCoverImage[] = $(`div.list-truyen-item-wrap > a > img`)
           .map((_, element) => {
-            const img = $(element).attr('src');
-            const alt = $(element).attr('alt');
-            if (typeof img === 'undefined' || typeof alt === 'undefined') return;
+            const imgEl = $(element);
+            const img = imgEl.attr('src');
+            const alt = imgEl.attr('alt') ?? '';
             return { url: img, alt };
           })
           .get();
@@ -423,10 +408,7 @@ export default class Mangakakalot {
 
         /** Get image URLs */
         const pages: string[] = $(`div.container-chapter-reader > img[src]`)
-          .map((_, element) => {
-            const page = $(element).attr('src');
-            if (typeof page !== 'undefined') return page;
-          })
+          .map((_, element) => $(element).attr('src'))
           .get();
 
         success(pages, callback, res);
