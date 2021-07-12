@@ -1,6 +1,6 @@
 import puppeteer, { Page } from 'puppeteer';
 import preload from './preload';
-import { ScrapingOptions } from '..';
+import { initPuppeteer, ScrapingOptions } from '..';
 
 export type AutomatedCallback<T> = (page: Page) => Promise<T>;
 
@@ -38,11 +38,20 @@ export default async function automateBrowser<T>(
   callback: AutomatedCallback<T>,
   network?: BrowserNetworkOptions,
 ) {
-  const { puppeteerInstance } = options;
+  const { puppeteerInstance = { instance: 'default' } } = options;
 
   try {
     const browser = await (async () => {
       switch (puppeteerInstance.instance) {
+        case 'default':
+          return await puppeteer.launch({
+            ...initPuppeteer,
+            args: options.proxy
+              ? [...initPuppeteer.args, `--proxy-server=${options.proxy.host}:${options.proxy.port}`]
+              : initPuppeteer.args,
+            headless: !options.debug,
+            ...puppeteerInstance.launch,
+          });
         case 'endpoint':
           return await puppeteer.connect({ browserWSEndpoint: puppeteerInstance.wsEndpoint });
         case 'custom':
@@ -53,9 +62,11 @@ export default async function automateBrowser<T>(
 
     const page = await (async () => {
       switch (puppeteerInstance.instance) {
+        case 'default':
+          return (await browser.pages())[0];
         case 'custom':
         default:
-          return browser.newPage();
+          return await browser.newPage();
       }
     })();
     await page.setViewport({ width: 1920, height: 1080 });
@@ -86,6 +97,10 @@ export default async function automateBrowser<T>(
     });
     return await callback(page).finally(async () => {
       switch (puppeteerInstance.instance) {
+        case 'default':
+          await Promise.all((await browser.pages()).map((page) => page.close()));
+          await browser.close();
+          break;
         case 'endpoint':
           await page.close();
           browser.disconnect();
