@@ -1,12 +1,12 @@
 # Notice
 
-> **Mangascraper no longer comes with puppeteer since version ~3.1.0**. You must install either [puppeteer](https://www.npmjs.com/package/puppeteer) or [puppeteer](https://www.npmjs.com/package/puppeteer)
+> **As of version `~3.1.0`, mangascraper uses [puppeteer](https://www.npmjs.com/package/puppeteer) as a peer dependency.** You must install [puppeteer](https://www.npmjs.com/package/puppeteer)
 
 ---
 
 [![npm package](https://img.shields.io/npm/v/@specify_/mangascraper)](https://www.npmjs.com/package/@specify_/mangascraper) [![license](https://img.shields.io/npm/l/@specify_/mangascraper)](https://github.com/EGGaming/mangascraper/blob/main/LICENSE)
 
-Mangascraper is a package used to scrape mangas. It is a solution to retrieving mangas that do not offer an API. Mangascraper can run either **asynchronously**, returning `Promises`, or **synchronously** if a `callback` function is provided.
+Mangascraper is a package used to scrape mangas. It is a solution to retrieving mangas that do not offer an API. Mangascraper can run either **asynchronously**, returning a `Promise`, or **synchronously** if a `callback` function is provided.
 
 ---
 
@@ -21,13 +21,6 @@ Mangascraper is a package used to scrape mangas. It is a solution to retrieving 
    - [Using an existing puppeteer package](#using-an-existing-browser-installation)
    - [Overriding mangascraper's puppeteer launch arguments](#overriding-mangascrapers-puppeteer-launch-arguments)
 5. [Examples](#examples)
-   - [Running asynchronously](#running-asynchronously)
-   - [Running synchronously](#running-synchronously)
-   - [Mangakakalot](#mangakakalot)
-   - [Manganato](#manganato)
-   - [Mangahasu](#mangahasu)
-   - [MangaSee](#mangasee)
-   - [MangaPark v2](#mangapark-v2)
 6. [API Reference](#api-reference)
 7. [License](#license)
 
@@ -38,8 +31,7 @@ Mangascraper is a package used to scrape mangas. It is a solution to retrieving 
 ### npm
 
 ```sh
-npm install @specify_/mangascraper
-npm install puppeteer
+npm install puppeteer @specify_/mangascraper
 ```
 
 ---
@@ -149,7 +141,7 @@ If you want to **override the launch arguments** mangascraper uses, you can add 
 const mangasee = new MangaSee({ puppeteerInstance: { instance: 'default', launch: { ...myCustomLaunchOptions } } });
 ```
 
-If you want to include a proxy:
+If you want to include a proxy, mangascraper will automatically put it into the launch arguments.
 
 ```js
 const manganato = new Mangahasu({
@@ -181,7 +173,7 @@ const browser = await puppeteer.launch();
 const mangapark = new MangaPark({
   proxy: { host: '127.0.0.1', port: 8080 },
   puppeteerInstance: { instance: 'custom', browser },
-}); // ❌ Mangascraper cannot include proxy
+}); // ❌ Mangascraper cannot include a proxy
 
 const browser = await puppeteer.launch({ args: ['--proxy-server=127.0.0.1:8080'] });
 const mangapark = new MangaPark({ puppeteerInstance: { instance: 'custom', browser } }); // ✔️ Our own browser instance will launch with a proxy
@@ -212,14 +204,20 @@ await mangapark
 
 ## Examples
 
-### Running asynchronously
+<details>
+
+<summary><strong>Running asynchronously</strong></summary>
 
 ```js
 const mangas = await mangahasu.search('Fairytail');
 console.log(mangas);
 ```
 
-### Running synchronously
+</details>
+
+<details>
+
+<summary><strong>Running synchronously</strong></summary>
 
 ```js
 mangahasu.search('Fairytail', null, (err, mangas) => {
@@ -228,7 +226,11 @@ mangahasu.search('Fairytail', null, (err, mangas) => {
 });
 ```
 
-### Mangakakalot
+</details>
+
+<details>
+
+<summary><strong>Mangakakalot</strong></summary>
 
 Get a list of manga that match the title **Black Clover**
 
@@ -266,9 +268,11 @@ mangakakalot.getMangaMeta('https://mangakakalot.com/read-qt9nz158504844280', fun
 });
 ```
 
----
+</details>
 
-### MangaNato
+<details>
+
+<summary><strong>Manganato</strong></summary>
 
 Get a list of manga that match the title **Naruto**
 
@@ -318,9 +322,11 @@ manganato.getMangasFromGenre('Comedy', {}, (err, mangas) => {
 });
 ```
 
----
+</details>
 
-### Mangahasu
+<details>
+
+<summary><strong>Mangahasu</strong></summary>
 
 Get a list of manga
 
@@ -362,9 +368,10 @@ const mangahasu = new Mangahasu();
 })();
 ```
 
----
+</details>
 
-### MangaSee
+<details>
+<summary><strong>MangaSee</strong></summary>
 
 Get a list of manga that match the title **the melancholy of haruhi suzumiya**, and as well open puppeteer in headful mode (useful for debugging);
 
@@ -418,9 +425,11 @@ const mangasee = new MangaSee();
 })();
 ```
 
----
+</details>
 
-### MangaPark v2
+<details>
+
+<summary><strong>MangaPark v2</strong></summary>
 
 Search for a manga that matches the title **noragami**.
 
@@ -442,6 +451,8 @@ import { MangaPark, initPuppeteer } from '@specify_/mangascraper';
   console.log(pages);
 })();
 ```
+
+</details>
 
 ---
 
