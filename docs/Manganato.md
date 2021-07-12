@@ -12,10 +12,10 @@
 ## Table of Contents
 
 - [Manganato(options)](#manganatooptions)
-  - [`search(query, callback)`](#searchquery-callback)
-  - [`getMangaMeta(url, callback)`](#getmangametaurl-callback)
-  - [`getMangasFromGenre(genre, options, callback)`](#getmangasfromgenregenreoptionscallback)
-  - [`getPages(url, callback)`](#getpagesurl-callback)
+  - [`search(query, callback)`](#manganatosearchquery-callback)
+  - [`getMangaMeta(url, callback)`](#manganatogetmangametaurl-callback)
+  - [`getMangasFromGenre(genre, options, callback)`](#manganatogetmangasfromgenregenre-options-callback)
+  - [`getPages(url, callback)`](#manganatogetpagesurl-callback)
 
 ---
 

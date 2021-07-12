@@ -12,9 +12,9 @@
 ## Table of Contents
 
 - [Mangahasu(options)](#mangahasuoptions)
-  - [`search(query, callback)`](#searchquery-callback)
-  - [`getMangaMeta(url, callback)`](#getmangametaurl-callback)
-  - [`getPages(url, callback)`](#getpagesurl-callback)
+  - [`search(query, callback)`](#mangahasusearchquery-callback)
+  - [`getMangaMeta(url, callback)`](#mangahasugetmangametaurl-callback)
+  - [`getPages(url, callback)`](#mangahasugetpagesurl-callback)
 
 ---
 

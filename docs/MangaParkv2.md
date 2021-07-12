@@ -12,9 +12,9 @@
 ## Table of Contents
 
 - [MangaPark(options)](#mangaparkoptions)
-  - [`search(query, callback)`](#searchquery-callback)
-  - [`getMangaMeta(url, callback)`](#getmangametaurl-callback)
-  - [`getPages(url, callback)`](#getpagesurl-callback)
+  - [`search(query, callback)`](#mangaparksearchquery-callback)
+  - [`getMangaMeta(url, callback)`](#mangaparkgetmangametaurl-callback)
+  - [`getPages(url, callback)`](#mangaparkgetpagesurl-callback)
 
 ---
 

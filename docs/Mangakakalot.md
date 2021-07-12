@@ -12,10 +12,10 @@
 ## Table of Contents
 
 - [Mangakakalot(options)](#mangakakalotoptions)
-  - [`search(keyword, callback)`](#searchkeyword-callback)
-  - [`getMangaMeta(url, callback)`](#getmangametaurl-callback)
-  - [`getMangas(filters, callback)`](#getmangasfilters-callback)
-  - [`getPages(url, callback)`](#getpagesurl-callback)
+  - [`search(keyword, callback)`](#mangakakalotsearchkeyword-callback)
+  - [`getMangaMeta(url, callback)`](#mangakakalotgetmangametaurl-callback)
+  - [`getMangas(filters, callback)`](#mangakakalotgetmangasfilters-callback)
+  - [`getPages(url, callback)`](#mangakakalotgetpagesurl-callback)
 
 ---
 

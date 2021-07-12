@@ -12,10 +12,10 @@
 ## Table of Contents
 
 - [MangaSee(options)](#mangaseeoptions)
-  - [`search(query, callback)`](#searchquery-callback)
-  - [`getMangaMeta(url, callback)`](#getmangametaurl-callback)
-  - [`getPages(url, callback)`](#getpagesurl-callback)
-  - [`directory(callback)`](#directorycallback)
+  - [`search(query, callback)`](#mangaseesearchquery-callback)
+  - [`getMangaMeta(url, callback)`](#mangaseegetmangametaurl-callback)
+  - [`getPages(url, callback)`](#mangaseegetpagesurl-callback)
+  - [`directory(callback)`](#mangaseedirectorycallback)
 
 ---
 
