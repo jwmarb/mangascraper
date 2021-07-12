@@ -36,7 +36,7 @@
 
   - `puppeteerInstance` «[Object]»
 
-    - `instance` «[String]» Accepts either `custom` or `endpoint` or `default`
+    - `instance` «[String]» Accepts either `custom`, `endpoint`, or `default` or `default`
 
     - `wsEndpoint` «[String]» URL of endpoint. Only available if `instance` is `endpoint`
 
