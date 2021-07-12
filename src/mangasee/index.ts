@@ -87,7 +87,7 @@ export default class MangaSee {
     'https://www.google.com/',
   ];
 
-  constructor(options: ScrapingOptions) {
+  constructor(options: ScrapingOptions = {}) {
     this.options = options;
   }
 

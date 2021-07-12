@@ -38,7 +38,7 @@ export type ManganatoGenre = keyof typeof ManganatoGenres;
 export default class Manganato {
   private options: ScrapingOptions;
 
-  constructor(options: ScrapingOptions) {
+  constructor(options: ScrapingOptions = {}) {
     this.options = options;
   }
 

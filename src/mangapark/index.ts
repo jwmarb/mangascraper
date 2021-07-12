@@ -75,7 +75,7 @@ let memo: string[] = [];
 export default class MangaPark {
   private options: ScrapingOptions;
 
-  constructor(options: ScrapingOptions) {
+  constructor(options: ScrapingOptions = {}) {
     this.options = options;
   }
 
