@@ -8,11 +8,12 @@
 [error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [mangapark]: https://v2.mangapark.net/
 [date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+[launchoptions]: https://pptr.dev/#?product=Puppeteer&version=v10.1.0&show=api-puppeteerlaunchoptions
 
 ## Table of Contents
 
 - [MangaPark(options)](#mangaparkoptions)
-  - [`search(query, callback)`](#mangaparksearchquery-callback)
+  - [`search(query, filters, callback)`](#mangaparksearchquery-callback)
   - [`getMangaMeta(url, callback)`](#mangaparkgetmangametaurl-callback)
   - [`getPages(url, callback)`](#mangaparkgetpagesurl-callback)
 
@@ -37,6 +38,8 @@
     - `instance` «[String]» Accepts either `custom` or `endpoint`
 
     - `wsEndpoint` «[String]» URL of endpoint. Only available if `instance` is `endpoint`
+
+    - `launch` «[LaunchOptions]» Puppeteer launch options. Only available if `instance` is `default`
 
     - `browser` «[Browser]» Only available if `instance` is `custom`
 

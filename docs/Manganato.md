@@ -8,11 +8,12 @@
 [error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [manganato]: https://manganato.com/
 [date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+[launchoptions]: https://pptr.dev/#?product=Puppeteer&version=v10.1.0&show=api-puppeteerlaunchoptions
 
 ## Table of Contents
 
 - [Manganato(options)](#manganatooptions)
-  - [`search(query, callback)`](#manganatosearchquery-callback)
+  - [`search(query, filters, callback)`](#manganatosearchquery-callback)
   - [`getMangaMeta(url, callback)`](#manganatogetmangametaurl-callback)
   - [`getMangasFromGenre(genre, options, callback)`](#manganatogetmangasfromgenregenre-options-callback)
   - [`getPages(url, callback)`](#manganatogetpagesurl-callback)
@@ -35,9 +36,11 @@
 
   - `puppeteerInstance` «[Object]»
 
-    - `instance` «[String]» Accepts either `custom` or `endpoint`
+    - `instance` «[String]» Accepts either `custom` or `endpoint` or `default`
 
     - `wsEndpoint` «[String]» URL of endpoint. Only available if `instance` is `endpoint`
+
+    - `launch` «[LaunchOptions]» Puppeteer launch options. Only available if `instance` is `default`
 
     - `browser` «[Browser]» Only available if `instance` is `custom`
 

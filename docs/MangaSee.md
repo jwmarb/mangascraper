@@ -8,11 +8,12 @@
 [error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [mangasee]: https://mangasee123.com/
 [date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+[launchoptions]: https://pptr.dev/#?product=Puppeteer&version=v10.1.0&show=api-puppeteerlaunchoptions
 
 ## Table of Contents
 
 - [MangaSee(options)](#mangaseeoptions)
-  - [`search(query, callback)`](#mangaseesearchquery-callback)
+  - [`search(query, filters, callback)`](#mangaseesearchquery-callback)
   - [`getMangaMeta(url, callback)`](#mangaseegetmangametaurl-callback)
   - [`getPages(url, callback)`](#mangaseegetpagesurl-callback)
   - [`directory(callback)`](#mangaseedirectorycallback)
@@ -38,6 +39,8 @@
     - `instance` «[String]» Accepts either `custom` or `endpoint`
 
     - `wsEndpoint` «[String]» URL of endpoint. Only available if `instance` is `endpoint`
+
+    - `launch` «[LaunchOptions]» Puppeteer launch options. Only available if `instance` is `default`
 
     - `browser` «[Browser]» Only available if `instance` is `custom`
 
