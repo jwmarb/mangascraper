@@ -9,7 +9,13 @@ import Manganato, { ManganatoGenre, ManganatoManga, ManganatoOptions, ManganatoQ
 import MangaSee, { MangaSeeGenre, MangaSeeManga, MangaSeeMangaAlt, MangaSeeMeta, MangaSeeOptions } from './mangasee';
 import MangaPark, { MangaParkManga, MangaParkGenre, MangaParkOptions, MangaParkMeta } from './mangapark';
 import randomUserAgent from 'random-useragent';
-import puppeteer, { Browser } from 'puppeteer';
+import puppeteer, {
+  Browser,
+  BrowserConnectOptions,
+  BrowserLaunchArgumentOptions,
+  LaunchOptions,
+  Product,
+} from 'puppeteer';
 
 export { default as Mangakakalot } from './mangakakalot';
 export { default as Manganato } from './manganato';
@@ -23,12 +29,17 @@ export type ScrapingOptions = {
     port: number;
   };
   debug?: boolean;
-  puppeteerInstance: PuppeteerInstance;
+  puppeteerInstance?: PuppeteerInstance;
 };
 
 type PuppeteerDefault = {
   instance: 'default';
-  launch: puppeteer.LaunchOptions;
+  launch?: LaunchOptions &
+    BrowserLaunchArgumentOptions &
+    BrowserConnectOptions & {
+      product?: Product;
+      extraPrefsFirefox?: Record<string, unknown>;
+    };
 };
 
 type PuppeteerCustom = {
@@ -39,7 +50,7 @@ type PuppeteerCustom = {
   };
 };
 type PuppeteerServer = { instance: 'endpoint'; wsEndpoint: string };
-type PuppeteerInstance = PuppeteerServer | PuppeteerCustom;
+type PuppeteerInstance = PuppeteerServer | PuppeteerCustom | PuppeteerDefault;
 
 export const initPuppeteer = {
   args: [

@@ -49,9 +49,9 @@ export interface MangaSeeOptions {
     publish?: MangaStatus<MangaSee>;
   };
   type?: MangaType<MangaSee>;
-  genre?: {
-    include?: Array<keyof typeof MangaSeeGenres>;
-    exclude?: Array<keyof typeof MangaSeeGenres>;
+  genres?: {
+    include?: MangaGenre<MangaSee>[];
+    exclude?: MangaGenre<MangaSee>[];
   };
 }
 
@@ -60,9 +60,9 @@ export type MangaSeeGenre = keyof typeof MangaSeeGenres;
 export interface MangaSeeMangaAlt {
   title: string;
   url: string;
-  genres: string[];
+  genres: MangaGenre<MangaSee>[];
   coverImage: string;
-  status: 'Ongoing' | 'Complete';
+  status: 'ongoing' | 'complete';
 }
 export interface MangaSeeManga {
   title: string;
@@ -71,7 +71,7 @@ export interface MangaSeeManga {
     scan: MangaStatus<MangaSee>;
     publish: MangaStatus<MangaSee>;
   };
-  genres: keyof typeof MangaSeeGenres;
+  genres: MangaGenre<MangaSee>[];
   coverImage: string;
   updatedAt: Date;
 }
@@ -94,7 +94,7 @@ export default class MangaSee {
   /**
    * Search up a manga from MangaSee
    * 
-   * @param title - Title of manga. Leave it at null if you don't want to search for a specific title. This parameter accepts either a `string` or `object` containing either or both `title` and `author`
+   * @param query - Title of manga. Leave it at null if you don't want to search for a specific title. This parameter accepts either a `string` or `object` containing either or both `title` and `author`
    * @param filters  - Filters to apply when searching for manga
    * @param callback - Callback function
    * @returns Returns an array of mangas from mangasee123.com
@@ -120,26 +120,28 @@ export default class MangaSee {
    * ```
    */
   public search(
-    title?: MangaSearch<MangaSee>,
+    query?: MangaSearch<MangaSee>,
     filters: MangaFilters<MangaSee> = {},
     callback: MangaCallback<Manga<MangaSee>[]> = () => {},
   ): Promise<Manga<MangaSee>[]> {
+    if (filters == null) filters = {};
+    if (query == null) query = '';
     const {
       orderBy = 'A-Z',
       orderType = 'ascending',
       translationGroup = 'any',
       status = { scan: 'any', publish: 'any' },
       type: mangaType = 'any',
-      genre = { include: [], exclude: [] },
+      genres: genre = { include: [], exclude: [] },
     } = filters;
 
     function generateURL() {
       const parsedQuery = (() => {
         // Check if its null or undefined...
-        if (title == null) return '';
+        if (query == null) return '';
 
         // Is the query a string? If so, just return it as a URI component
-        if (typeof title === 'string') return `name=${encodeURIComponent(title)}`;
+        if (typeof query === 'string') return `name=${encodeURIComponent(query)}`;
 
         /**
          * If the query is not a string, extract `title` and `author`
@@ -148,8 +150,8 @@ export default class MangaSee {
          * ex: &name=title&author=author
          */
         const params: string[] = [];
-        if ('author' in title && title.author != null) params.push(`author=${encodeURIComponent(title.author)}`);
-        if ('title' in title && title.title != null) params.push(`name=${encodeURIComponent(title.title)}`);
+        if ('author' in query && query.author != null) params.push(`author=${encodeURIComponent(query.author)}`);
+        if ('title' in query && query.title != null) params.push(`name=${encodeURIComponent(query.title)}`);
         return params.join('&');
       })();
 
@@ -368,27 +370,24 @@ export default class MangaSee {
           const divElement = $('div');
           const img = divElement.children('img').attr('src') || '';
           const textArr = divElement
-            .clone()
             .children()
             .remove()
             .end()
-            .map((_, el) => {
-              return $(el).text().trim().split(', ');
-            })
+            .map((_, el) => $(el).text().trim().split(', '))
             .get();
           const firstIndexItemArray = textArr[0].split(' ');
           return {
             title,
             url: `https://mangasee123.com${url}`,
             coverImage: img,
-            status: firstIndexItemArray[0] as 'Ongoing' | 'Complete',
+            status: firstIndexItemArray[0].toLowerCase() as 'ongoing' | 'complete',
             genres: textArr.map((genre, i) => {
               if (i === 0) return firstIndexItemArray[1];
               return genre;
-            }),
+            }) as MangaGenre<MangaSee>[],
           };
         });
-        success(mangas as any, callback, res);
+        success(mangas, callback, res);
       } catch (e) {
         failure(e, callback);
       }
