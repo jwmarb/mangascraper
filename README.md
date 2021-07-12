@@ -1,9 +1,3 @@
-# Notice
-
-> **As of version `~3.1.0`, mangascraper uses [puppeteer](https://www.npmjs.com/package/puppeteer) as a peer dependency.** You must install [puppeteer](https://www.npmjs.com/package/puppeteer)
-
----
-
 [![npm package](https://img.shields.io/npm/v/@specify_/mangascraper)](https://www.npmjs.com/package/@specify_/mangascraper) [![license](https://img.shields.io/npm/l/@specify_/mangascraper)](https://github.com/EGGaming/mangascraper/blob/main/LICENSE)
 
 Mangascraper is a package used to scrape mangas. It is a solution to retrieving mangas that do not offer an API. Mangascraper can run either **asynchronously**, returning a `Promise`, or **synchronously** if a `callback` function is provided.
@@ -31,7 +25,7 @@ Mangascraper is a package used to scrape mangas. It is a solution to retrieving 
 ### npm
 
 ```sh
-npm install puppeteer @specify_/mangascraper
+npm install @specify_/mangascraper
 ```
 
 ---
@@ -153,6 +147,8 @@ const manganato = new Mangahasu({
 ### Using an existing puppeteer package
 
 By using an existing puppeteer package in your app, this will enable mangascraper to use one browser instead of opening new browsers per operation. In addition, mangascraper will be able to scrape manga **concurrently**. With this approach, **resources will be less intensive on chromium**, and it can save you a lot of time if you are handling a lot of scraping operations. This is the best approach if you do not want to connect to an existing endpoint.
+
+However, you must have [puppeteer](https://github.com/puppeteer/puppeteer) already installed.
 
 This is the most basic setup:
 
