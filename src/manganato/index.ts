@@ -206,7 +206,7 @@ export default class Manganato {
     callback: MangaCallback<MangaMeta<Manganato>> = () => {},
   ): Promise<MangaMeta<Manganato>> {
     return new Promise(async (res, rej) => {
-      if (typeof url == null) return failure('Missing argument "url" is required', callback);
+      if (url == null) return failure('Missing argument "url" is required', callback);
       try {
         /** Parse HTML Document */
         const $ = await readHtml(url, this.options);
