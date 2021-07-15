@@ -37,7 +37,7 @@ export default async function automateBrowser<T>(
   options: ScrapingOptions,
   callback: AutomatedCallback<T>,
   network?: BrowserNetworkOptions,
-) {
+): Promise<T> {
   const { puppeteerInstance = { instance: 'default' } } = options;
 
   const browser = await (async () => {

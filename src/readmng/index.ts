@@ -1,3 +1,4 @@
+import jquery from 'jquery';
 import {
   Manga,
   MangaCallback,
@@ -15,7 +16,6 @@ import {
 } from '..';
 import automateBrowser from '../functions/automateBrowser';
 import failure from '../functions/failure';
-import jquery from 'jquery';
 import success from '../functions/success';
 import readHtml from '../functions/readHtml';
 
@@ -90,7 +90,7 @@ export default class ReadMng {
   public search(
     query: MangaSearch<ReadMng> = '',
     filters: MangaFilters<ReadMng> = {},
-    callback: MangaCallback<Manga<ReadMng>[]> = () => {},
+    callback: MangaCallback<Manga<ReadMng>[]> = () => void 0,
   ): Promise<Manga<ReadMng>[]> {
     if (query == null) query = '';
     if (filters == null) filters = {};
@@ -285,7 +285,7 @@ export default class ReadMng {
                   const voteCount = voteCountNum.toLocaleString();
                   const rating_percentage =
                     voteCountNum > 0 && sadCt < smileyCt
-                      ? ((smileyCt / voteCountNum) * 100).toFixed(2) + '%'
+                      ? `${((smileyCt / voteCountNum) * 100).toFixed(2)}%`
                       : undefined;
                   const rating_stars =
                     voteCountNum > 0 && sadCt < smileyCt
@@ -330,7 +330,7 @@ export default class ReadMng {
    */
   public getMangaMeta(
     url: string,
-    callback: MangaCallback<MangaMeta<ReadMng>> = () => {},
+    callback: MangaCallback<MangaMeta<ReadMng>> = () => void 0,
   ): Promise<MangaMeta<ReadMng>> {
     return new Promise(async (res) => {
       if (url == null) return failure('Missing argument "url" is required', callback);
@@ -385,7 +385,7 @@ export default class ReadMng {
           const voteCountNum = dislikeCnt + likeCnt;
           const voteCount = voteCountNum.toLocaleString();
           const rating_percentage =
-            voteCountNum > 0 && dislikeCnt < likeCnt ? ((likeCnt / voteCountNum) * 100).toFixed(2) + '%' : undefined;
+            voteCountNum > 0 && dislikeCnt < likeCnt ? `${((likeCnt / voteCountNum) * 100).toFixed(2)}%` : undefined;
           const rating_stars =
             voteCountNum > 0 && dislikeCnt < likeCnt
               ? `${(Number(Number(rating_percentage?.slice(0, -1)) / 10) / 2).toFixed(1)} / 5`
@@ -401,7 +401,7 @@ export default class ReadMng {
         const chapters: MangaChapters<ReadMng>[] = $('ul.chp_lst > li > a')
           .map((_, el) => {
             const anchorEl = $(el);
-            const url = anchorEl.attr('href') + '/all-pages';
+            const url = `${anchorEl.attr('href')}/all-pages`;
             const uploadWhen = anchorEl.children('span.dte').text().trim().toLowerCase();
             const name = anchorEl.children('span.val').children().remove().end().text().trim();
             return {
@@ -455,7 +455,7 @@ export default class ReadMng {
    * @param callback - Callback function
    * @returns Returns an array of img urls from the manga chapter.
    */
-  public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
+  public getPages(url: string, callback: MangaCallback<string[]> = () => void 0): Promise<string[]> {
     return new Promise(async (res) => {
       if (url == null) return failure('Missing argument "url" is required', callback);
 

@@ -1,25 +1,30 @@
+import { parse } from 'date-fns';
 import failure from '../functions/failure';
 import readHtml from '../functions/readHtml';
 import success from '../functions/success';
-import { parse } from 'date-fns';
 import {
   MangaCallback,
   MangaCoverImage,
   MangaMeta,
-  MangaRating,
   MangaChapters,
   MangakakalotGenres,
   MangaFilters,
   Manga,
   ScrapingOptions,
   MangaGenre,
-  MangaBase,
   MangaAge,
   MangaStatus,
-} from '../';
+} from '..';
 import splitAltTitles from '../functions/splitAltTitles';
 
-export interface MangakakalotManga extends MangaBase {}
+export interface MangakakalotManga {
+  title: string;
+  url: string;
+  authors: string[];
+  updatedAt: Date;
+  views: string;
+  coverImage: MangaCoverImage;
+}
 
 export interface MangakakalotAlt {
   title: string;
@@ -65,17 +70,17 @@ export default class Mangakakalot {
    */
   public search(
     keyword: string,
-    callback: MangaCallback<Manga<Mangakakalot>[]> = () => {},
+    callback: MangaCallback<Manga<Mangakakalot>[]> = () => void 0,
   ): Promise<Manga<Mangakakalot>[]> {
     function generateURL(): string {
       const search: string = keyword.replace(/[^a-zA-Z0-9]/g, '_');
 
-      const base_url = `https://mangakakalot.com/search/story/${search}`;
+      const baseUrl = `https://mangakakalot.com/search/story/${search}`;
 
-      return base_url;
+      return baseUrl;
     }
 
-    return new Promise(async (res, rej) => {
+    return new Promise(async (res) => {
       /** Param Validation */
       if (keyword == null) return failure('Missing argument "keyword" is required', callback);
 
@@ -114,7 +119,7 @@ export default class Mangakakalot {
           .map((index, element) => {
             const image = $(element).attr('src');
             const alt = $(element).attr('alt');
-            if (typeof alt !== 'undefined') return { url: image, alt: alt };
+            if (typeof alt !== 'undefined') return { url: image, alt };
           })
           .get();
 
@@ -168,9 +173,9 @@ export default class Mangakakalot {
    */
   public getMangaMeta(
     url: string,
-    callback: MangaCallback<MangaMeta<Mangakakalot>> = () => {},
+    callback: MangaCallback<MangaMeta<Mangakakalot>> = () => void 0,
   ): Promise<MangaMeta<Mangakakalot>> {
-    return new Promise(async (res, rej) => {
+    return new Promise(async (res) => {
       if (url == null) return failure('Argument "url" is required', callback);
       try {
         /** Load HTML Document to cheerio to extract HTML data */
@@ -178,29 +183,28 @@ export default class Mangakakalot {
 
         let status!: MangaStatus<Mangakakalot>;
         let updatedAt: Date = new Date();
-        let views: string = '';
+        let views = '';
 
-        let rating!: MangaRating;
         let coverImage: MangaCoverImage = { alt: '', url: undefined };
 
         const chaptersViews: string[] = [];
         const chaptersDate: Date[] = [];
 
         /** Get main title */
-        let mainTitle: string = $(`h1`).text();
+        const mainTitle: string = $(`h1`).text();
 
         /** Get alternate titles */
-        let altTitles: string[] = $(`div.manga-info-top > ul.manga-info-text > li > h2.story-alternative`)
+        const altTitles: string[] = $(`div.manga-info-top > ul.manga-info-text > li > h2.story-alternative`)
           .map((_, element) => splitAltTitles($(element).text().substring(14)))
           .get();
 
         /** Get manga status, update date, views */
         $(`div.manga-info-top > ul > li`).each((_, element) => {
-          const unknown_li = $(element).text();
-          if (unknown_li.startsWith('Status :'))
-            status = <MangaStatus<Mangakakalot>>unknown_li.substring(9).toLowerCase();
-          if (unknown_li.startsWith('Last updated :')) updatedAt = new Date(unknown_li.substring(15));
-          if (unknown_li.startsWith('View :')) views = unknown_li.substring(7);
+          const unknownLi = $(element).text();
+          if (unknownLi.startsWith('Status :'))
+            status = unknownLi.substring(9).toLowerCase() as MangaStatus<Mangakakalot>;
+          if (unknownLi.startsWith('Last updated :')) updatedAt = new Date(unknownLi.substring(15));
+          if (unknownLi.startsWith('View :')) views = unknownLi.substring(7);
         });
 
         /** Get manga authors */
@@ -217,13 +221,13 @@ export default class Mangakakalot {
         const ratingText = $(
           `div.manga-info-top > ul > li[style="line-height: 20px; font-size: 11px; font-style: italic; padding: 0px 0px 0px 44px;"] > em#rate_row_cmd`,
         ).text();
-        const string_array = ratingText.split(' ');
-        const src = string_array[0].trim();
-        const voteCount = Number(string_array[7]).toLocaleString();
-        const rating_stars = `${string_array[3]} / ${string_array[5]}`;
-        const rating_percentage = `${((Number(string_array[3]) / Number(string_array[5])) * 100).toFixed(2)}%`;
+        const stringArr = ratingText.split(' ');
+        const src = stringArr[0].trim();
+        const voteCount = Number(stringArr[7]).toLocaleString();
+        const ratingStars = `${stringArr[3]} / ${stringArr[5]}`;
+        const ratingPercentage = `${((Number(stringArr[3]) / Number(stringArr[5])) * 100).toFixed(2)}%`;
 
-        rating = { sourceRating: src, voteCount, rating_percentage, rating_stars };
+        const rating = { sourceRating: src, voteCount, ratingPercentage, ratingStars };
 
         /** Remove all children and get summary text */
         const summary = $(`div#noidungm`).clone().children().remove().end().text().trim();
@@ -238,7 +242,7 @@ export default class Mangakakalot {
         const chapterDiv = $(`div.manga-info-chapter > div.chapter-list > div.row`);
 
         /** Get manga chapter name and url */
-        const chaptersNameURL: Array<{ name: string; url: string }> = chapterDiv
+        const chaptersNameURL: { name: string; url: string }[] = chapterDiv
           .find(`span > a`)
           .map((_, element) => {
             const chapterName = $(element).text();
@@ -249,21 +253,18 @@ export default class Mangakakalot {
 
         /** Get views of every manga chapter */
         chapterDiv.children(`span:not(:has(a))`).each((_, element) => {
-          const chapters_views_date: string = $(element).text();
-          if (chapters_views_date.match(/[a-zA-Z]/g))
-            chaptersDate.push(parse(chapters_views_date, 'MMM-dd-yy', new Date()));
-          else chaptersViews.push(chapters_views_date);
+          const chaptersViewDate: string = $(element).text();
+          if (chaptersViewDate.match(/[a-zA-Z]/g)) chaptersDate.push(parse(chaptersViewDate, 'MMM-dd-yy', new Date()));
+          else chaptersViews.push(chaptersViewDate);
         });
 
         const chapters: MangaChapters<Mangakakalot>[] = chapterDiv
-          .map((index, _) => {
-            return {
-              name: chaptersNameURL[index].name,
-              url: chaptersNameURL[index].url,
-              uploadDate: chaptersDate[index],
-              views: chaptersViews[index],
-            };
-          })
+          .map((index) => ({
+            name: chaptersNameURL[index].name,
+            url: chaptersNameURL[index].url,
+            uploadDate: chaptersDate[index],
+            views: chaptersViews[index],
+          }))
           .get();
 
         success(
@@ -273,7 +274,7 @@ export default class Mangakakalot {
             updatedAt,
             views,
             authors,
-            genres: (<unknown>genres) as MangaGenre<Mangakakalot>[],
+            genres: genres as MangaGenre<Mangakakalot>[],
             rating,
             summary,
             coverImage,
@@ -310,10 +311,10 @@ export default class Mangakakalot {
 
   public getMangas(
     filters: MangaFilters<Mangakakalot> = {},
-    callback: MangaCallback<Manga<Mangakakalot, 'alt'>[]> = () => {},
+    callback: MangaCallback<Manga<Mangakakalot, 'alt'>[]> = () => void 0,
   ): Promise<Manga<Mangakakalot, 'alt'>[]> {
     const { page = 1, genre = 'any', status, age: type = 'updated' } = filters;
-    return new Promise(async (res, rej) => {
+    return new Promise(async (res) => {
       if (page == null) return failure('Missing argument "page" is required', callback);
       if (typeof page !== 'number') return failure('"page" must be a number', callback);
       if (page <= 0) return failure('"page" must be a number greater than 0', callback);
@@ -390,8 +391,8 @@ export default class Mangakakalot {
    * />
    * ```
    */
-  public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
-    return new Promise(async (res, rej) => {
+  public getPages(url: string, callback: MangaCallback<string[]> = () => void 0): Promise<string[]> {
+    return new Promise(async (res) => {
       if (url == null) return failure('Argument "url" is required', callback);
 
       try {

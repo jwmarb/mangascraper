@@ -1,9 +1,9 @@
 export default function splitAltTitles(titles: string): string[] {
-  let titles_array: string[];
+  let titlesArray: string[];
 
-  if (titles.match(/,+/g)) titles_array = titles.split(',');
-  else titles_array = titles.split(';');
+  if (titles.match(/,+/g)) titlesArray = titles.split(',');
+  else titlesArray = titles.split(';');
 
   /** Trim each array element */
-  return titles_array.map((title) => title.trim());
+  return titlesArray.map((title) => title.trim());
 }

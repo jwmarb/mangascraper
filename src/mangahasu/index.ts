@@ -1,3 +1,4 @@
+import { parse } from 'date-fns';
 import {
   MangaCallback,
   Manga,
@@ -14,7 +15,6 @@ import {
   MangaGenre,
   MangaType,
 } from '..';
-import { parse } from 'date-fns';
 import failure from '../functions/failure';
 import readHtml from '../functions/readHtml';
 import splitAltTitles from '../functions/splitAltTitles';
@@ -59,6 +59,7 @@ export default class Mangahasu {
   constructor(options: ScrapingOptions = {}) {
     this.options = options;
   }
+
   /**
    *
    * @param query - Search manga, name of author and artist. If you only want to search for a specific characteristic of a manga (such as searching for author name only), use an object which has the fields `author`, `artist`, and `title`
@@ -79,7 +80,7 @@ export default class Mangahasu {
   public search(
     query: MangaSearch<Mangahasu> = '',
     filters: MangaFilters<Mangahasu> = {},
-    callback: MangaCallback<Manga<Mangahasu>[]> = () => {},
+    callback: MangaCallback<Manga<Mangahasu>[]> = () => void 0,
   ): Promise<Manga<Mangahasu>[]> {
     if (query == null) query = '';
     if (filters == null) filters = {};
@@ -98,21 +99,21 @@ export default class Mangahasu {
 
       const typeid: string = type !== 'any' ? `typeid=${MangahasuTypes[type]}` : '';
 
-      const include_genres: string = genres.include
+      const includeGenres: string = genres.include
         ? `g_i[]=${genres.include.map((genre) => MangahasuGenres[genre])}`
         : '';
-      const exclude_genres: string = genres.exclude
+      const excludeGenres: string = genres.exclude
         ? `g_e[]=${genres.exclude.map((genre) => MangahasuGenres[genre])}`
         : '';
 
-      const manga_status = status !== 'any' ? `status=${status === 'completed' ? '1' : '2'}` : '';
+      const mangaStatus = status !== 'any' ? `status=${status === 'completed' ? '1' : '2'}` : '';
 
-      const url_args = [keyword, author, artist, typeid, include_genres, exclude_genres, manga_status]
+      const urlArgs = [keyword, author, artist, typeid, includeGenres, excludeGenres, mangaStatus]
         .filter((arg) => arg.length > 0)
         .join('&');
 
-      const base_url = `https://mangahasu.se/advanced-search.html?${url_args}&page=${page}`;
-      return base_url;
+      const baseUrl = `https://mangahasu.se/advanced-search.html?${urlArgs}&page=${page}`;
+      return baseUrl;
     }
 
     return new Promise(async (res) => {
@@ -185,22 +186,22 @@ export default class Mangahasu {
    */
   public getMangaMeta(
     url: string,
-    callback: MangaCallback<MangaMeta<Mangahasu>> = () => {},
+    callback: MangaCallback<MangaMeta<Mangahasu>> = () => void 0,
   ): Promise<MangaMeta<Mangahasu>> {
     return new Promise(async (res) => {
       if (url == null) return failure('Missing argument "url" is required', callback);
       try {
         /** Parse HTML document */
         const $ = await readHtml(url, this.options);
-        let title: string = '';
+        let title = '';
         let altTitles: string[] = [];
-        let summary: string = '';
+        let summary = '';
         let authors: string[] = [];
         let artists: string[] = [];
         let genres: string[] = [];
-        let type: string = '';
-        let status: string = '';
-        let views: string = '';
+        let type = '';
+        let status = '';
+        let views = '';
         let rating: MangaRating = {} as MangaRating;
         let coverImage: MangaCoverImage = {} as MangaCoverImage;
 
@@ -239,19 +240,19 @@ export default class Mangahasu {
 
         /** Get manga rating */
         const spanRatings = $(`div[class="div-evaluate detail_item"] > span.info > span.ratings`).text().trim();
-        let rating_stars;
-        let rating_percentage;
+        let ratingStars;
+        let ratingPercentage;
         if (spanRatings.length !== 0) {
-          rating_stars = `${spanRatings}/5`;
-          rating_percentage = `${((Number(spanRatings) / 5) * 100).toFixed(2)}%`;
+          ratingStars = `${spanRatings}/5`;
+          ratingPercentage = `${((Number(spanRatings) / 5) * 100).toFixed(2)}%`;
         }
-        let voteCount = Number(
+        const voteCount = Number(
           $(`div[class="div-evaluate detail_item"] > span.info > span.div_evaluate`).text().trim(),
         ).toLocaleString();
         rating = {
           sourceRating: 'Mangahasu.se',
-          rating_percentage,
-          rating_stars,
+          ratingPercentage,
+          ratingStars,
           voteCount,
         };
 
@@ -264,11 +265,11 @@ export default class Mangahasu {
         const chapters: MangaChapters<Mangahasu>[] = $(`div.content-info > div.list-chapter > table.table > tbody > tr`)
           .map((_, el) => {
             const anchorEl = $(el).children('td.name').children('a');
-            const chapter_name = anchorEl.text().replace(title, '').trim();
-            const chapter_url = anchorEl.attr('href');
-            const chapter_date = parse($(el).children('td.date-updated').text().trim(), 'MMM dd, yyyy', new Date());
-            if (typeof chapter_url !== 'undefined')
-              return { name: chapter_name, url: chapter_url, uploadDate: chapter_date };
+            const chapterName = anchorEl.text().replace(title, '').trim();
+            const chapterUrl = anchorEl.attr('href');
+            const chapterDate = parse($(el).children('td.date-updated').text().trim(), 'MMM dd, yyyy', new Date());
+            if (typeof chapterUrl !== 'undefined')
+              return { name: chapterName, url: chapterUrl, uploadDate: chapterDate };
           })
           .get();
 
@@ -313,7 +314,7 @@ export default class Mangahasu {
    * })();
    * ```
    */
-  public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
+  public getPages(url: string, callback: MangaCallback<string[]> = () => void 0): Promise<string[]> {
     return new Promise(async (res) => {
       if (url == null) return failure('Missing argument "url" is required', callback);
       try {

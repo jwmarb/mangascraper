@@ -1,5 +1,5 @@
-import preload from './preload';
 import puppeteer from 'puppeteer';
+import preload from './preload';
 import { initPuppeteer, ScrapingOptions } from '..';
 import { AutomatedCallback, BrowserNetworkOptions } from './automateBrowser';
 
@@ -8,7 +8,10 @@ type Instances<T> = {
   callback: AutomatedCallback<T>;
 };
 
-export default async function automateBrowsers(options: ScrapingOptions, instances: Instances<any>[]): Promise<any> {
+export default async function automateBrowsers(
+  options: ScrapingOptions,
+  instances: Instances<unknown>[],
+): Promise<unknown> {
   const { puppeteerInstance = { instance: 'default' } } = options;
 
   try {

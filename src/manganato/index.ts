@@ -1,3 +1,4 @@
+import { parse } from 'date-fns';
 import failure from '../functions/failure';
 import readHtml from '../functions/readHtml';
 import success from '../functions/success';
@@ -14,16 +15,21 @@ import {
   Manga,
   MangaGenreFilters,
   ScrapingOptions,
-  MangaBase,
   MangaOrder,
   MangaStatus,
-} from '../';
-import { parse } from 'date-fns';
+} from '..';
 import splitAltTitles from '../functions/splitAltTitles';
 
 export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'everything'; search: string } | string;
 
-export interface ManganatoManga extends MangaBase {}
+export interface ManganatoManga {
+  title: string;
+  url: string;
+  authors: string[];
+  updatedAt: Date;
+  views: string;
+  coverImage: MangaCoverImage;
+}
 
 export interface ManganatoOptions {
   genres?: { include?: ManganatoGenre[]; exclude?: ManganatoGenre[] };
@@ -68,15 +74,15 @@ export default class Manganato {
   public search(
     query: MangaSearch<Manganato> = '',
     filters: MangaFilters<Manganato> = {},
-    callback: MangaCallback<Manga<Manganato>[]> = () => {},
+    callback: MangaCallback<Manga<Manganato>[]> = () => void 0,
   ): Promise<Manga<Manganato>[]> {
     if (query == null) query = '';
     if (filters == null) filters = {};
-    const { genres: genre = {}, status = 'any', orderBy = 'latest_updates', page = 1 } = filters;
+    const { genres = {}, status = 'any', orderBy = 'latest_updates', page = 1 } = filters;
 
     function generateURL(): string {
-      let g_i: string = ''; // short for genre_includes
-      let g_e: string = ''; // short for genre_excludes
+      let includeGenres = ''; // short for genre_includes
+      let excludeGenres = ''; // short for genre_excludes
       const keyw: string = (() => {
         if (query == null) return '';
         if (typeof query === 'string') return `keyw=${query.replace(/[^a-zA-Z0-9]/g, '_')}`;
@@ -99,26 +105,25 @@ export default class Manganato {
           case 'most_views':
             return 'orby=topview';
           default:
-            console.warn(
-              `The value "orderBy" is equal to "${orderBy}". Use a matching value such as "top_view" to get the correct search results`,
-            );
             return '';
         }
       })(); // short for Order By
 
       /** Check if there is a genre object */
-      if (genre != null) {
+      if (genres != null) {
         /** Put each genre from 'includes' into 'genre_includes' */
-        g_i = (genre.include && `g_i=_${genre.include.map((genre) => ManganatoGenres[genre]).join('_')}_`) || '';
+        includeGenres =
+          (genres.include && `g_i=_${genres.include.map((genre) => ManganatoGenres[genre]).join('_')}_`) || '';
 
         /** Put each genre from 'excludes' into 'genre_excludes' */
-        g_e = (genre.exclude && `g_e=_${genre.exclude.map((genre) => ManganatoGenres[genre]).join('_')}_`) || '';
+        excludeGenres =
+          (genres.exclude && `g_e=_${genres.exclude.map((genre) => ManganatoGenres[genre]).join('_')}_`) || '';
       }
-      let url_args: string[] = [g_i, g_e, sts, orby, keyw].filter((arg) => arg.length > 0);
+      const urlArgs: string[] = [includeGenres, excludeGenres, sts, orby, keyw].filter((arg) => arg.length > 0);
 
-      return `https://manganato.com/advanced_search?s=all&${url_args.join('&')}&page=${page}`;
+      return `https://manganato.com/advanced_search?s=all&${urlArgs.join('&')}&page=${page}`;
     }
-    return new Promise(async (res, rej) => {
+    return new Promise(async (res) => {
       if (page == null) return failure('Missing argument "page" is required', callback);
       if (page <= 0) return failure('"page" must be greater than 0', callback);
 
@@ -205,9 +210,9 @@ export default class Manganato {
    */
   public getMangaMeta(
     url: string,
-    callback: MangaCallback<MangaMeta<Manganato>> = () => {},
+    callback: MangaCallback<MangaMeta<Manganato>> = () => void 0,
   ): Promise<MangaMeta<Manganato>> {
-    return new Promise(async (res, rej) => {
+    return new Promise(async (res) => {
       if (url == null) return failure('Missing argument "url" is required', callback);
       try {
         /** Parse HTML Document */
@@ -221,9 +226,9 @@ export default class Manganato {
           `div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-value > h2`,
         )
           .map((_, el) => {
-            const alternate_titles = $(el).text();
-            if (typeof alternate_titles === 'undefined') return;
-            return splitAltTitles(alternate_titles);
+            const alternateTitles = $(el).text();
+            if (typeof alternateTitles == null) return;
+            return splitAltTitles(alternateTitles);
           })
           .get();
 
@@ -235,12 +240,12 @@ export default class Manganato {
           .get();
 
         /** Get manga status */
-        const status = <MangaStatus<Manganato>>(
-          $(`div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-label > i.info-status`)
-            .parent()
-            .siblings('td.table-value')
-            .text()
-        );
+        const status = $(
+          `div.story-info-right > table.variations-tableInfo > tbody > tr > td.table-label > i.info-status`,
+        )
+          .parent()
+          .siblings('td.table-value')
+          .text() as MangaStatus<Manganato>;
 
         /** Get manga genres */
         const genres: string[] = $(
@@ -267,14 +272,14 @@ export default class Manganato {
           .text();
 
         /** Get manga rating */
-        const rating_text = $(`div.story-info-right-extent > p > em#rate_row_cmd > em > em`)
+        const ratingText = $(`div.story-info-right-extent > p > em#rate_row_cmd > em > em`)
           .map((_, el) => $(el).text().trim().split(' ').join('').split('\n'))
           .get();
-        let rating: MangaRating = {
-          sourceRating: rating_text[0],
-          voteCount: Number(rating_text[4]).toLocaleString(),
-          rating_percentage: `${((Number(rating_text[2].substring(0, 3)) / Number(rating_text[3])) * 100).toFixed(2)}%`,
-          rating_stars: `${rating_text[2].substring(0, 3)} / ${rating_text[3]}`,
+        const rating: MangaRating = {
+          sourceRating: ratingText[0],
+          voteCount: Number(ratingText[4]).toLocaleString(),
+          ratingPercentage: `${((Number(ratingText[2].substring(0, 3)) / Number(ratingText[3])) * 100).toFixed(2)}%`,
+          ratingStars: `${ratingText[2].substring(0, 3)} / ${ratingText[3]}`,
         };
 
         /** Get manga summary */
@@ -290,10 +295,9 @@ export default class Manganato {
         // Get chapter names and URLs
         const chapterNameURL = $(`div.panel-story-chapter-list > ul.row-content-chapter > li > a.chapter-name`)
           .map((_, el) => {
-            const chapter_name = $(el).text();
-            const chapter_url = $(el).attr('href');
-            if (typeof chapter_name !== 'undefined' && typeof chapter_url !== 'undefined')
-              return { name: chapter_name, url: chapter_url };
+            const chapterName = $(el).text();
+            const chapterUrl = $(el).attr('href');
+            if (chapterName != null && chapterUrl != null) return { name: chapterName, url: chapterUrl };
           })
           .get();
 
@@ -308,9 +312,9 @@ export default class Manganato {
           .get();
 
         /** Get data from chapters and arrange them into JSON-like data */
-        const chapters: MangaChapters<Manganato>[] = chapterNameURL.map(({ name, url }, i) => ({
+        const chapters: MangaChapters<Manganato>[] = chapterNameURL.map(({ name, url: chapterUrl }, i) => ({
           name,
-          url,
+          url: chapterUrl,
           uploadDate: chapterDates[i],
           views: chapterViews[i],
         }));
@@ -325,7 +329,7 @@ export default class Manganato {
             authors,
             status,
             summary,
-            genres: (<unknown>genres) as MangaGenre<Manganato>[],
+            genres: genres as MangaGenre<Manganato>[],
             rating,
             updatedAt,
             views,
@@ -361,7 +365,7 @@ export default class Manganato {
    * />
    * ```
    */
-  public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
+  public getPages(url: string, callback: MangaCallback<string[]> = () => void 0): Promise<string[]> {
     return new Promise(async (res) => {
       if (url == null) return failure('Argument "url" is required', callback);
 
@@ -410,19 +414,19 @@ export default class Manganato {
   public getMangasFromGenre(
     genre: MangaGenre<Manganato>,
     options: MangaGenreFilters<Manganato> = {},
-    callback: MangaCallback<Manga<Manganato>[]> = () => {},
+    callback: MangaCallback<Manga<Manganato>[]> = () => void 0,
   ): Promise<Manga<Manganato>[]> {
     const { age: type = 'updated', status = 'all', page = 1 } = options;
 
     function generateURL(): string {
-      const filter_state = `state=${status}`;
-      const filter_type = `type=${type === 'updated' ? 'latest' : 'newest'}`;
-      const base_url = `https://manganato.com/genre-${ManganatoGenres[genre]}/${page}?${filter_type}&${filter_state}`;
+      const filterState = `state=${status}`;
+      const filterType = `type=${type === 'updated' ? 'latest' : 'newest'}`;
+      const baseUrl = `https://manganato.com/genre-${ManganatoGenres[genre]}/${page}?${filterType}&${filterState}`;
 
-      return base_url;
+      return baseUrl;
     }
 
-    return new Promise(async (res, rej) => {
+    return new Promise(async (res) => {
       if (genre == null) return failure('Missing argument "genres" is required', callback);
       if (page == null) return failure('Missing argument "page" is required', callback);
       if (page <= 0) return failure('"page" must be greater than 0', callback);
@@ -457,8 +461,8 @@ export default class Manganato {
         $(
           `div.panel-content-genres > div.content-genres-item > div.genres-item-info > p.genres-item-view-time > span.genres-item-time`,
         ).each((_, el) => {
-          const time_string = $(el).text();
-          if (typeof time_string !== 'undefined') updatedAt.push(parse(time_string, 'MMM dd,yy', new Date()));
+          const timestamp = $(el).text();
+          if (timestamp != null) updatedAt.push(parse(timestamp, 'MMM dd,yy', new Date()));
         });
 
         /** Get manga authors */

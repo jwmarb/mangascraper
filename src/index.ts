@@ -1,3 +1,5 @@
+import randomUserAgent from 'random-useragent';
+import { Browser, BrowserConnectOptions, BrowserLaunchArgumentOptions, LaunchOptions, Product } from 'puppeteer';
 import Mangahasu, { MangahasuGenre, MangahasuManga, MangahasuMeta, MangahasuOptions } from './mangahasu';
 import Mangakakalot, {
   MangakakalotAlt,
@@ -8,14 +10,6 @@ import Mangakakalot, {
 import Manganato, { ManganatoGenre, ManganatoManga, ManganatoOptions, ManganatoQuery } from './manganato';
 import MangaSee, { MangaSeeGenre, MangaSeeManga, MangaSeeMangaAlt, MangaSeeMeta, MangaSeeOptions } from './mangasee';
 import MangaPark, { MangaParkManga, MangaParkGenre, MangaParkOptions, MangaParkMeta } from './mangapark';
-import randomUserAgent from 'random-useragent';
-import puppeteer, {
-  Browser,
-  BrowserConnectOptions,
-  BrowserLaunchArgumentOptions,
-  LaunchOptions,
-  Product,
-} from 'puppeteer';
 import ReadMng, { ReadMngGenre, ReadMngManga, ReadMngMeta, ReadMngOptions } from './readmng';
 
 export { default as ReadMng } from './readmng';
@@ -76,15 +70,6 @@ export const initPuppeteer = {
 };
 
 export type MangaCallback<T> = (error?: Error, result?: T) => void;
-
-export interface MangaBase {
-  title: string;
-  url: string;
-  authors: string[];
-  updatedAt: Date;
-  views: string;
-  coverImage: MangaCoverImage;
-}
 
 export type Manga<T, S extends 'main' | 'alt' = 'main'> = T extends Mangakakalot
   ? S extends 'main'
@@ -184,8 +169,8 @@ export type MangaChapters<T> = T extends Manganato | Mangakakalot
 export type MangaRating = {
   sourceRating: string;
   voteCount: string;
-  rating_percentage?: string;
-  rating_stars?: string;
+  ratingPercentage?: string;
+  ratingStars?: string;
 };
 
 export type MangaCoverImage = {

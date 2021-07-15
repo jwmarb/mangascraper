@@ -1,8 +1,8 @@
 import cheerio, { CheerioAPI } from 'cheerio';
 import axios from 'axios';
-import { ScrapingOptions } from '..';
 import puppeteer from 'puppeteer';
 import randomUserAgent from 'random-useragent';
+import { ScrapingOptions } from '..';
 import automateBrowser, { BrowserNetworkOptions } from './automateBrowser';
 
 export default async function readHtml(
@@ -11,9 +11,8 @@ export default async function readHtml(
   network?: BrowserNetworkOptions,
   waitUntil?: puppeteer.PuppeteerLifeCycleEvent | puppeteer.PuppeteerLifeCycleEvent[],
 ): Promise<CheerioAPI> {
-  const { proxy, debug = false } = options;
+  const { proxy } = options;
 
-  if (debug) console.log(`Fetching HTML from ${url}`);
   try {
     const { data } = await axios.get(url, {
       proxy,
@@ -21,20 +20,17 @@ export default async function readHtml(
         'User-Agent': randomUserAgent.getRandom((ua) => ua.osName === 'Windows' && ua.browserName === 'Chrome'),
       },
     });
-    if (debug) console.log(`Successfully retrieved html without any errors`);
     return cheerio.load(data);
   } catch (e) {
-    if (debug) console.log(`Failed to fetch HTML from ${url}. Using puppeteer...`);
     try {
       const html = await automateBrowser(
         options,
         async (page) => {
-          await page.goto(url, { waitUntil: waitUntil ? waitUntil : 'load' });
+          await page.goto(url, { waitUntil: waitUntil || 'load' });
           return await page.evaluate(() => document.body.innerHTML);
         },
-        network ? network : { resource: { method: 'unblock', type: ['document'] } },
+        network || { resource: { method: 'unblock', type: ['document'] } },
       );
-      if (debug) console.log('Successfully retrieved html after failed GET request');
       return cheerio.load(html);
     } catch (e) {
       throw Error(e);

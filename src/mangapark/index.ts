@@ -1,3 +1,5 @@
+import jquery from 'jquery';
+import cheerio from 'cheerio';
 import {
   Manga,
   MangaCallback,
@@ -16,11 +18,9 @@ import {
   ScrapingOptions,
 } from '..';
 import failure from '../functions/failure';
-import jquery from 'jquery';
 import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import automateBrowser from '../functions/automateBrowser';
-import cheerio from 'cheerio';
 
 export type MangaParkMeta = {
   title: {
@@ -103,15 +103,15 @@ export default class MangaPark {
   search(
     query: MangaSearch<MangaPark> = '',
     filters: MangaFilters<MangaPark> = {},
-    callback: MangaCallback<Manga<MangaPark>[]> = () => {},
+    callback: MangaCallback<Manga<MangaPark>[]> = () => void 0,
   ): Promise<Manga<MangaPark>[]> {
     if (query == null) query = '';
     if (filters == null) filters = {};
 
-    const { genres: genre, status = 'any', rating, type, yearReleased, orderBy = 'views', page = 1 } = filters;
+    const { genres, status = 'any', rating, type, yearReleased, orderBy = 'views', page = 1 } = filters;
 
     const url = (() => {
-      const query_param = (() => {
+      const queryParam = (() => {
         if (query == null || (typeof query === 'string' && query.length === 0)) return '';
         if (typeof query === 'string') return `q=${encodeURIComponent(query)}`;
 
@@ -126,13 +126,13 @@ export default class MangaPark {
       })();
 
       const includeGenres =
-        genre && genre.include && genre.include.length > 0
-          ? `genres=${genre.include.map((genre) => MangaParkGenres[genre])}`
+        genres && genres.include && genres.include.length > 0
+          ? `genres=${genres.include.map((genre) => MangaParkGenres[genre])}`
           : '';
 
       const excludeGenres =
-        genre && genre.exclude && genre.exclude.length > 0
-          ? `genres-exclude=${genre.exclude.map((genre) => MangaParkGenres[genre])}`
+        genres && genres.exclude && genres.exclude.length > 0
+          ? `genres-exclude=${genres.exclude.map((genre) => MangaParkGenres[genre])}`
           : '';
 
       const mangaRating = rating ? `rating=${rating.substring(0, 0)}` : '';
@@ -146,7 +146,7 @@ export default class MangaPark {
       const order = `orderby=${MangaParkOrderBy[orderBy]}`;
 
       const args = [
-        query_param,
+        queryParam,
         includeGenres,
         excludeGenres,
         mangaRating,
@@ -172,10 +172,10 @@ export default class MangaPark {
         const titleURLs = $('h2 > a')
           .map((_, el) => {
             const anchorEl = $(el);
-            const url = `https://v2.mangapark.net${anchorEl.attr('href')}` || '';
+            const href = `https://v2.mangapark.net${anchorEl.attr('href')}` || '';
             const title = anchorEl.attr('title') || '';
             return {
-              url,
+              url: href,
               title,
             };
           })
@@ -194,7 +194,7 @@ export default class MangaPark {
           })
           .get();
 
-        const genres = $('div.field.last > a')
+        const mangaGenres = $('div.field.last > a')
           .map((_, el) => {
             const anchorEl = $(el);
             const text = anchorEl.text();
@@ -207,12 +207,12 @@ export default class MangaPark {
           })
           .get();
 
-        const rating = $('div.rate').map((_, el) => {
+        const mangaRating = $('div.rate').map((_, el) => {
           const divEl = $(el);
-          const rating = divEl.attr('title')?.split(' ') || [];
-          const numerator = Number(rating[1]);
-          const denominator = Number(rating[3]);
-          const voteCount = Number(rating[6]).toLocaleString();
+          const ratingText = divEl.attr('title')?.split(' ') || [];
+          const numerator = Number(ratingText[1]);
+          const denominator = Number(ratingText[3]);
+          const voteCount = Number(ratingText[6]).toLocaleString();
           return {
             sourceRating: 'MangaPark.net',
             voteCount,
@@ -233,13 +233,13 @@ export default class MangaPark {
           })
           .get();
 
-        const data = titleURLs.map(({ title, url }, i) => ({
+        const data = titleURLs.map(({ title, url: mangaUrl }, i) => ({
           title,
-          url,
+          url: mangaUrl,
           authors: authors[i],
           coverImage: coverImage[i],
-          genres: genres[i],
-          rating: rating[i],
+          genres: mangaGenres[i],
+          rating: mangaRating[i],
         }));
 
         success(data, callback, res);
@@ -265,7 +265,7 @@ export default class MangaPark {
    */
   public getMangaMeta(
     url: string,
-    callback: MangaCallback<MangaMeta<MangaPark>> = () => {},
+    callback: MangaCallback<MangaMeta<MangaPark>> = () => void 0,
   ): Promise<MangaMeta<MangaPark>> {
     return new Promise(async (res) => {
       if (url == null) return failure('Missing argument "url" is required', callback);
@@ -284,7 +284,7 @@ export default class MangaPark {
 
         const $ = cheerio.load(html);
 
-        const title = $('h2 > a').text().split(' ').slice(0, -1).join(' ');
+        const mainTitle = $('h2 > a').text().split(' ').slice(0, -1).join(' ');
 
         const altTitles = $('th:contains("Alternative")')
           .siblings('td')
@@ -322,12 +322,12 @@ export default class MangaPark {
         const genres = $('th:contains("Genre(s)")')
           .siblings('td')
           .children()
-          .map((_, el) => <MangaGenre<MangaPark>>$(el).text().trim())
+          .map((_, el) => $(el).text().trim() as MangaGenre<MangaPark>)
           .get();
         const type = (() => {
           let mangaType = $('th:contains("Type")').siblings().text().trim().split(' ')[1];
           if (mangaType === 'Webtoon') mangaType = 'manhwa';
-          return <MangaType<MangaPark>>mangaType.toLowerCase();
+          return mangaType.toLowerCase() as MangaType<MangaPark>;
         })();
         const status: MangaMeta<MangaPark>['status'] = $('th:contains("Status")')
           .siblings()
@@ -337,87 +337,92 @@ export default class MangaPark {
         const summary = $('div.summary').children().remove().end().text().trim();
         const coverImage: MangaCoverImage = (() => {
           const imgEl = $('img.w-100');
-          const url = imgEl.attr('src');
+          const src = imgEl.attr('src');
           const alt = imgEl.attr('alt') || '';
           return {
-            url,
+            url: src,
             alt,
           };
         })();
 
-        let memo: MangaChapters<MangaPark>[][] = [[], [], [], [], [], []];
-        $('div.volumes').each((_, el) => {
-          const container = $(el);
-          const version = <MangaMeta<MangaPark>['chapters']['recentlyUpdated']>(
-            container.siblings().find('div > a > span').text().slice(8).toLowerCase()
-          );
+        const sourceChapters: MangaChapters<MangaPark>[][] = [[], [], [], [], [], []];
+        $('div.volumes').each((_, div) => {
+          const container = $(div);
+          const version = container
+            .siblings()
+            .find('div > a > span')
+            .text()
+            .slice(8)
+            .toLowerCase() as MangaMeta<MangaPark>['chapters']['recentlyUpdated'];
 
-          let chapters = container
+          const mangaChapters = container
             .find('a.visited.ch')
-            .map((_, el) => {
-              const anchorEl = $(el);
-              const url = `https://v2.mangapark.net${anchorEl.attr('href')?.slice(0, -1)}` || '';
+            .map((__, a) => {
+              const anchorEl = $(a);
+              const chapterUrl = `https://v2.mangapark.net${anchorEl.attr('href')?.slice(0, -1)}` || '';
               const name = anchorEl.text();
               return {
                 name,
-                url,
+                url: chapterUrl,
               };
             })
             .get();
 
           const uploadWhen = container
             .find('span.time')
-            .map((_, el) => $(el).text().trim())
+            .map((__, span) => $(span).text().trim())
             .get();
 
-          const data = chapters.map(({ url, name }, i) => ({ name, url, uploadWhen: uploadWhen[i] }));
+          const data = mangaChapters.map(({ url: chapterUrl, name }, i) => ({
+            name,
+            url: chapterUrl,
+            uploadWhen: uploadWhen[i],
+          }));
 
           switch (version) {
             case 'duck':
-              memo[0] = data;
+              sourceChapters[0] = data;
               break;
             case 'fox':
-              memo[1] = data;
+              sourceChapters[1] = data;
               break;
             case 'rock':
-              memo[2] = data;
+              sourceChapters[2] = data;
               break;
             case 'panda':
-              memo[3] = data;
+              sourceChapters[3] = data;
               break;
             case 'mini':
-              memo[4] = data;
+              sourceChapters[4] = data;
               break;
             case 'toon':
-              memo[5] = data;
+              sourceChapters[5] = data;
             default:
               break;
           }
         });
 
-        const recommendedSource = <NonNullable<MangaMeta<MangaPark>['chapters']['recentlyUpdated']>>$(
-          'div#list > div.stream',
-        )
+        const recommendedSource = $('div#list > div.stream')
           .filter((_, el) => !$(el).hasClass('collapsed'))
           .find('div > div > a > span')
           .text()
           .substring(8)
-          .toLowerCase();
+          .toLowerCase() as NonNullable<MangaMeta<MangaPark>['chapters']['recentlyUpdated']>;
 
         const chapters: MangaMeta<MangaPark>['chapters'] = {
           recentlyUpdated: recommendedSource.length === 0 ? undefined : recommendedSource,
-          duck: memo[0],
-          fox: memo[1],
-          rock: memo[2],
-          panda: memo[3],
-          mini: memo[4],
-          toon: memo[5],
+          duck: sourceChapters[0],
+          fox: sourceChapters[1],
+          rock: sourceChapters[2],
+          panda: sourceChapters[3],
+          mini: sourceChapters[4],
+          toon: sourceChapters[5],
         };
 
         success(
           {
             title: {
-              main: title,
+              main: mainTitle,
               alt: altTitles.filter((title) => title.length !== 0),
             },
             summary,
@@ -453,7 +458,7 @@ export default class MangaPark {
    * await mangapark.getPages('https://xcdn-222.mangapark.net/10102/69/9b/5c791a3ae9c047226f2bb996/02_75696_711_1114.webp');
    * ```
    */
-  public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
+  public getPages(url: string, callback: MangaCallback<string[]> = () => void 0): Promise<string[]> {
     const BLOCKED_REQUESTS = [
       'https://v2.mangapark.net/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js',
       'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/',

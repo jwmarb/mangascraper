@@ -1,3 +1,5 @@
+import jquery from 'jquery';
+import cheerio from 'cheerio';
 import {
   Manga,
   MangaCallback,
@@ -14,8 +16,6 @@ import {
   ScrapingOptions,
 } from '..';
 import automateBrowser from '../functions/automateBrowser';
-import jquery from 'jquery';
-import cheerio from 'cheerio';
 import success from '../functions/success';
 import failure from '../functions/failure';
 import automateBrowsers from '../functions/automateBrowsers';
@@ -94,7 +94,7 @@ export default class MangaSee {
 
   /**
    * Search up a manga from MangaSee
-   * 
+   *
    * @param query - Title of manga. Leave it at null if you don't want to search for a specific title. This parameter accepts either a `string` or `object` containing either or both `title` and `author`
    * @param filters  - Filters to apply when searching for manga
    * @param callback - Callback function
@@ -103,27 +103,27 @@ export default class MangaSee {
    * ```js
    * await mangasee.search('chainsaw man');
    * ```
-   * 
+   *
    * @example
    * ```js
    * await mangasee.search({ author: 'Fujimoto Tatsuki' });
    * ```
-   * 
+   *
    * @example
    * ```js
    * await mangasee.search(null, {
-        genre: { include: ['Fantasy'], exclude: ['Seinen'] },
-        status: { scan: 'ongoing', publish: 'ongoing' },
-        orderBy: 'popularity(all_time)',
-        orderType: 'ascending',
-        type: 'manga',
-    });
+   *    genre: { include: ['Fantasy'], exclude: ['Seinen'] },
+   *    status: { scan: 'ongoing', publish: 'ongoing' },
+   *    orderBy: 'popularity(all_time)',
+   *    orderType: 'ascending',
+   *    type: 'manga',
+   * });
    * ```
    */
   public search(
     query: MangaSearch<MangaSee> = '',
     filters: MangaFilters<MangaSee> = {},
-    callback: MangaCallback<Manga<MangaSee>[]> = () => {},
+    callback: MangaCallback<Manga<MangaSee>[]> = () => void 0,
   ): Promise<Manga<MangaSee>[]> {
     if (query == null) query = '';
     if (filters == null) filters = {};
@@ -158,8 +158,8 @@ export default class MangaSee {
 
       const desc = (() => {
         if (orderBy === 'popularity(all_time)' || orderBy === 'popularity(monthly)')
-          return `desc=${orderType === 'descending' ? false : true}`;
-        return `desc=${orderType === 'ascending' ? false : true}`;
+          return `desc=${orderType !== 'descending'}`;
+        return `desc=${orderType !== 'ascending'}`;
       })();
 
       const type = mangaType === 'any' ? '' : `type=${mangaType}`;
@@ -177,10 +177,10 @@ export default class MangaSee {
           : `pstatus=${status.publish === 'paused' ? 'hiatus' : status.publish}`;
 
       const includeGenres =
-        genre.include == null || genre.include.length == 0 ? `` : `genre=${genre.include.join(',')}`;
+        genre.include == null || genre.include.length === 0 ? `` : `genre=${genre.include.join(',')}`;
 
       const excludeGenres =
-        genre.exclude == null || genre.exclude.length == 0 ? `` : `genreNo=${genre.exclude.join(',')}`;
+        genre.exclude == null || genre.exclude.length === 0 ? `` : `genreNo=${genre.exclude.join(',')}`;
 
       const urlParams = [
         parsedQuery,
@@ -251,7 +251,6 @@ export default class MangaSee {
             const currentMemo = [...memo, author];
             memo = [];
             authors.push(currentMemo);
-            return;
           }
         });
 
@@ -259,14 +258,14 @@ export default class MangaSee {
         const statuses = $('div[ng-if="vm.FullDisplay"]:contains("Status") > a')
           .map((_, el) => $(el).text().trim())
           .get()
-          .reduce<Array<{ scan: string; publish: string }>>((acc, cV, cI, arr) => {
+          .reduce<{ scan?: string; publish?: string }[]>((acc, cV, cI, arr) => {
             const object = arr.slice(cI, cI + 2).map((text) => {
               if (text.endsWith('(Scan)'))
                 return { scan: text.replace(' (Scan)', '').replace('Hiatus', 'Paused').toLowerCase() };
-              else return { publish: text.replace(' (Publish)', '').replace('Hiatus', 'Paused').toLowerCase() };
+              return { publish: text.replace(' (Publish)', '').replace('Hiatus', 'Paused').toLowerCase() };
             });
 
-            if (cI % 2 === 0) acc.push(Object.assign(object[0], object[1]) as any);
+            if (cI % 2 === 0) acc.push(Object.assign(object[0], object[1]));
             return acc;
           }, []);
 
@@ -281,17 +280,16 @@ export default class MangaSee {
         // Get manga genres
         const genres: string[][] = [];
         $('div.col-md-10.col-8 > div:contains("Genres") > span').each((_, el) => {
-          const genre = $(el).text().trim();
-          if (genre.endsWith(',')) {
-            memo = [...memo, genre.slice(0, genre.length - 1)];
+          const mangaGenre = $(el).text().trim();
+          if (mangaGenre.endsWith(',')) {
+            memo = [...memo, mangaGenre.slice(0, mangaGenre.length - 1)];
             return;
           }
 
-          if (!genre.endsWith(',')) {
-            const currentMemo = [...memo, genre];
+          if (!mangaGenre.endsWith(',')) {
+            const currentMemo = [...memo, mangaGenre];
             memo = [];
             genres.push(currentMemo);
-            return;
           }
         });
 
@@ -310,7 +308,7 @@ export default class MangaSee {
             scan: statuses[i].scan as MangaStatus<MangaSee>,
             publish: statuses[i].publish as MangaStatus<MangaSee>,
           },
-          genres: (<unknown>genres[i]) as (keyof typeof MangaSeeGenres)[],
+          genres: genres[i] as (keyof typeof MangaSeeGenres)[],
           updatedAt: updatedAt[i],
         }));
 
@@ -331,7 +329,7 @@ export default class MangaSee {
    * const mangas = await mangasee.directory();
    * ```
    */
-  public directory(callback: MangaCallback<MangaSeeMangaAlt[]> = () => {}): Promise<MangaSeeMangaAlt[]> {
+  public directory(callback: MangaCallback<MangaSeeMangaAlt[]> = () => void 0): Promise<MangaSeeMangaAlt[]> {
     return new Promise(async (res) => {
       try {
         const data = await automateBrowser(
@@ -397,11 +395,9 @@ export default class MangaSee {
 
   public getMangaMeta(
     url: string,
-    callback: MangaCallback<MangaMeta<MangaSee>> = () => {},
+    callback: MangaCallback<MangaMeta<MangaSee>> = () => void 0,
   ): Promise<MangaMeta<MangaSee>> {
-    const xml_document = (() => {
-      return url.replace('/manga/', '/rss/') + '.xml';
-    })();
+    const xmlDocument = (() => `${url.replace('/manga/', '/rss/')}.xml`)();
 
     return new Promise(async (res) => {
       if (url == null) return failure('Missing argument "url" is required', callback);
@@ -409,67 +405,64 @@ export default class MangaSee {
         /**
          * Runs tabs in parallization. Pretty cool, right?
          */
-        const [data, [xmlData, chapterURLs]]: [Omit<MangaMeta<MangaSee>, 'chapters'>, [string, string[]]] =
-          await automateBrowsers(this.options, [
-            {
-              network: {
-                domains: {
-                  method: 'block',
-                  value: this.BLOCKED_DOMAINS,
-                },
-                resource: {
-                  method: 'unblock',
-                  type: ['script', 'document'],
-                },
+        const [data, [xmlData, chapterURLs]] = (await automateBrowsers(this.options, [
+          {
+            network: {
+              domains: {
+                method: 'block',
+                value: this.BLOCKED_DOMAINS,
               },
-              callback: async (page) => {
-                await page.goto(url, { waitUntil: 'domcontentloaded' });
-                await page.addScriptTag({ path: require.resolve('jquery') });
-                await page.waitForSelector('h1');
-                return await page.evaluate(() => {
-                  const { $ } = window as InjectedScriptsWindow;
-                  const title = $('h1').text();
-                  const alt = $('span.mlabel:contains("Alternate Name(s):")')
-                    .parent()
-                    .text()
-                    .trim()
-                    .replace('Alternate Name(s): ', '');
-                  const authors = $('span.mlabel:contains("Author(s):")')
-                    .siblings()
-                    .map((_, el) => $(el).text())
-                    .get();
-                  const genres = $('span.mlabel:contains("Genre(s):")')
-                    .siblings()
-                    .map((_, el) => $(el).text())
-                    .get();
-                  const summary = $('div.top-5.Content').text().trim();
-                  const type = $('span.mlabel:contains("Type:")').siblings().text().toLowerCase();
-                  const _status = $('span.mlabel:contains("Status:")')
-                    .siblings()
-                    .map((_, el) => $(el).text().toLowerCase().split(' ')[0])
-                    .get();
-                  const status = { scan: _status[0], publish: _status[1] };
-                  const img = document.querySelector('img.img-fluid')?.getAttribute('src') || '';
-                  return { title: { main: title, alt }, authors, genres, summary, type, status, coverImage: img };
-                });
+              resource: {
+                method: 'unblock',
+                type: ['script', 'document'],
               },
             },
-            {
-              callback: async (page) => {
-                await page.goto(xml_document, { waitUntil: 'domcontentloaded' });
-                return await page.evaluate(() => [
-                  document.querySelector('*')?.outerHTML || '',
-                  Array.from(document.querySelectorAll('item > link')).map((url) =>
-                    url.innerHTML.replace('-page-1', ''),
-                  ),
-                ]);
-              },
+            callback: async (page) => {
+              await page.goto(url, { waitUntil: 'domcontentloaded' });
+              await page.addScriptTag({ path: require.resolve('jquery') });
+              await page.waitForSelector('h1');
+              return await page.evaluate(() => {
+                const { $ } = window as InjectedScriptsWindow;
+                const title = $('h1').text();
+                const alt = $('span.mlabel:contains("Alternate Name(s):")')
+                  .parent()
+                  .text()
+                  .trim()
+                  .replace('Alternate Name(s): ', '');
+                const authors = $('span.mlabel:contains("Author(s):")')
+                  .siblings()
+                  .map((_, el) => $(el).text())
+                  .get();
+                const genres = $('span.mlabel:contains("Genre(s):")')
+                  .siblings()
+                  .map((_, el) => $(el).text())
+                  .get();
+                const summary = $('div.top-5.Content').text().trim();
+                const type = $('span.mlabel:contains("Type:")').siblings().text().toLowerCase();
+                const _status = $('span.mlabel:contains("Status:")')
+                  .siblings()
+                  .map((_, el) => $(el).text().toLowerCase().split(' ')[0])
+                  .get();
+                const status = { scan: _status[0], publish: _status[1] };
+                const img = document.querySelector('img.img-fluid')?.getAttribute('src') || '';
+                return { title: { main: title, alt }, authors, genres, summary, type, status, coverImage: img };
+              });
             },
-          ]);
+          },
+          {
+            callback: async (page) => {
+              await page.goto(xmlDocument, { waitUntil: 'domcontentloaded' });
+              return await page.evaluate(() => [
+                document.querySelector('*')?.outerHTML || '',
+                Array.from(document.querySelectorAll('item > link')).map((url) => url.innerHTML.replace('-page-1', '')),
+              ]);
+            },
+          },
+        ])) as [Omit<MangaMeta<MangaSee>, 'chapters'>, [string, string[]]];
 
         const $ = cheerio.load(xmlData);
 
-        const title = $('title').first().text() + ' ';
+        const title = `${$('title').first().text()} `;
 
         const chapterTitles = $('item > title').map((_, el) => $(el).text().replace(title, ''));
         const chapterDates = $('pubDate').map((_, el) => new Date($(el).text()));
@@ -492,7 +485,7 @@ export default class MangaSee {
     });
   }
 
-  public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
+  public getPages(url: string, callback: MangaCallback<string[]> = () => void 0): Promise<string[]> {
     return new Promise(async (res) => {
       if (url == null) return failure('Missing argument "url" is required', callback);
       try {
@@ -502,7 +495,22 @@ export default class MangaSee {
             await page.goto(url, { waitUntil: 'domcontentloaded' });
             await page.waitForFunction('window.angular.element(document.body).scope()');
             return await page.evaluate(() => {
-              const { angular } = window as InjectedScriptsWindow & { angular: any };
+              const { angular } = window as InjectedScriptsWindow & {
+                angular: {
+                  element: (el: HTMLElement) => {
+                    scope: () => {
+                      vm: {
+                        Pages: number[];
+                        IndexName: string;
+                        CurPathName: string;
+                        CurChapter: { Directory: string; Chapter: string };
+                        ChapterImage: (chapter: string) => string;
+                        PageImage: (page: number) => string;
+                      };
+                    };
+                  };
+                };
+              };
               const $state = angular.element(document.body).scope();
               const iterator: number[] = $state.vm.Pages;
               const title: string = $state.vm.IndexName;
@@ -514,7 +522,7 @@ export default class MangaSee {
               const pages = iterator.map(
                 (number) =>
                   `https://${baseURL}/manga/${title}/${
-                    $state.vm.CurChapter.Directory === '' ? '' : $state.vm.CurChapter.Directory + '/'
+                    $state.vm.CurChapter.Directory === '' ? '' : `${$state.vm.CurChapter.Directory}/`
                   }${$state.vm.ChapterImage($state.vm.CurChapter.Chapter)}-${$state.vm.PageImage(number)}.png`,
               );
 
