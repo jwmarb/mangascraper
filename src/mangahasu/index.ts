@@ -81,6 +81,8 @@ export default class Mangahasu {
     filters: MangaFilters<Mangahasu> = {},
     callback: MangaCallback<Manga<Mangahasu>[]> = () => {},
   ): Promise<Manga<Mangahasu>[]> {
+    if (query == null) query = '';
+    if (filters == null) filters = {};
     const { genres = {}, status = 'any', type = 'any', page = 1 } = filters;
 
     function generateURL(): string {

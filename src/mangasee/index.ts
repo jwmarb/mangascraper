@@ -125,6 +125,9 @@ export default class MangaSee {
     filters: MangaFilters<MangaSee> = {},
     callback: MangaCallback<Manga<MangaSee>[]> = () => {},
   ): Promise<Manga<MangaSee>[]> {
+    if (query == null) query = '';
+    if (filters == null) filters = {};
+
     const {
       orderBy = 'A-Z',
       orderType = 'ascending',
@@ -203,7 +206,7 @@ export default class MangaSee {
           async (page) => {
             await page.goto(generateURL(), { waitUntil: 'domcontentloaded' });
             await page.addScriptTag({ path: require.resolve('jquery') });
-            await page.waitForSelector('a.SeriesName.ng-binding');
+            await page.waitForSelector('a.SeriesName.ng-binding, div.NoResults');
 
             return await page.evaluate(() => document.documentElement.innerHTML);
           },
@@ -220,6 +223,8 @@ export default class MangaSee {
         );
 
         const $ = cheerio.load(html);
+
+        if ($('div.NoResults').length === 1) return success([], callback, res);
 
         let memo: string[] = [];
 

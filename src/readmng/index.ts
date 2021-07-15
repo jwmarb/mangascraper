@@ -92,6 +92,9 @@ export default class ReadMng {
     filters: MangaFilters<ReadMng> = {},
     callback: MangaCallback<Manga<ReadMng>[]> = () => {},
   ): Promise<Manga<ReadMng>[]> {
+    if (query == null) query = '';
+    if (filters == null) filters = {};
+
     const { genres, status = 'any', type = 'any' } = filters;
 
     const genresIncludeCnt = genres?.include?.length ?? 0;

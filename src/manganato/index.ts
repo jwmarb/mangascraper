@@ -70,6 +70,8 @@ export default class Manganato {
     filters: MangaFilters<Manganato> = {},
     callback: MangaCallback<Manga<Manganato>[]> = () => {},
   ): Promise<Manga<Manganato>[]> {
+    if (query == null) query = '';
+    if (filters == null) filters = {};
     const { genres: genre = {}, status = 'any', orderBy = 'latest_updates', page = 1 } = filters;
 
     function generateURL(): string {
