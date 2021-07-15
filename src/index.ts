@@ -16,7 +16,9 @@ import puppeteer, {
   LaunchOptions,
   Product,
 } from 'puppeteer';
+import ReadMng, { ReadMngGenre, ReadMngManga, ReadMngMeta, ReadMngOptions } from './readmng';
 
+export { default as ReadMng } from './readmng';
 export { default as Mangakakalot } from './mangakakalot';
 export { default as Manganato } from './manganato';
 export { default as Mangahasu } from './mangahasu';
@@ -98,6 +100,8 @@ export type Manga<T, S extends 'main' | 'alt' = 'main'> = T extends Mangakakalot
     : MangaSeeMangaAlt
   : T extends MangaPark
   ? MangaParkManga
+  : T extends ReadMng
+  ? ReadMngManga
   : never;
 
 export type MangaSearch<T> = T extends Manganato
@@ -105,8 +109,8 @@ export type MangaSearch<T> = T extends Manganato
   :
       | {
           title?: string;
-          author?: T extends Mangahasu | MangaSee | MangaPark ? string : never;
-          artist?: T extends Mangahasu ? string : never;
+          author?: T extends Mangahasu | MangaSee | MangaPark | ReadMng ? string : never;
+          artist?: T extends Mangahasu | ReadMng ? string : never;
         }
       | string;
 
@@ -120,6 +124,8 @@ export type MangaFilters<T> = T extends Manganato
   ? MangaSeeOptions
   : T extends MangaPark
   ? MangaParkOptions
+  : T extends ReadMng
+  ? ReadMngOptions
   : never;
 
 export type MangaGenre<T> = T extends Mangakakalot
@@ -132,6 +138,8 @@ export type MangaGenre<T> = T extends Mangakakalot
   ? MangaSeeGenre
   : T extends MangaPark
   ? MangaParkGenre
+  : T extends ReadMng
+  ? ReadMngGenre
   : never;
 
 export type MangaMeta<T> = T extends Mangakakalot | Manganato
@@ -156,6 +164,8 @@ export type MangaMeta<T> = T extends Mangakakalot | Manganato
   ? MangaSeeMeta
   : T extends MangaPark
   ? MangaParkMeta
+  : T extends ReadMng
+  ? ReadMngMeta
   : never;
 
 export type MangaChapters<T> = T extends Manganato | Mangakakalot
@@ -167,7 +177,7 @@ export type MangaChapters<T> = T extends Manganato | Mangakakalot
     }
   : T extends Mangahasu | MangaSee
   ? { name: string; url: string; uploadDate: Date }
-  : T extends MangaPark
+  : T extends MangaPark | ReadMng
   ? { name: string; url: string; uploadWhen: string }
   : never;
 
@@ -205,6 +215,44 @@ export enum MangaSeeOrderBy {
   'year_released' = 'y',
   'popularity(all_time)' = 'v',
   'popularity(monthly)' = 'vm',
+}
+
+export enum ReadMngGenres {
+  'Action' = '2',
+  'Adventure' = '4',
+  'Comedy' = '5',
+  'Doujinshi' = '6',
+  'Drama' = '7',
+  'Ecchi' = '8',
+  'Fantasy' = '9',
+  'Gender Bender' = '10',
+  'Harem' = '11',
+  'Historical' = '12',
+  'Horror' = '13',
+  'Josei' = '14',
+  'Lolicon' = '15',
+  'Martial Arts' = '16',
+  'Mature' = '17',
+  'Mecha' = '18',
+  'Mystery' = '19',
+  'One shot' = '20',
+  'Psychological' = '21',
+  'Romance' = '22',
+  'School Life' = '23',
+  'Sci-fi' = '24',
+  'Seinen' = '25',
+  'Shotacon' = '26',
+  'Shoujo' = '27',
+  'Shoujo Ai' = '28',
+  'Shounen' = '29',
+  'Shounen Ai' = '30',
+  'Slice of Life' = '31',
+  'Smut' = '32',
+  'Sports' = '33',
+  'Supernatural' = '34',
+  'Tragedy' = '35',
+  'Yaoi' = '36',
+  'Yuri' = '37',
 }
 
 export enum MangaSeeGenres {
@@ -256,7 +304,7 @@ export interface BaseMangaGenreOptions<T> {
   page?: number;
 }
 
-export type MangaStatus<T> = T extends Mangakakalot | Mangahasu | Manganato | MangaPark
+export type MangaStatus<T> = T extends Mangakakalot | Mangahasu | Manganato | MangaPark | ReadMng
   ? 'ongoing' | 'completed' | 'any'
   : T extends MangaSee
   ? 'any' | 'cancelled' | 'complete' | 'discontinued' | 'paused' | 'ongoing'
@@ -264,7 +312,7 @@ export type MangaStatus<T> = T extends Mangakakalot | Mangahasu | Manganato | Ma
 
 export type MangaType<T> = T extends MangaSee
   ? 'any' | 'doujinshi' | 'manga' | 'manhua' | 'manhwa'
-  : T extends Mangahasu
+  : T extends Mangahasu | ReadMng
   ? keyof typeof MangahasuTypes
   : T extends MangaPark
   ? 'manhua' | 'manga' | 'manhwa'
