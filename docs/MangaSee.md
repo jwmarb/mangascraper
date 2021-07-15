@@ -13,7 +13,7 @@
 ## Table of Contents
 
 - [MangaSee(options)](#mangaseeoptions)
-  - [`search(query, filters, callback)`](#mangaseesearchquery-callback)
+  - [`search(query, filters, callback)`](#mangaseesearchquery-filters-callback)
   - [`getMangaMeta(url, callback)`](#mangaseegetmangametaurl-callback)
   - [`getPages(url, callback)`](#mangaseegetpagesurl-callback)
   - [`directory(callback)`](#mangaseedirectorycallback)

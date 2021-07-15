@@ -13,7 +13,7 @@
 ## Table of Contents
 
 - [Manganato(options)](#manganatooptions)
-  - [`search(query, filters, callback)`](#manganatosearchquery-callback)
+  - [`search(query, filters, callback)`](#manganatosearchquery-filters-callback)
   - [`getMangaMeta(url, callback)`](#manganatogetmangametaurl-callback)
   - [`getMangasFromGenre(genre, options, callback)`](#manganatogetmangasfromgenregenre-options-callback)
   - [`getPages(url, callback)`](#manganatogetpagesurl-callback)

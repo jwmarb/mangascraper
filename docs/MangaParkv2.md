@@ -13,7 +13,7 @@
 ## Table of Contents
 
 - [MangaPark(options)](#mangaparkoptions)
-  - [`search(query, filters, callback)`](#mangaparksearchquery-callback)
+  - [`search(query, filters, callback)`](#mangaparksearchquery-filters-callback)
   - [`getMangaMeta(url, callback)`](#mangaparkgetmangametaurl-callback)
   - [`getPages(url, callback)`](#mangaparkgetpagesurl-callback)
 

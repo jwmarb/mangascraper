@@ -13,7 +13,7 @@
 ## Table of Contents
 
 - [Mangahasu(options)](#mangahasuoptions)
-  - [`search(query, filters, callback)`](#mangahasusearchquery-callback)
+  - [`search(query, filters, callback)`](#mangahasusearchquery-filters-callback)
   - [`getMangaMeta(url, callback)`](#mangahasugetmangametaurl-callback)
   - [`getPages(url, callback)`](#mangahasugetpagesurl-callback)
 

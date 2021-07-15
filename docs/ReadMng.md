@@ -13,7 +13,7 @@
 ## Table of Contents
 
 - [ReadMng(options)](#readmngoptions)
-  - [`search(query, filters, callback)`](#readmngquery-callback)
+  - [`search(query, filters, callback)`](#readmngsearchquery-filters-callback)
   - [`getMangaMeta(url, callback)`](#readmnggetmangametaurl-callback)
   - [`getPages(url, callback)`](#readmnggetpagesurl-callback)
 
