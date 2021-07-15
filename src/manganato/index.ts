@@ -66,12 +66,10 @@ export default class Manganato {
    * ```
    */
   public search(
-    query?: MangaSearch<Manganato>,
+    query: MangaSearch<Manganato> = '',
     filters: MangaFilters<Manganato> = {},
     callback: MangaCallback<Manga<Manganato>[]> = () => {},
   ): Promise<Manga<Manganato>[]> {
-    if (filters == null) filters = {};
-    if (query == null) query = '';
     const { genres: genre = {}, status = 'any', orderBy = 'latest_updates', page = 1 } = filters;
 
     function generateURL(): string {
