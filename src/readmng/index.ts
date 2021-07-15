@@ -330,6 +330,8 @@ export default class ReadMng {
     callback: MangaCallback<MangaMeta<ReadMng>> = () => {},
   ): Promise<MangaMeta<ReadMng>> {
     return new Promise(async (res) => {
+      if (url == null) return failure('Missing argument "url" is required', callback);
+
       try {
         const $ = await readHtml(url, this.options);
 
@@ -452,6 +454,8 @@ export default class ReadMng {
    */
   public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
     return new Promise(async (res) => {
+      if (url == null) return failure('Missing argument "url" is required', callback);
+
       try {
         const $ = await readHtml(url, this.options);
         const pages = $('div.page_chapter > img')

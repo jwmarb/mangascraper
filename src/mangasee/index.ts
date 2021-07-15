@@ -489,6 +489,7 @@ export default class MangaSee {
 
   public getPages(url: string, callback: MangaCallback<string[]> = () => {}): Promise<string[]> {
     return new Promise(async (res) => {
+      if (url == null) return failure('Missing argument "url" is required', callback);
       try {
         const pages = await automateBrowser(
           this.options,

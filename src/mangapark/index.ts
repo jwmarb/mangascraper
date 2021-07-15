@@ -264,6 +264,8 @@ export default class MangaPark {
     callback: MangaCallback<MangaMeta<MangaPark>> = () => {},
   ): Promise<MangaMeta<MangaPark>> {
     return new Promise(async (res) => {
+      if (url == null) return failure('Missing argument "url" is required', callback);
+
       try {
         // Parse HTML document
         const $ = await readHtml(url, this.options);
@@ -455,6 +457,8 @@ export default class MangaPark {
     ];
 
     return new Promise(async (res) => {
+      if (url == null) return failure('Missing argument "url" is required', callback);
+
       try {
         const data = await automateBrowser(
           this.options,
