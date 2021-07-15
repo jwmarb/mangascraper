@@ -100,12 +100,10 @@ export default class MangaPark {
    * ```
    */
   search(
-    query: MangaSearch<MangaPark>,
+    query: MangaSearch<MangaPark> = '',
     filters: MangaFilters<MangaPark> = {},
     callback: MangaCallback<Manga<MangaPark>[]> = () => {},
   ): Promise<Manga<MangaPark>[]> {
-    if (filters == null) filters = {};
-    if (query == null) query = '';
     const { genres: genre, status = 'any', rating, type, yearReleased, orderBy = 'views', page = 1 } = filters;
 
     const url = (() => {
