@@ -466,6 +466,8 @@ import { MangaPark, initPuppeteer } from '@specify_/mangascraper';
 
 - [MangaPark](/docs/MangaParkv2.md)
 
+- [ReadMng](/docs/ReadMng.md)
+
 ---
 
 ## License
