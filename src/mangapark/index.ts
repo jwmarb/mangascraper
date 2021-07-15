@@ -20,7 +20,6 @@ import jquery from 'jquery';
 import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import automateBrowser from '../functions/automateBrowser';
-import numberSeperator from '../functions/numberSeperator';
 
 export type MangaParkMeta = {
   title: {
@@ -211,7 +210,7 @@ export default class MangaPark {
           const rating = divEl.attr('title')?.split(' ') || [];
           const numerator = Number(rating[1]);
           const denominator = Number(rating[3]);
-          const voteCount = numberSeperator(rating[6]);
+          const voteCount = Number(rating[6]).toLocaleString();
           return {
             sourceRating: 'MangaPark.net',
             voteCount,
@@ -288,7 +287,7 @@ export default class MangaPark {
           const textArray = $('th:contains("Rating")').siblings('td').text().trim().split(' ');
           const numerator = Number(textArray[1]);
           const denominator = Number(textArray[3]);
-          const voteCount = numberSeperator(textArray[6]);
+          const voteCount = Number(textArray[6]).toLocaleString();
           return {
             sourceRating: 'MangaPark.net',
             voteCount,

@@ -16,7 +16,6 @@ import {
 } from '..';
 import { parse } from 'date-fns';
 import failure from '../functions/failure';
-import numberSeperator from '../functions/numberSeperator';
 import readHtml from '../functions/readHtml';
 import splitAltTitles from '../functions/splitAltTitles';
 import success from '../functions/success';
@@ -234,9 +233,9 @@ export default class Mangahasu {
         status = $(`div.detail_item > b:contains("Status")`).siblings('span.info').text().trim();
 
         /** Get manga views */
-        views = numberSeperator(
+        views = Number(
           $(`div.detail_item > div.row > b:contains("Views")`).siblings('span.info').text().trim(),
-        );
+        ).toLocaleString();
 
         /** Get manga rating */
         const spanRatings = $(`div[class="div-evaluate detail_item"] > span.info > span.ratings`).text().trim();
@@ -246,9 +245,9 @@ export default class Mangahasu {
           rating_stars = `${spanRatings}/5`;
           rating_percentage = `${((Number(spanRatings) / 5) * 100).toFixed(2)}%`;
         }
-        let voteCount = numberSeperator(
+        let voteCount = Number(
           $(`div[class="div-evaluate detail_item"] > span.info > span.div_evaluate`).text().trim(),
-        );
+        ).toLocaleString();
         rating = {
           sourceRating: 'Mangahasu.se',
           rating_percentage,

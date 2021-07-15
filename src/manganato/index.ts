@@ -20,7 +20,6 @@ import {
 } from '../';
 import { parse } from 'date-fns';
 import splitAltTitles from '../functions/splitAltTitles';
-import numberSeperator from '../functions/numberSeperator';
 
 export type ManganatoQuery = { keywords: 'author' | 'title' | 'alt_title' | 'everything'; search: string } | string;
 
@@ -273,7 +272,7 @@ export default class Manganato {
           .get();
         let rating: MangaRating = {
           sourceRating: rating_text[0],
-          voteCount: numberSeperator(rating_text[4]),
+          voteCount: Number(rating_text[4]).toLocaleString(),
           rating_percentage: `${((Number(rating_text[2].substring(0, 3)) / Number(rating_text[3])) * 100).toFixed(2)}%`,
           rating_stars: `${rating_text[2].substring(0, 3)} / ${rating_text[3]}`,
         };
