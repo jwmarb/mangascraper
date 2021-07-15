@@ -19,9 +19,10 @@ import cheerio from 'cheerio';
 import success from '../functions/success';
 import failure from '../functions/failure';
 import automateBrowsers from '../functions/automateBrowsers';
-import { parse } from 'date-fns';
 
-type WindowJquery = typeof window & { $: typeof jquery };
+type InjectedScriptsWindow = {
+  $: typeof jquery;
+} & typeof window;
 
 export type MangaSeeMeta = {
   title: {
@@ -120,12 +121,10 @@ export default class MangaSee {
    * ```
    */
   public search(
-    query?: MangaSearch<MangaSee>,
+    query: MangaSearch<MangaSee> = '',
     filters: MangaFilters<MangaSee> = {},
     callback: MangaCallback<Manga<MangaSee>[]> = () => {},
   ): Promise<Manga<MangaSee>[]> {
-    if (filters == null) filters = {};
-    if (query == null) query = '';
     const {
       orderBy = 'A-Z',
       orderType = 'ascending',
@@ -205,12 +204,11 @@ export default class MangaSee {
         const html = await automateBrowser(
           this.options,
           async (page) => {
-            await page.goto(generateURL(), { waitUntil: 'networkidle2' });
+            await page.goto(generateURL(), { waitUntil: 'domcontentloaded' });
             await page.addScriptTag({ path: require.resolve('jquery') });
+            await page.waitForSelector('a.SeriesName.ng-binding');
 
-            return await page.evaluate(() => {
-              return document.querySelector('*')?.outerHTML || '';
-            });
+            return await page.evaluate(() => document.documentElement.innerHTML);
           },
           {
             domains: {
@@ -276,7 +274,7 @@ export default class MangaSee {
           .trim()
           .slice(2)
           .split('· ')
-          .map((date) => parse(date, 'MM/dd/yyyy', new Date()));
+          .map((date) => new Date(date));
 
         // Get manga genres
         const genres: string[][] = [];
@@ -310,11 +308,11 @@ export default class MangaSee {
             scan: statuses[i].scan as MangaStatus<MangaSee>,
             publish: statuses[i].publish as MangaStatus<MangaSee>,
           },
-          genres: (<unknown>genres[i]) as keyof typeof MangaSeeGenres,
+          genres: (<unknown>genres[i]) as (keyof typeof MangaSeeGenres)[],
           updatedAt: updatedAt[i],
         }));
 
-        success(data as any, callback, res);
+        success(data, callback, res);
       } catch (e) {
         failure(e, callback);
       }
@@ -340,7 +338,7 @@ export default class MangaSee {
             await page.goto('https://mangasee123.com/directory/', { waitUntil: 'networkidle2' });
             await page.addScriptTag({ path: require.resolve('jquery') });
             return await page.evaluate(() => {
-              const { $ } = window as WindowJquery;
+              const { $ } = window as InjectedScriptsWindow;
               return $(`div.top-15 > a`)
                 .map((_, el) => {
                   const element = $(el);
@@ -425,7 +423,7 @@ export default class MangaSee {
                 await page.goto(url, { waitUntil: 'networkidle2' });
                 await page.addScriptTag({ path: require.resolve('jquery') });
                 return await page.evaluate(() => {
-                  const { $ } = window as WindowJquery;
+                  const { $ } = window as InjectedScriptsWindow;
                   const title = $('h1').text();
                   const alt = $('span.mlabel:contains("Alternate Name(s):")')
                     .parent()
@@ -499,7 +497,7 @@ export default class MangaSee {
             await page.goto(url, { waitUntil: 'networkidle2' });
             await page.addScriptTag({ path: require.resolve('jquery') });
             return await page.evaluate(() => {
-              const { $ } = window as WindowJquery;
+              const { $ } = window as InjectedScriptsWindow;
               return $('img.img-fluid')
                 .map((_, el) => $(el).attr('src'))
                 .get();
