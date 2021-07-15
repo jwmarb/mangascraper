@@ -40,35 +40,36 @@ export default async function automateBrowser<T>(
 ) {
   const { puppeteerInstance = { instance: 'default' } } = options;
 
-  try {
-    const browser = await (async () => {
-      switch (puppeteerInstance.instance) {
-        case 'default':
-          return await puppeteer.launch({
-            ...initPuppeteer,
-            args: options.proxy
-              ? [...initPuppeteer.args, `--proxy-server=${options.proxy.host}:${options.proxy.port}`]
-              : initPuppeteer.args,
-            headless: !options.debug,
-            ...puppeteerInstance.launch,
-          });
-        case 'endpoint':
-          return await puppeteer.connect({ browserWSEndpoint: puppeteerInstance.wsEndpoint });
-        case 'custom':
-        default:
-          return puppeteerInstance.browser;
-      }
-    })();
+  const browser = await (async () => {
+    switch (puppeteerInstance.instance) {
+      case 'default':
+        return await puppeteer.launch({
+          ...initPuppeteer,
+          args: options.proxy
+            ? [...initPuppeteer.args, `--proxy-server=${options.proxy.host}:${options.proxy.port}`]
+            : initPuppeteer.args,
+          headless: !options.debug,
+          ...puppeteerInstance.launch,
+        });
+      case 'endpoint':
+        return await puppeteer.connect({ browserWSEndpoint: puppeteerInstance.wsEndpoint });
+      case 'custom':
+      default:
+        return puppeteerInstance.browser;
+    }
+  })();
 
-    const page = await (async () => {
-      switch (puppeteerInstance.instance) {
-        case 'default':
-          return (await browser.pages())[0];
-        case 'custom':
-        default:
-          return await browser.newPage();
-      }
-    })();
+  const page = await (async () => {
+    switch (puppeteerInstance.instance) {
+      case 'default':
+        return (await browser.pages())[0];
+      case 'custom':
+      default:
+        return await browser.newPage();
+    }
+  })();
+
+  try {
     await page.setViewport({ width: 1920, height: 1080 });
     await page.evaluateOnNewDocument(preload);
     await page.setRequestInterception(true);
@@ -95,27 +96,27 @@ export default async function automateBrowser<T>(
       }
       request.continue();
     });
-    return await callback(page).finally(async () => {
-      switch (puppeteerInstance.instance) {
-        case 'default':
-          await Promise.all((await browser.pages()).map((page) => page.close()));
-          await browser.close();
-          break;
-        case 'endpoint':
-          await page.close();
-          browser.disconnect();
-          break;
-        case 'custom':
-          try {
-            await page.close();
-          } finally {
-            if ((await browser.pages()).length <= 1 && puppeteerInstance.options?.closeAfterOperation)
-              await browser.close();
-          }
-          break;
-      }
-    });
+    return await callback(page);
   } catch (e) {
     throw Error(e);
+  } finally {
+    switch (puppeteerInstance.instance) {
+      case 'default':
+        await page.close();
+        await browser.close();
+        break;
+      case 'endpoint':
+        await page.close();
+        browser.disconnect();
+        break;
+      case 'custom':
+        try {
+          await page.close();
+        } finally {
+          if ((await browser.pages()).length <= 1 && puppeteerInstance.options?.closeAfterOperation)
+            await browser.close();
+        }
+        break;
+    }
   }
 }
