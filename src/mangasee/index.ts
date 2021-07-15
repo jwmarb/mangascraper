@@ -335,8 +335,9 @@ export default class MangaSee {
         const data = await automateBrowser(
           this.options,
           async (page) => {
-            await page.goto('https://mangasee123.com/directory/', { waitUntil: 'networkidle2' });
+            await page.goto('https://mangasee123.com/directory/', { waitUntil: 'domcontentloaded' });
             await page.addScriptTag({ path: require.resolve('jquery') });
+            await page.waitForSelector('a[href="/manga/Zui-Wu-Dao"]');
             return await page.evaluate(() => {
               const { $ } = window as InjectedScriptsWindow;
               return $(`div.top-15 > a`)
@@ -420,8 +421,9 @@ export default class MangaSee {
                 },
               },
               callback: async (page) => {
-                await page.goto(url, { waitUntil: 'networkidle2' });
+                await page.goto(url, { waitUntil: 'domcontentloaded' });
                 await page.addScriptTag({ path: require.resolve('jquery') });
+                await page.waitForSelector('h1');
                 return await page.evaluate(() => {
                   const { $ } = window as InjectedScriptsWindow;
                   const title = $('h1').text();
@@ -494,13 +496,26 @@ export default class MangaSee {
         const pages = await automateBrowser(
           this.options,
           async (page) => {
-            await page.goto(url, { waitUntil: 'networkidle2' });
-            await page.addScriptTag({ path: require.resolve('jquery') });
+            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            await page.waitForFunction('window.angular.element(document.body).scope()');
             return await page.evaluate(() => {
-              const { $ } = window as InjectedScriptsWindow;
-              return $('img.img-fluid')
-                .map((_, el) => $(el).attr('src'))
-                .get();
+              const { angular } = window as InjectedScriptsWindow & { angular: any };
+              const $state = angular.element(document.body).scope();
+              const iterator: number[] = $state.vm.Pages;
+              const title: string = $state.vm.IndexName;
+              const baseURL: string = $state.vm.CurPathName;
+
+              /**
+               * MangaSee123 uses angular. We can get the chapters very quickly just by accessing the document state.
+               */
+              const pages = iterator.map(
+                (number) =>
+                  `https://${baseURL}/manga/${title}/${
+                    $state.vm.CurChapter.Directory === '' ? '' : $state.vm.CurChapter.Directory + '/'
+                  }${$state.vm.ChapterImage($state.vm.CurChapter.Chapter)}-${$state.vm.PageImage(number)}.png`,
+              );
+
+              return pages;
             });
           },
           {
@@ -510,7 +525,7 @@ export default class MangaSee {
             },
             resource: {
               method: 'unblock',
-              type: ['document', 'script', 'image'],
+              type: ['script', 'document'],
             },
           },
         );
