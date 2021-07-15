@@ -452,6 +452,26 @@ import { MangaPark, initPuppeteer } from '@specify_/mangascraper';
 
 </details>
 
+<details>
+
+<summary><strong> Readmng </strong></summary>
+
+Get 50 of the most viewed mangas
+
+```js
+import { ReadMng } from '@specify_/mangascraper';
+
+(async () => {
+  const readmng = new ReadMng();
+
+  const mangas = await readmng.search();
+
+  console.log(mangas);
+})();
+```
+
+</details>
+
 ---
 
 ## API Reference
