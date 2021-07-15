@@ -461,8 +461,9 @@ export default class MangaPark {
         const data = await automateBrowser(
           this.options,
           async (page) => {
-            await page.goto(url);
+            await page.goto(url, { waitUntil: 'domcontentloaded' });
             await page.addScriptTag({ path: require.resolve('jquery') });
+            await page.waitForSelector('section.viewer > div');
             return await page.evaluate(() => {
               const { $ } = window as typeof window & { $: typeof jquery };
               return $('a.img-link > img')
