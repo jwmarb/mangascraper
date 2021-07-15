@@ -41,11 +41,13 @@ Currently, mangascraper **supports 5 sources**, but will support more in the fut
 | [Mangahasu](https://mangahasu.se/)        | ✔️         | ---                 | ✔️              |
 | [Mangaparkv2](https://v2.mangapark.net)   | ✔️         | ✔️                  | ❌              |
 | [Mangasee](https://mangasee123.com/)      | ✔️         | ✔️                  | ❌              |
-| [Readmng](https://www.readmng.com/)       | ❌         | ---                 | ---             |
+| [Readmng](https://www.readmng.com/)       | ✔️         | ✔️                  | ✔️              |
 | [Kissmanga](https://kissmanga.org)        | ❌         | ---                 | ---             |
 | [Mangafreak](https://w11.mangafreak.net/) | ❌         | ---                 | ---             |
 
 If a supported source uses [axios](https://github.com/axios/axios), mangascraper will try to use axios as much as possible to save computer resources. If the network request is blocked by Cloudflare, mangascraper **will resort to using puppeteer**.
+
+If a supported source uses both [axios](https://github.com/axios/axios) and [puppeteer](https://github.com/puppeteer/puppeteer), it means one or more methods use either. For example, `Readmng` uses puppeteer for `search()`, but uses axios for `getMangaMeta()` and `getPages`
 
 ---
 
