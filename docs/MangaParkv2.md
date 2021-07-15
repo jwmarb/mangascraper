@@ -51,7 +51,7 @@
 
 ### Methods
 
-#### `mangapark.search(query, callback)`
+#### `mangapark.search(query, filters, callback)`
 
 Gets a list of manga that match the `query` from [MangaPark]
 
@@ -99,7 +99,7 @@ Gets a list of manga that match the `query` from [MangaPark]
 
     - `url` «[String]»
 
-    - `authors` «[Object]<[String]>»
+    - `authors` «[Array]<[String]>»
 
     - `coverImage` «[String]»
 

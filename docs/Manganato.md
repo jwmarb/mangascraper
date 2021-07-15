@@ -52,7 +52,7 @@
 
 ### Methods
 
-#### `manganato.search(query, callback)`
+#### `manganato.search(query, filters, callback)`
 
 Gets a list of manga that match the `query` from [Manganato]
 

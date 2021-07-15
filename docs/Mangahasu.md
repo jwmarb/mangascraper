@@ -51,7 +51,7 @@
 
 ### Methods
 
-#### `mangahasu.search(query, callback)`
+#### `mangahasu.search(query, filters, callback)`
 
 Gets a list of manga that match the `query` from [Mangahasu]
 

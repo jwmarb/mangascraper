@@ -52,7 +52,7 @@
 
 ### Methods
 
-#### `mangasee.search(query, callback)`
+#### `mangasee.search(query, filters, callback)`
 
 Gets a list of manga that match the `query` from [MangaSee]
 
