@@ -136,9 +136,6 @@ export default class MangaSee {
 
     function generateURL() {
       const parsedQuery = (() => {
-        // Check if its null or undefined...
-        if (query == null) return '';
-
         // Is the query a string? If so, just return it as a URI component
         if (typeof query === 'string') return `name=${encodeURIComponent(query)}`;
 
