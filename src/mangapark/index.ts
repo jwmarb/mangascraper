@@ -20,6 +20,7 @@ import jquery from 'jquery';
 import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import automateBrowser from '../functions/automateBrowser';
+import cheerio from 'cheerio';
 
 export type MangaParkMeta = {
   title: {
@@ -104,6 +105,9 @@ export default class MangaPark {
     filters: MangaFilters<MangaPark> = {},
     callback: MangaCallback<Manga<MangaPark>[]> = () => {},
   ): Promise<Manga<MangaPark>[]> {
+    if (query == null) query = '';
+    if (filters == null) filters = {};
+
     const { genres: genre, status = 'any', rating, type, yearReleased, orderBy = 'views', page = 1 } = filters;
 
     const url = (() => {
@@ -268,7 +272,17 @@ export default class MangaPark {
 
       try {
         // Parse HTML document
-        const $ = await readHtml(url, this.options);
+        const html = await automateBrowser(
+          this.options,
+          async (page) => {
+            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            await page.waitForSelector('h2');
+            return await page.evaluate(() => document.documentElement.innerHTML);
+          },
+          { resource: { method: 'unblock', type: ['document'] } },
+        );
+
+        const $ = cheerio.load(html);
 
         const title = $('h2 > a').text().split(' ').slice(0, -1).join(' ');
 
@@ -454,6 +468,11 @@ export default class MangaPark {
       'https://hm.baidu.com/',
       'https://s7.addthis.com/',
       'https://tags.crwdcntrl.net/',
+      'https://cdn.run-syndicate.com/',
+      'https://go.bebi.com/',
+      'https://st.bebi.com/',
+      'https://run-syndicate.com/',
+      'https://platform.bidgear.com/',
     ];
 
     return new Promise(async (res) => {
@@ -465,7 +484,7 @@ export default class MangaPark {
           async (page) => {
             await page.goto(url, { waitUntil: 'domcontentloaded' });
             await page.addScriptTag({ path: require.resolve('jquery') });
-            await page.waitForSelector('section.viewer > div');
+            await page.waitForSelector('a.img-link');
             return await page.evaluate(() => {
               const { $ } = window as typeof window & { $: typeof jquery };
               return $('a.img-link > img')
