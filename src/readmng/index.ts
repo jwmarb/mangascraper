@@ -108,7 +108,7 @@ export default class ReadMng {
     const authorInput = query && typeof query === 'object' && query.author ? query.author : '';
     const artistInput = query && typeof query === 'object' && query.artist ? query.artist : '';
 
-    return new Promise(async (res) => {
+    return new Promise(async (res, rej) => {
       try {
         const data = (await automateBrowser(
           this.options,
@@ -316,7 +316,7 @@ export default class ReadMng {
         )) as Manga<ReadMng>[];
         success(data, callback, res);
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
@@ -332,8 +332,8 @@ export default class ReadMng {
     url: string,
     callback: MangaCallback<MangaMeta<ReadMng>> = () => void 0,
   ): Promise<MangaMeta<ReadMng>> {
-    return new Promise(async (res) => {
-      if (url == null) return failure('Missing argument "url" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (url == null) return failure('Missing argument "url" is required', callback, rej);
 
       try {
         const $ = await readHtml(url, this.options);
@@ -443,7 +443,7 @@ export default class ReadMng {
           res,
         );
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
@@ -456,8 +456,8 @@ export default class ReadMng {
    * @returns Returns an array of img urls from the manga chapter.
    */
   public getPages(url: string, callback: MangaCallback<string[]> = () => void 0): Promise<string[]> {
-    return new Promise(async (res) => {
-      if (url == null) return failure('Missing argument "url" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (url == null) return failure('Missing argument "url" is required', callback, rej);
 
       try {
         const $ = await readHtml(url, this.options);
@@ -466,7 +466,7 @@ export default class ReadMng {
           .get();
         success(pages, callback, res);
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }

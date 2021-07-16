@@ -116,9 +116,9 @@ export default class Mangahasu {
       return baseUrl;
     }
 
-    return new Promise(async (res) => {
-      if (page == null) return failure('Missing argument "page" is required', callback);
-      if (page <= 0) return failure('"page" must be greater than 0', callback);
+    return new Promise(async (res, rej) => {
+      if (page == null) return failure('Missing argument "page" is required', callback, rej);
+      if (page <= 0) return failure('"page" must be greater than 0', callback, rej);
       if (typeof query !== 'string' && query.artist == null && query.title == null && query.author == null) query = '';
 
       try {
@@ -162,7 +162,7 @@ export default class Mangahasu {
 
         success(mangaList, callback, res);
       } catch (e) {
-        return failure(e, callback);
+        return failure(e, callback, rej);
       }
     });
   }
@@ -188,8 +188,8 @@ export default class Mangahasu {
     url: string,
     callback: MangaCallback<MangaMeta<Mangahasu>> = () => void 0,
   ): Promise<MangaMeta<Mangahasu>> {
-    return new Promise(async (res) => {
-      if (url == null) return failure('Missing argument "url" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (url == null) return failure('Missing argument "url" is required', callback, rej);
       try {
         /** Parse HTML document */
         const $ = await readHtml(url, this.options);
@@ -291,7 +291,7 @@ export default class Mangahasu {
           res,
         );
       } catch (e) {
-        return failure(e, callback);
+        return failure(e, callback, rej);
       }
     });
   }
@@ -315,8 +315,8 @@ export default class Mangahasu {
    * ```
    */
   public getPages(url: string, callback: MangaCallback<string[]> = () => void 0): Promise<string[]> {
-    return new Promise(async (res) => {
-      if (url == null) return failure('Missing argument "url" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (url == null) return failure('Missing argument "url" is required', callback, rej);
       try {
         /** parse HTML document */
         const $ = await readHtml(url, this.options);
@@ -332,7 +332,7 @@ export default class Mangahasu {
 
         success(pages, callback, res);
       } catch (e) {
-        return failure(e, callback);
+        return failure(e, callback, rej);
       }
     });
   }

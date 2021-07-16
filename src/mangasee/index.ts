@@ -199,7 +199,7 @@ export default class MangaSee {
       return `https://mangasee123.com/search/?${urlParams}`;
     }
 
-    return new Promise(async (res) => {
+    return new Promise(async (res, rej) => {
       try {
         const html = await automateBrowser(
           this.options,
@@ -314,7 +314,7 @@ export default class MangaSee {
 
         success(data, callback, res);
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
@@ -330,7 +330,7 @@ export default class MangaSee {
    * ```
    */
   public directory(callback: MangaCallback<MangaSeeMangaAlt[]> = () => void 0): Promise<MangaSeeMangaAlt[]> {
-    return new Promise(async (res) => {
+    return new Promise(async (res, rej) => {
       try {
         const data = await automateBrowser(
           this.options,
@@ -388,7 +388,7 @@ export default class MangaSee {
         });
         success(mangas, callback, res);
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
@@ -399,8 +399,8 @@ export default class MangaSee {
   ): Promise<MangaMeta<MangaSee>> {
     const xmlDocument = (() => `${url.replace('/manga/', '/rss/')}.xml`)();
 
-    return new Promise(async (res) => {
-      if (url == null) return failure('Missing argument "url" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (url == null) return failure('Missing argument "url" is required', callback, rej);
       try {
         /**
          * Runs tabs in parallization. Pretty cool, right?
@@ -480,14 +480,14 @@ export default class MangaSee {
           res,
         );
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
 
   public getPages(url: string, callback: MangaCallback<string[]> = () => void 0): Promise<string[]> {
-    return new Promise(async (res) => {
-      if (url == null) return failure('Missing argument "url" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (url == null) return failure('Missing argument "url" is required', callback, rej);
       try {
         const pages = await automateBrowser(
           this.options,
@@ -542,7 +542,7 @@ export default class MangaSee {
         );
         success(pages, callback, res);
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }

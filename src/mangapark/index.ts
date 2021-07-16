@@ -163,9 +163,9 @@ export default class MangaPark {
       return `https://v2.mangapark.net/search?${args}`;
     })();
 
-    return new Promise(async (res) => {
-      if (typeof page !== 'number') return failure('"page" must be a number', callback);
-      if (page == null) return failure('Missing argument "page" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (typeof page !== 'number') return failure('"page" must be a number', callback, rej);
+      if (page == null) return failure('Missing argument "page" is required', callback, rej);
       try {
         // Parse HTML document
         const $ = await readHtml(url, this.options);
@@ -244,7 +244,7 @@ export default class MangaPark {
 
         success(data, callback, res);
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
@@ -267,8 +267,8 @@ export default class MangaPark {
     url: string,
     callback: MangaCallback<MangaMeta<MangaPark>> = () => void 0,
   ): Promise<MangaMeta<MangaPark>> {
-    return new Promise(async (res) => {
-      if (url == null) return failure('Missing argument "url" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (url == null) return failure('Missing argument "url" is required', callback, rej);
 
       try {
         // Parse HTML document
@@ -439,7 +439,7 @@ export default class MangaPark {
           res,
         );
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
@@ -480,8 +480,8 @@ export default class MangaPark {
       'https://platform.bidgear.com/',
     ];
 
-    return new Promise(async (res) => {
-      if (url == null) return failure('Missing argument "url" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (url == null) return failure('Missing argument "url" is required', callback, rej);
 
       try {
         const data = await automateBrowser(
@@ -504,7 +504,7 @@ export default class MangaPark {
         );
         success(data, callback, res);
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }

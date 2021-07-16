@@ -50,7 +50,7 @@ export default class Mangakakalot {
   }
 
   /**
-   * Get a list of manga that match the title. Unfortunately, Mangakakalot does not offer an advanced search, so this can only search manga titles only. I will be updating this if Mangakakalot introduces a better search system
+   * Get a list of manga that match the title. Unfortunately, Mangakakalot does not offer an advanced search, so this can only search manga titles only. I will be updating this if Mangakakalot introduces a better search system. This method also requires you to have at least **3 characters** minimum.
    *
    * @param keyword - Title of manga (e.g "Black Clover", "One Piece", "Naruto")
    * @param callback - Callback function
@@ -80,10 +80,11 @@ export default class Mangakakalot {
       return baseUrl;
     }
 
-    return new Promise(async (res) => {
-      /** Param Validation */
-      if (keyword == null) return failure('Missing argument "keyword" is required', callback);
-
+    return new Promise(async (res, rej) => {
+      if (keyword == null) return failure('Missing argument "keyword" is required', callback, rej);
+      if (keyword.length < 3) {
+        return failure('"keyword" must be greater than 3 characters', callback, rej);
+      }
       try {
         /** Load HTML Document to cheerio to extract HTML data */
         const $ = await readHtml(generateURL(), this.options);
@@ -147,7 +148,7 @@ export default class Mangakakalot {
 
         success(mangaList, callback, res);
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
@@ -175,8 +176,8 @@ export default class Mangakakalot {
     url: string,
     callback: MangaCallback<MangaMeta<Mangakakalot>> = () => void 0,
   ): Promise<MangaMeta<Mangakakalot>> {
-    return new Promise(async (res) => {
-      if (url == null) return failure('Argument "url" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (url == null) return failure('Argument "url" is required', callback, rej);
       try {
         /** Load HTML Document to cheerio to extract HTML data */
         const $ = await readHtml(url, this.options);
@@ -284,7 +285,7 @@ export default class Mangakakalot {
           res,
         );
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
@@ -314,10 +315,10 @@ export default class Mangakakalot {
     callback: MangaCallback<Manga<Mangakakalot, 'alt'>[]> = () => void 0,
   ): Promise<Manga<Mangakakalot, 'alt'>[]> {
     const { page = 1, genre = 'any', status, age: type = 'updated' } = filters;
-    return new Promise(async (res) => {
-      if (page == null) return failure('Missing argument "page" is required', callback);
-      if (typeof page !== 'number') return failure('"page" must be a number', callback);
-      if (page <= 0) return failure('"page" must be a number greater than 0', callback);
+    return new Promise(async (res, rej) => {
+      if (page == null) return failure('Missing argument "page" is required', callback, rej);
+      if (typeof page !== 'number') return failure('"page" must be a number', callback, rej);
+      if (page <= 0) return failure('"page" must be a number greater than 0', callback, rej);
 
       try {
         /** Parse HTML Document */
@@ -365,7 +366,7 @@ export default class Mangakakalot {
 
         success(mangaList, callback, res);
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
@@ -392,8 +393,8 @@ export default class Mangakakalot {
    * ```
    */
   public getPages(url: string, callback: MangaCallback<string[]> = () => void 0): Promise<string[]> {
-    return new Promise(async (res) => {
-      if (url == null) return failure('Argument "url" is required', callback);
+    return new Promise(async (res, rej) => {
+      if (url == null) return failure('Argument "url" is required', callback, rej);
 
       try {
         /** Parse HTML document */
@@ -406,7 +407,7 @@ export default class Mangakakalot {
 
         success(pages, callback, res);
       } catch (e) {
-        failure(e, callback);
+        failure(e, callback, rej);
       }
     });
   }
