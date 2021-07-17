@@ -206,7 +206,7 @@ export default class MangaSee {
           async (page) => {
             await page.goto(generateURL(), { waitUntil: 'domcontentloaded' });
             await page.addScriptTag({ path: require.resolve('jquery') });
-            await page.waitForSelector('a.SeriesName.ng-binding, div.NoResults');
+            await page.waitForSelector('a.SeriesName.ng-binding, div.NoResults', { hidden: false, visible: true });
 
             return await page.evaluate(() => document.documentElement.innerHTML);
           },
