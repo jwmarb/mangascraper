@@ -35,6 +35,7 @@ export type MangaParkMeta = {
   type: MangaType<MangaPark>;
   status: Omit<MangaStatus<MangaPark>, 'any'>;
   rating: MangaRating;
+  popularity: string;
   chapters: {
     recentlyUpdated?: 'duck' | 'fox' | 'rock' | 'panda' | 'mini' | 'toon';
     duck: MangaChapters<MangaPark>[];
@@ -419,6 +420,12 @@ export default class MangaPark {
           toon: sourceChapters[5],
         };
 
+        const popularity = $('tr > th:contains("Popularity")')
+          .siblings('td')
+          .text()
+          .trim()
+          .match(/\d+\w{2}/)![0];
+
         success(
           {
             title: {
@@ -429,6 +436,7 @@ export default class MangaPark {
             coverImage,
             authors,
             artists: artists.filter((artist) => artist.length !== 0),
+            popularity,
             genres,
             rating,
             type,
