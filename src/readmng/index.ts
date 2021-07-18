@@ -384,17 +384,17 @@ export default class ReadMng {
         const rating: MangaRating = (() => {
           const voteCountNum = dislikeCnt + likeCnt;
           const voteCount = voteCountNum.toLocaleString();
-          const rating_percentage =
+          const ratingPercentage =
             voteCountNum > 0 && dislikeCnt < likeCnt ? `${((likeCnt / voteCountNum) * 100).toFixed(2)}%` : undefined;
-          const rating_stars =
+          const ratingStars =
             voteCountNum > 0 && dislikeCnt < likeCnt
-              ? `${(Number(Number(rating_percentage?.slice(0, -1)) / 10) / 2).toFixed(1)} / 5`
+              ? `${(Number(Number(ratingPercentage?.slice(0, -1)) / 10) / 2).toFixed(1)} / 5`
               : undefined;
           return {
             sourceRating: 'readMng.com',
             voteCount,
-            rating_percentage,
-            rating_stars,
+            ratingPercentage,
+            ratingStars,
           };
         })();
 

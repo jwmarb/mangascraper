@@ -216,8 +216,8 @@ export default class MangaPark {
           return {
             sourceRating: 'MangaPark.net',
             voteCount,
-            rating_percentage: `${((numerator / denominator) * 100).toFixed(2)}%`,
-            rating_stars: `${numerator} / ${denominator}`,
+            ratingPercentage: `${((numerator / denominator) * 100).toFixed(2)}%`,
+            ratingStars: `${numerator} / ${denominator}`,
           };
         });
 
@@ -297,7 +297,7 @@ export default class MangaPark {
           )
           .get();
 
-        const rating = (() => {
+        const rating: MangaRating = (() => {
           const textArray = $('th:contains("Rating")').siblings('td').text().trim().split(' ');
           const numerator = Number(textArray[1]);
           const denominator = Number(textArray[3]);
@@ -305,8 +305,8 @@ export default class MangaPark {
           return {
             sourceRating: 'MangaPark.net',
             voteCount,
-            rating_percentage: `${((numerator / denominator) * 100).toFixed(2)}%`,
-            rating_stars: `${numerator} / ${denominator}`,
+            ratingPercentage: `${((numerator / denominator) * 100).toFixed(2)}%`,
+            ratingStars: `${numerator} / ${denominator}`,
           };
         })();
         const authors = $('th:contains("Author(s)")')
