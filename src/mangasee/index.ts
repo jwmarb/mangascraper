@@ -444,7 +444,8 @@ export default class MangaSee {
                   .map((_, el) => $(el).text().toLowerCase().split(' ')[0])
                   .get();
                 const status = { scan: _status[0], publish: _status[1] };
-                const img = document.querySelector('img.img-fluid')?.getAttribute('src') || '';
+                const img =
+                  document.querySelector('div.col-md-3.top-5 > img.img-fluid.bottom-5')?.getAttribute('src') || '';
                 return { title: { main: title, alt }, authors, genres, summary, type, status, coverImage: img };
               });
             },
