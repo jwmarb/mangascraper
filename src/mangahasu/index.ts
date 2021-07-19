@@ -34,6 +34,7 @@ export type MangahasuMeta = {
   summary: string;
   authors: string[];
   artists: string[];
+  genres: MangaGenre<Mangahasu>[];
   type: string;
   status: string;
   views: string;
@@ -198,7 +199,7 @@ export default class Mangahasu {
         let summary = '';
         let authors: string[] = [];
         let artists: string[] = [];
-        let genres: string[] = [];
+        let genres: MangaGenre<MangahasuGenre>[] = [];
         let type = '';
         let status = '';
         let views = '';
@@ -228,7 +229,11 @@ export default class Mangahasu {
         type = $(`div.detail_item > b:contains("Type")`).siblings('span.info').text().trim();
 
         /** Get manga genres */
-        genres = $(`div.detail_item > b:contains("Genre(s)")`).siblings('span.info').text().trim().split(', ');
+        genres = $(`div.detail_item > b:contains("Genre(s)")`)
+          .siblings('span.info')
+          .text()
+          .trim()
+          .split(', ') as MangaGenre<MangahasuGenre>[];
 
         /** Get status of the manga */
         status = $(`div.detail_item > b:contains("Status")`).siblings('span.info').text().trim();
