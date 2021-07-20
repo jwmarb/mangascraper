@@ -292,7 +292,7 @@ export interface BaseMangaGenreOptions<T> {
 export type MangaStatus<T> = T extends Mangakakalot | Mangahasu | Manganato | MangaPark | ReadMng
   ? 'ongoing' | 'completed' | 'any'
   : T extends MangaSee
-  ? 'any' | 'cancelled' | 'complete' | 'discontinued' | 'paused' | 'ongoing'
+  ? 'any' | 'cancelled' | 'completed' | 'discontinued' | 'paused' | 'ongoing'
   : never;
 
 export type MangaType<T> = T extends MangaSee

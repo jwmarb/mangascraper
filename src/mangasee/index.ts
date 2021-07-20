@@ -63,7 +63,7 @@ export interface MangaSeeMangaAlt {
   url: string;
   genres: MangaGenre<MangaSee>[];
   coverImage: string;
-  status: 'ongoing' | 'complete';
+  status: 'ongoing' | 'completed';
 }
 export interface MangaSeeManga {
   title: string;
@@ -379,7 +379,10 @@ export default class MangaSee {
             title,
             url: `https://mangasee123.com${url}`,
             coverImage: img,
-            status: firstIndexItemArray[0].toLowerCase() as 'ongoing' | 'complete',
+            status:
+              firstIndexItemArray[0] === 'Complete'
+                ? 'completed'
+                : (firstIndexItemArray[0].toLowerCase() as 'ongoing' | 'completed'),
             genres: textArr.map((genre, i) => {
               if (i === 0) return firstIndexItemArray[1];
               return genre;
