@@ -47,8 +47,8 @@ export interface ReadMngOptions {
     include?: MangaGenre<ReadMng>[];
     exclude?: MangaGenre<ReadMng>[];
   };
-  status?: MangaStatus<ReadMng>;
-  type?: MangaType<ReadMng>;
+  status?: MangaStatus<ReadMng> | 'any';
+  type?: MangaType<ReadMng> | 'any';
 }
 
 export interface ReadMngManga {

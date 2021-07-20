@@ -61,9 +61,9 @@ export interface MangaParkOptions {
     include?: MangaGenre<MangaPark>[];
     exclude?: MangaGenre<MangaPark>[];
   };
-  status?: MangaStatus<MangaPark>;
-  rating?: '5☆' | '4☆' | '3☆' | '2☆' | '1☆' | '0☆';
-  type?: MangaType<MangaPark>;
+  status?: MangaStatus<MangaPark> | 'any';
+  rating?: '5☆' | '4☆' | '3☆' | '2☆' | '1☆' | '0☆' | 'any';
+  type?: MangaType<MangaPark> | 'any';
   yearReleased?: string;
   orderBy?: MangaOrder<MangaPark>;
   page?: number;
@@ -109,7 +109,15 @@ export default class MangaPark {
     if (query == null) query = '';
     if (filters == null) filters = {};
 
-    const { genres, status = 'any', rating, type, yearReleased, orderBy = 'views', page = 1 } = filters;
+    const {
+      genres,
+      status = 'any',
+      rating = 'any',
+      type = 'any',
+      yearReleased,
+      orderBy = 'most_views',
+      page = 1,
+    } = filters;
 
     const url = (() => {
       const queryParam = (() => {
@@ -136,11 +144,11 @@ export default class MangaPark {
           ? `genres-exclude=${genres.exclude.map((genre) => MangaParkGenres[genre])}`
           : '';
 
-      const mangaRating = rating ? `rating=${rating.substring(0, 0)}` : '';
+      const mangaRating = rating !== 'any' ? `rating=${rating.substring(0, 0)}` : '';
 
       const mangaStatus = status !== 'any' ? `status=${status}` : '';
 
-      const mangaType = type ? `types=${type}` : '';
+      const mangaType = type !== 'any' ? `types=${type}` : '';
 
       const year = yearReleased ? `years=${yearReleased}` : '';
 

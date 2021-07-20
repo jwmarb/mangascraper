@@ -33,7 +33,7 @@ export interface ManganatoManga {
 
 export interface ManganatoOptions {
   genres?: { include?: ManganatoGenre[]; exclude?: ManganatoGenre[] };
-  status?: MangaStatus<Manganato>;
+  status?: MangaStatus<Manganato> | 'any';
   orderBy?: MangaOrder<Manganato>;
   page?: number;
 }

@@ -191,7 +191,7 @@ export enum MangaParkOrderBy {
   'latest_updates' = 'update',
   'rating' = 'rating',
   'new_manga' = 'create',
-  'views' = 'views_a',
+  'most_views' = 'views_a',
 }
 
 export enum MangaSeeOrderBy {
@@ -290,13 +290,13 @@ export interface BaseMangaGenreOptions<T> {
 }
 
 export type MangaStatus<T> = T extends Mangakakalot | Mangahasu | Manganato | MangaPark | ReadMng
-  ? 'ongoing' | 'completed' | 'any'
+  ? 'ongoing' | 'completed'
   : T extends MangaSee
-  ? 'any' | 'cancelled' | 'completed' | 'discontinued' | 'paused' | 'ongoing'
+  ? 'cancelled' | 'completed' | 'discontinued' | 'paused' | 'ongoing'
   : never;
 
 export type MangaType<T> = T extends MangaSee
-  ? 'any' | 'doujinshi' | 'manga' | 'manhua' | 'manhwa'
+  ? 'doujinshi' | 'manga' | 'manhua' | 'manhwa'
   : T extends Mangahasu | ReadMng
   ? keyof typeof MangahasuTypes
   : T extends MangaPark
@@ -409,7 +409,6 @@ export enum MangaParkGenres {
 }
 
 export enum MangahasuTypes {
-  'any' = '',
   'manga' = '10',
   'manhwa' = '12',
   'manhua' = '19',

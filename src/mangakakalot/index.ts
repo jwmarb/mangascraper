@@ -37,7 +37,7 @@ export type MangakakalotGenre = keyof typeof MangakakalotGenres | 'any';
 
 export interface MangakakalotOptions {
   genre?: MangaGenre<Mangakakalot>;
-  status?: MangaStatus<Mangakakalot>;
+  status?: MangaStatus<Mangakakalot> | 'any';
   age?: MangaAge;
   page?: number;
 }
@@ -314,7 +314,7 @@ export default class Mangakakalot {
     filters: MangaFilters<Mangakakalot> = {},
     callback: MangaCallback<Manga<Mangakakalot, 'alt'>[]> = () => void 0,
   ): Promise<Manga<Mangakakalot, 'alt'>[]> {
-    const { page = 1, genre = 'any', status, age: type = 'updated' } = filters;
+    const { page = 1, genre = 'any', status = 'any', age: type = 'updated' } = filters;
     return new Promise(async (res, rej) => {
       if (page == null) return failure('Missing argument "page" is required', callback, rej);
       if (typeof page !== 'number') return failure('"page" must be a number', callback, rej);

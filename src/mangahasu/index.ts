@@ -48,8 +48,8 @@ export interface MangahasuOptions {
     include?: MangaGenre<Mangahasu>[];
     exclude?: MangaGenre<Mangahasu>[];
   };
-  status?: MangaStatus<Mangahasu>;
-  type?: MangaType<Mangahasu>;
+  status?: MangaStatus<Mangahasu> | 'any';
+  type?: MangaType<Mangahasu> | 'any';
   page?: number;
 }
 export type MangahasuGenre = keyof typeof MangahasuGenres;

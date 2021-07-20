@@ -46,10 +46,10 @@ export interface MangaSeeOptions {
   orderType?: 'ascending' | 'descending';
   translationGroup?: 'any' | 'official';
   status?: {
-    scan?: MangaStatus<MangaSee>;
-    publish?: MangaStatus<MangaSee>;
+    scan?: MangaStatus<MangaSee> | 'any';
+    publish?: MangaStatus<MangaSee> | 'any';
   };
-  type?: MangaType<MangaSee>;
+  type?: MangaType<MangaSee> | 'any';
   genres?: {
     include?: MangaGenre<MangaSee>[];
     exclude?: MangaGenre<MangaSee>[];
