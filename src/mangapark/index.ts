@@ -428,11 +428,13 @@ export default class MangaPark {
           toon: sourceChapters[5],
         };
 
-        const popularity = $('tr > th:contains("Popularity")')
-          .siblings('td')
-          .text()
-          .trim()
-          .match(/\d+\w{2}/)![0];
+        const popularity =
+          $('tr > th:contains("Popularity")')
+            .siblings('td')
+            .text()
+            .trim()
+            .match(/\d+\w{2}/)
+            ?.toString() ?? '?';
 
         success(
           {
