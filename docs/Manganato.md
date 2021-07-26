@@ -96,11 +96,7 @@ Gets a list of manga that match the `query` from [Manganato]
 
     - `authors` «[Array]<[String]>»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
     - `updatedAt` «[Date]»
 
@@ -116,10 +112,7 @@ await manganato.search({ keywords: 'author', search: 'Oda' }, { orderBy: 'most_v
     title: 'One Piece',
     url: 'https://readmanganato.com/manga-aa951409',
     authors: [ 'Oda Eiichiro' ],
-    coverImage: {
-      url: 'https://avt.mkklcdnv6temp.com/3/u/1-1583463814.jpg',
-      alt: 'One Piece'
-    },
+    coverImage: 'https://avt.mkklcdnv6temp.com/3/u/1-1583463814.jpg',
     updatedAt: 2021-03-12T07:00:00.000Z,
     views: '126,812,256'
   },
@@ -127,10 +120,7 @@ await manganato.search({ keywords: 'author', search: 'Oda' }, { orderBy: 'most_v
     title: 'Komi-San Wa Komyushou Desu',
     url: 'https://readmanganato.com/manga-va953509',
     authors: [ 'Oda Tomohito' ],
-    coverImage: {
-      url: 'https://avt.mkklcdnv6temp.com/25/s/2-1583466695.jpg',
-      alt: 'Komi-san wa Komyushou Desu'
-    },
+    coverImage: 'https://avt.mkklcdnv6temp.com/25/s/2-1583466695.jpg',
     updatedAt: 2021-07-08T07:00:00.000Z,
     views: '106,575,387'
   },
@@ -166,11 +156,7 @@ Gets the metadata of the given manga url from [Manganato]
 
       - `alt` «[Array]<[String]>»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
     - `authors` «[Array]<[String]>»
 
@@ -222,10 +208,7 @@ await manganato.getMangaMeta('https://readmanganato.com/manga-va953509');
       'Komi Là Cô Nàng Ít Nói (Vietnamese - Tiếng Việt - TV)'
     ]
   },
-  coverImage: {
-    url: 'https://avt.mkklcdnv6temp.com/25/s/2-1583466695.jpg',
-    alt: 'Komi-san wa Komyushou Desu'
-  },
+  coverImage: 'https://avt.mkklcdnv6temp.com/25/s/2-1583466695.jpg',
   authors: [ 'Oda Tomohito' ],
   status: 'Ongoing',
   summary: "Komi-san is the beautiful and admirable girl that no-one can take their eyes off her. Almost the whole school sees her as the cold beauty out of their league, but Tadano Shigeo knows the truth: she's
@@ -291,11 +274,7 @@ Gets a list of mangas according to the applied `filters`
 
     - `views` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
 ##### Example
 
@@ -309,10 +288,7 @@ await manganato.getMangasFromGenre('One shot');
     authors: [ 'Pingmin', 'Ju hyeon' ],
     updatedAt: 2021-07-11T07:00:00.000Z,
     views: '34,994,411',
-    coverImage: {
-      url: 'https://avt.mkklcdnv6temp.com/3/s/18-1583497223.jpg',
-      alt: 'Lady Baby'
-    }
+    coverImage: 'https://avt.mkklcdnv6temp.com/3/s/18-1583497223.jpg'
   },
   ...
 ]

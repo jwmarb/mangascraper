@@ -82,11 +82,7 @@ Gets a list of manga that match the `query` from [Mangakakalot]
 
     - `views` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
 ##### Example
 
@@ -100,10 +96,7 @@ await mangakakalot.search('Please dont bully me Nagatoro');
     authors: [ '774 House (774)' ],
     updatedAt: 2021-07-06T19:43:00.000Z,
     views: '38,186,463',
-    coverImage: {
-      url: 'https://avt.mkklcdnv6temp.com/2/g/16-1583493543.jpg',
-      alt: "Please don't bully me, Nagatoro"
-    }
+    coverImage: 'https://avt.mkklcdnv6temp.com/2/g/16-1583493543.jpg'
   },
   {
     title: "Please Don't Bully Me, Nagatoro Comic Anthology",
@@ -111,10 +104,7 @@ await mangakakalot.search('Please dont bully me Nagatoro');
     authors: [ 'Anthology' ],
     updatedAt: 2020-03-12T19:58:00.000Z,
     views: '448,531',
-    coverImage: {
-      url: 'https://avt.mkklcdnv6temp.com/43/k/20-1583989794.jpg',
-      alt: "Please Don't Bully Me, Nagatoro Comic Anthology"
-    }
+    coverImage: 'https://avt.mkklcdnv6temp.com/43/k/20-1583989794.jpg'
   }
 ]
 ```
@@ -169,11 +159,7 @@ Gets the metadata of the given manga url from [Mangakakalot]
 
     - `summary` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
     - `chapters` «[Array]<[Object]>»
 
@@ -217,10 +203,7 @@ await mangakakalot.getMangaMeta('https://mangakakalot.com/read-rp1kv158504840628
     '\n' +
     'Cain grew up being surrounded by Gods who doesn’t know self-esteem, the upper noble and the girls who are swayed around him.\n' +
     'Being given so many protection from the gods, He overcame any obstacle (aka Flags) while hiding his unbelievable status. The noble path fantasy story of a young boy who sometimes wicked and clumsy.',
-  coverImage: {
-    url: 'https://avt.mkklcdnv6temp.com/40/f/16-1583494908.jpg',
-    alt: 'Tensei Kizoku no Isekai Boukenroku ~Jichou wo Shiranai Kamigami no Shito~'
-  },
+  coverImage: 'https://avt.mkklcdnv6temp.com/40/f/16-1583494908.jpg',
   chapters: [
     {
       name: 'Chapter 33',
@@ -269,11 +252,7 @@ Gets a list of mangas with according to the applied `filters`
 
     - `views` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
 ##### Example
 
@@ -285,10 +264,7 @@ await mangakakalot.getMangas({ genre: 'Historical' });
     title: '100 Strange Nights',
     url: 'https://mangakakalot.com/manga/sp918107',
     views: '212,385',
-    coverImage: {
-      url: 'https://avt.mkklcdnv6temp.com/33/x/17-1583496474.jpg',
-      alt: '100 Strange Nights'
-    }
+    coverImage: 'https://avt.mkklcdnv6temp.com/33/x/17-1583496474.jpg'
   },
 ...
 ]

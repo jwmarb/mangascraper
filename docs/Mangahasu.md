@@ -96,11 +96,7 @@ Gets a list of manga that match the `query` from [Mangahasu]
 
     - `url` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
 ##### Example
 
@@ -111,18 +107,12 @@ await mangahasu.search('gamer');
   {
     title: 'Hell Mode - Yarikomi Suki no Gamer wa Haisettei no Isekai de Musou Suru',
     url: 'https://mangahasu.se/hell-mode---yarikomi-suki-no-gamer-wa-haisettei-no-isekai-de-musou-suru-p55361.html',
-    coverImage: {
-      url: 'https://img.mangahasu.se/1img/ddyLr-AXOt2Q5a/hell-mode---yarikomi-suki-no-gamer-wa-haisettei-no-isekai-de-musou-suru.jpg',
-      alt: 'Hell Mode - Yarikomi Suki no Gamer wa Haisettei no Isekai de Musou Suru'
-    }
+    coverImage: 'https://img.mangahasu.se/1img/ddyLr-AXOt2Q5a/hell-mode---yarikomi-suki-no-gamer-wa-haisettei-no-isekai-de-musou-suru.jpg'
   },
   {
     title: 'Gamers!',
     url: 'https://mangahasu.se/gamers-p25752.html',
-    coverImage: {
-      url: 'https://img.mangahasu.se/1img/BdadB-2c3Xtbrn/gamers.jpg',
-      alt: 'Gamers!'
-    }
+    coverImage: 'https://img.mangahasu.se/1img/BdadB-2c3Xtbrn/gamers.jpg'
   },
   ...
 ]
@@ -180,11 +170,7 @@ Gets the metadata of the given manga url from [Mangahasu]
 
       - `rating_stars` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
     - `chapters` «[Array]<[Object]>»
 
@@ -226,10 +212,7 @@ club. \n" +
     rating_stars: '5/5',
     voteCount: '2'
   },
-  coverImage: {
-    url: 'https://img.mangahasu.se/1img/BdadB-2c3Xtbrn/gamers.jpg',
-    alt: 'Gamers!'
-  },
+  coverImage: 'https://img.mangahasu.se/1img/BdadB-2c3Xtbrn/gamers.jpg',
   chapters: [
     {
       name: 'Vol 3 Chapter 14: Gamers & Flying Get 5',
@@ -328,11 +311,7 @@ Gets a list of mangas from Mangahasu's latest releases page
 
     - `title` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
     - `url` «[String]»
 
@@ -344,18 +323,12 @@ await mangahasu.getLatestUpdates();
 [
   {
     title: 'Max Level Returner',
-    coverImage: {
-      url: 'https://img.mangahasu.se/1img/dZrEr-ZuqEfX9o/max-level-returner.jpg',
-      alt: 'Max Level Returner'
-    },
+    coverImage: 'https://img.mangahasu.se/1img/dZrEr-ZuqEfX9o/max-level-returner.jpg',
     url: 'https://mangahasu.se/max-level-returner-p50181.html'
   },
   {
     title: 'Arasa Dakedo, Hatsukoi desu',
-    coverImage: {
-      url: 'https://img.mangahasu.se/1img/yNNdN-Ms0zAiv2/im-nearly-30--but-this-is-my-first-love.jpg',
-      alt: 'Arasa Dakedo, Hatsukoi desu'
-    },
+    coverImage: 'https://img.mangahasu.se/1img/yNNdN-Ms0zAiv2/im-nearly-30--but-this-is-my-first-love.jpg',
     url: 'https://mangahasu.se/arasa-dakedo--hatsukoi-desu-p34454.html'
   },
   ...

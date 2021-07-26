@@ -93,11 +93,7 @@ Gets a list of manga that match the `query` from [ReadMng]
 
     - `url` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
     - `genres` «[Array]<[String]>»
 
@@ -126,10 +122,7 @@ await readmng.search({ title: 'the gamer' });
   {
     title: 'The Gamer',
     url: 'https://www.readmng.com/the-gamer',
-    coverImage: {
-      url: 'https://www.readmng.com/uploads/posters/thumb/1547203467.jpg',
-      alt: 'The Gamer',
-    },
+    coverImage: 'https://www.readmng.com/uploads/posters/thumb/1547203467.jpg',
     genres: ['Action', 'Fantasy', 'School Life', 'Shounen', 'Supernatural'],
     type: 'manhwa',
     views: '14,395,524',
@@ -173,11 +166,7 @@ Gets the metadata of the given manga url from [ReadMng]
 
     - `summary` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
     - `author` «[String]»
 
@@ -218,10 +207,7 @@ await readmng.getMangaMeta('https://v2.readmng.net/manga/maou-no-hajimekata-wara
 
 {
   title: { main: 'The Gamer', alt: [ '더 게이머' ] },
-  coverImage: {
-    url: 'https://www.readmng.com/uploads/posters/1547203467.jpg',
-    alt: 'The Gamer'
-  },
+  coverImage: 'https://www.readmng.com/uploads/posters/1547203467.jpg',
   author: 'Sung San Young',
   artist: 'Sang Ah',
   genres: [ 'Action', 'Fantasy', 'School Life', 'Shounen', 'Supernatural' ],

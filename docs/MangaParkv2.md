@@ -126,10 +126,7 @@ await mangapark.search('dungeon');
     title: 'Dungeon ni Deai o Motomeru no wa Machigatte Iru Darou ka',
     url: 'https://v2.mangapark.net/manga/dungeon-ni-deai-o-motomeru-no-wa-machigatte-iru-darou-ka',
     authors: [ 'Oomori fujino', 'Kunieda' ],
-    coverImage: {
-      url: 'https://xfs-000.animemark.net/pictures/W300/71a/71a9191cabeae820e9455916931a4ec06fa7ad53_200_284_36777.jpg?acc=Er5Q5zP3zZT7OP99Econrw&exp=1626097380',
-      alt: 'Dungeon ni Deai o Motomeru no wa Machigatte Iru Darou ka'
-    },
+    coverImage: 'https://xfs-000.animemark.net/pictures/W300/71a/71a9191cabeae820e9455916931a4ec06fa7ad53_200_284_36777.jpg?acc=Er5Q5zP3zZT7OP99Econrw&exp=1626097380',
     genres: [
       'Seinen',
       'Ecchi',
@@ -150,10 +147,7 @@ await mangapark.search('dungeon');
     title: 'Maou no Hajimekata',
     url: 'https://v2.mangapark.net/manga/maou-no-hajimekata-warau-yakan',
     authors: [ 'Warau yakan', 'Maou no hajimekata 43', 'Komiya toshimasa' ],
-    coverImage: {
-      url: 'https://xfs-000.animemark.net/pictures/W300/b67/b677257f3eba92aa6c4a86c45e6c71682ecbfb65_200_292_31113.jpg?acc=oVSy1-u4FlBL4bARKAMryQ&exp=1626097380',
-      alt: 'Maou no Hajimekata'
-    },
+    coverImage: 'https://xfs-000.animemark.net/pictures/W300/b67/b677257f3eba92aa6c4a86c45e6c71682ecbfb65_200_292_31113.jpg?acc=oVSy1-u4FlBL4bARKAMryQ&exp=1626097380',
     genres: [
       'Seinen',  'Adult',
       'Mature',  'Smut',
@@ -201,11 +195,7 @@ Gets the metadata of the given manga url from [MangaPark]
 
     - `summary` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
     - `authors` «[Array]<[String]>»
 
@@ -278,10 +268,7 @@ await mangapark.getMangaMeta('https://v2.mangapark.net/manga/maou-no-hajimekata-
     ]
   },
   summary: '“I do not trust humans. They’ll betray you without fail.” Aur, the man who had obtained the ability and right to become the Maou at the end of his life of research. Summoning the succubus Lilu, he then sets out on creating his own domain, a gigantic labyrinthine dungeon. The misanthropic Maou taking on the world, the curtain rises on a dark harem fantasy!',
-  coverImage: {
-    url: 'https://xfs-000.animemark.net/pictures/W600/b67/b677257f3eba92aa6c4a86c45e6c71682ecbfb65_200_292_31113.jpg?acc=JRPVbdoV7qOGLGKYz-fqrA&exp=1626098272',
-    alt: 'Maou no Hajimekata'
-  },
+  coverImage: 'https://xfs-000.animemark.net/pictures/W600/b67/b677257f3eba92aa6c4a86c45e6c71682ecbfb65_200_292_31113.jpg?acc=JRPVbdoV7qOGLGKYz-fqrA&exp=1626098272',
   authors: [ 'Warau yakan' ],
   artists: [ 'Komiya toshimasa', 'Maou no hajimekata 43' ],
   genres: [
@@ -417,11 +404,7 @@ Gets a list of mangas from MangaPark's latest manga releases page
 
     - `url` «[String]»
 
-    - `coverImage` «[Object]»
-
-      - `url` «[String]»
-
-      - `alt` «[String]»
+    - `coverImage` «[String]»
 
     - `genres` «[Array]<[String]>»
 
@@ -436,10 +419,7 @@ await mangapark.getLatestUpdates();
   {
     title: 'Taming the Cat Master',
     url: 'https://v2.mangapark.net/manga/taming-the-cat-master',
-    coverImage: {
-      url: 'https://xfs-000.animemark.net/pictures/W300/e6f/e6faec552e8e5a15c35f989984e9a4cd66760abf_200_298_18022.jpg?acc=fGJfjpL-5R53pA8W6ubD3A&exp=1627321647',
-      alt: 'Taming the Cat Master'
-    },
+    coverImage: 'https://xfs-000.animemark.net/pictures/W300/e6f/e6faec552e8e5a15c35f989984e9a4cd66760abf_200_298_18022.jpg?acc=fGJfjpL-5R53pA8W6ubD3A&exp=1627321647'
     genres: [
       'Shoujo',
       'Comedy',
@@ -453,20 +433,14 @@ await mangapark.getLatestUpdates();
   {
     title: 'Hakumei to Mikochi',
     url: 'https://v2.mangapark.net/manga/hakumei-to-mikochi',
-    coverImage: {
-      url: 'https://xfs-000.animemark.net/pictures/W300/f07/f073a581f82f56f2b7be819c49459200fed9fdce_200_284_27273.jpg?acc=yKuar7NDZ0GwhBrW02JB8g&exp=1627321647',
-      alt: 'Hakumei to Mikochi'
-    },
+    coverImage: 'https://xfs-000.animemark.net/pictures/W300/f07/f073a581f82f56f2b7be819c49459200fed9fdce_200_284_27273.jpg?acc=yKuar7NDZ0GwhBrW02JB8g&exp=1627321647',
     genres: [ 'Seinen', 'Fantasy', 'Slice of life' ],
     updatedWhen: '33 hours ago'
   },
   {
     title: "Can't See Can't Hear But Love",
     url: 'https://v2.mangapark.net/manga/can-t-see-can-t-hear-but-love',
-    coverImage: {
-      url: 'https://xfs-000.animemark.net/pictures/W300/572/5726907d2ccea5345ac983218ccbb2595d89fbd5_200_266_16184.jpg?acc=SG1OMGznNH-osxQ0XmlHrQ&exp=1627321647',
-      alt: "Can't See Can't Hear But Love"
-    },
+    coverImage: 'https://xfs-000.animemark.net/pictures/W300/572/5726907d2ccea5345ac983218ccbb2595d89fbd5_200_266_16184.jpg?acc=SG1OMGznNH-osxQ0XmlHrQ&exp=1627321647',
     genres: [
       'Comedy',
       'Drama',
@@ -480,10 +454,7 @@ await mangapark.getLatestUpdates();
   {
     title: 'Urban Fairy King',
     url: 'https://v2.mangapark.net/manga/urban-fairy-king-boyi-animation',
-    coverImage: {
-      url: 'https://xfs-000.animemark.net/pictures/W300/bdd/bdd1632b244894b1376c86a35cce20bc24f62b1b_200_266_45988.jpg?acc=fJ7hoNjrRdzuafoLvYAmkQ&exp=1627321647',
-      alt: 'Urban Fairy King'
-    },
+    coverImage: 'https://xfs-000.animemark.net/pictures/W300/bdd/bdd1632b244894b1376c86a35cce20bc24f62b1b_200_266_45988.jpg?acc=fJ7hoNjrRdzuafoLvYAmkQ&exp=1627321647',
     genres: [ 'Action', 'Martial arts', 'School life', 'Webtoon' ],
     updatedWhen: '35 hours ago'
   },
