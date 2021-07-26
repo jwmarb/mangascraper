@@ -48,7 +48,7 @@ Currently, mangascraper **supports 5 sources**, but will support more in the fut
 
 If a supported source uses [axios](https://github.com/axios/axios), mangascraper will try to use axios as much as possible to save computer resources. If the network request is blocked by Cloudflare, mangascraper **will resort to using puppeteer**.
 
-If a supported source uses both [axios](https://github.com/axios/axios) and [puppeteer](https://github.com/puppeteer/puppeteer), it means one or more methods are either used. For example, `Readmng` uses puppeteer for `search()`, but uses axios for `getMangaMeta()` and `getPages`
+If a supported source uses both [axios](https://github.com/axios/axios) and [puppeteer](https://github.com/puppeteer/puppeteer), it means one or more methods in the source use either axios or puppeteer. For example, `Readmng` uses puppeteer for `search()`, but uses axios for `getMangaMeta()` and `getPages`
 
 ---
 
