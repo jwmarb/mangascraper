@@ -1,6 +1,7 @@
 import jquery from 'jquery';
 import cheerio from 'cheerio';
 import {
+  LatestHotManga,
   Manga,
   MangaCallback,
   MangaChapters,
@@ -18,11 +19,56 @@ import {
 import automateBrowser from '../functions/automateBrowser';
 import success from '../functions/success';
 import failure from '../functions/failure';
-import automateBrowsers from '../functions/automateBrowsers';
 
 type InjectedScriptsWindow = {
   $: typeof jquery;
 } & typeof window;
+
+interface AngularJSON {
+  $$hashKey: string;
+  Chapter: string;
+  Date: string;
+  IndexName: string;
+  IsEdd: boolean;
+  SeriesID: string;
+  SeriesName: string;
+}
+
+interface AngularState {
+  angular: {
+    element: (el: HTMLElement) => {
+      scope: () => {
+        vm: {
+          Pages: number[];
+          IndexName: string;
+          CurPathName: string;
+          CurChapter: { Directory: string; Chapter: string };
+          ChapterImage: (chapter: string) => string;
+          PageImage: (page: number) => string;
+          HotUpdateJSON: AngularJSON[];
+          LatestJSON: AngularJSON[];
+          FullDirectory: {
+            AllGenres: MangaSeeGenre[];
+            Directory: {
+              $$hashKey: string;
+              g: number[];
+              i: string;
+              s: string;
+              st: string;
+            }[];
+          };
+          Chapters: {
+            $$hashKey: string;
+            Chapter: string;
+            Type: 'Chapter';
+            Date: string;
+            ChapterName: null | string;
+          }[];
+        };
+      };
+    };
+  };
+}
 
 export type MangaSeeMeta = {
   title: {
@@ -63,7 +109,7 @@ export interface MangaSeeMangaAlt {
   url: string;
   genres: MangaGenre<MangaSee>[];
   coverImage: string;
-  status: 'ongoing' | 'completed';
+  status: MangaStatus<MangaSee>;
 }
 export interface MangaSeeManga {
   title: string;
@@ -75,6 +121,13 @@ export interface MangaSeeManga {
   genres: MangaGenre<MangaSee>[];
   coverImage: string;
   updatedAt: Date;
+}
+
+export interface MangaSeeLatestHotManga {
+  title: string;
+  updatedAt: Date;
+  url: string;
+  coverImage: string;
 }
 
 export default class MangaSee {
@@ -336,20 +389,12 @@ export default class MangaSee {
           this.options,
           async (page) => {
             await page.goto('https://mangasee123.com/directory/', { waitUntil: 'domcontentloaded' });
-            await page.addScriptTag({ path: require.resolve('jquery') });
-            await page.waitForSelector('a[href="/manga/Zui-Wu-Dao"]');
-            return await page.evaluate(() => {
-              const { $ } = window as InjectedScriptsWindow;
-              return $(`div.top-15 > a`)
-                .map((_, el) => {
-                  const element = $(el);
-                  const title = element.text();
-                  const url = element.attr('href') || '';
-                  const tooltip = element.attr('title') || '';
+            await page.waitForFunction('window.angular.element(document.body).scope()');
 
-                  return { title, url, tooltip };
-                })
-                .get();
+            return await page.evaluate(() => {
+              const { angular } = window as typeof window & AngularState;
+              const { FullDirectory } = angular.element(document.body).scope().vm;
+              return FullDirectory;
             });
           },
           {
@@ -364,32 +409,137 @@ export default class MangaSee {
           },
         );
 
-        const mangas = data.map(({ tooltip, url, title }) => {
-          const $ = cheerio.load(tooltip);
-          const divElement = $('div');
-          const img = divElement.children('img').attr('src') || '';
-          const textArr = divElement
-            .children()
-            .remove()
-            .end()
-            .map((_, el) => $(el).text().trim().split(', '))
-            .get();
-          const firstIndexItemArray = textArr[0].split(' ');
+        const formattedDirectoryData: MangaSeeMangaAlt[] = data.Directory.map((manga) => {
+          const status = (() => {
+            switch (manga.st) {
+              case 'Complete':
+                return 'completed';
+              case 'Hiatus':
+                return 'paused';
+              case 'Ongoing':
+              default:
+                return 'ongoing';
+              case 'Discontinued':
+                return 'discontinued';
+              case 'Cancelled':
+                return 'cancelled';
+            }
+          })();
+
           return {
-            title,
-            url: `https://mangasee123.com${url}`,
-            coverImage: img,
-            status:
-              firstIndexItemArray[0] === 'Complete'
-                ? 'completed'
-                : (firstIndexItemArray[0].toLowerCase() as 'ongoing' | 'completed'),
-            genres: textArr.map((genre, i) => {
-              if (i === 0) return firstIndexItemArray[1];
-              return genre;
-            }) as MangaGenre<MangaSee>[],
+            title: manga.s,
+            url: `https://mangasee123.com/manga/${manga.i}`,
+            coverImage: `https://cover.nep.li/cover/${manga.i}.jpg`,
+            genres: manga.g.map((genre) => data.AllGenres[genre]),
+            status,
           };
         });
-        success(mangas, callback, res);
+
+        success(formattedDirectoryData, callback, res);
+      } catch (e) {
+        failure(e, callback, rej);
+      }
+    });
+  }
+
+  /**
+   * Get a list of mangas that have been recently updated from MangaSee
+   *
+   * @param callback - Callback function
+   * @returns Returns an array of mangas in the latest chapters section in MangaSee's homepage.
+   * @example
+   *
+   * ```js
+   * await mangasee.getLatestUpdates();
+   * ```
+   */
+  public getLatestUpdates(
+    callback: MangaCallback<LatestHotManga<MangaSee>[]> = () => void 0,
+  ): Promise<LatestHotManga<MangaSee>[]> {
+    return new Promise(async (res, rej) => {
+      try {
+        const json = await automateBrowser(
+          this.options,
+          async (page) => {
+            await page.goto('https://mangasee123.com/', { waitUntil: 'domcontentloaded' });
+            await page.waitForFunction('window.angular.element(document.body).scope()');
+            return await page.evaluate(() => {
+              const { angular } = window as typeof window & AngularState;
+              return angular.element(document.body).scope().vm.LatestJSON;
+            });
+          },
+          {
+            domains: {
+              method: 'block',
+              value: this.BLOCKED_DOMAINS,
+            },
+            resource: {
+              method: 'unblock',
+              type: ['script', 'document'],
+            },
+          },
+        );
+
+        const formattedJson: MangaSeeLatestHotManga[] = json.map((manga) => ({
+          title: manga.SeriesName,
+          updatedAt: new Date(manga.Date),
+          url: `https://mangasee123.com/manga/${manga.IndexName}`,
+          coverImage: `https://cover.nep.li/cover/${manga.IndexName}.jpg`,
+        }));
+
+        success(formattedJson, callback, res);
+      } catch (e) {
+        failure(e, callback, rej);
+      }
+    });
+  }
+
+  /**
+   * Get the hottest updates from MangaSee
+   *
+   * @param callback - Callback function
+   * @returns Returns an array of mangas in the hottest updates section in MangaSee's homepage.
+   * @example
+   *
+   * ```js
+   * await mangasee.getHotUpdates();
+   * ```
+   */
+  public getHotUpdates(
+    callback: MangaCallback<LatestHotManga<MangaSee>[]> = () => void 0,
+  ): Promise<LatestHotManga<MangaSee>[]> {
+    return new Promise(async (res, rej) => {
+      try {
+        const json = await automateBrowser(
+          this.options,
+          async (page) => {
+            await page.goto('https://mangasee123.com/', { waitUntil: 'domcontentloaded' });
+            await page.waitForFunction('window.angular.element(document.body).scope()');
+            return await page.evaluate(() => {
+              const { angular } = window as typeof window & AngularState;
+              return angular.element(document.body).scope().vm.HotUpdateJSON;
+            });
+          },
+          {
+            domains: {
+              method: 'block',
+              value: this.BLOCKED_DOMAINS,
+            },
+            resource: {
+              method: 'unblock',
+              type: ['script', 'document'],
+            },
+          },
+        );
+
+        const formattedJson: MangaSeeLatestHotManga[] = json.map((manga) => ({
+          title: manga.SeriesName,
+          updatedAt: new Date(manga.Date),
+          url: `https://mangasee123.com/manga/${manga.IndexName}`,
+          coverImage: `https://cover.nep.li/cover/${manga.IndexName}.jpg`,
+        }));
+
+        success(formattedJson, callback, res);
       } catch (e) {
         failure(e, callback, rej);
       }
@@ -400,85 +550,73 @@ export default class MangaSee {
     url: string,
     callback: MangaCallback<MangaMeta<MangaSee>> = () => void 0,
   ): Promise<MangaMeta<MangaSee>> {
-    const xmlDocument = (() => `${url.replace('/manga/', '/rss/')}.xml`)();
-
     return new Promise(async (res, rej) => {
       if (url == null) return failure('Missing argument "url" is required', callback, rej);
       try {
-        /**
-         * Runs tabs in parallization. Pretty cool, right?
-         */
-        const [data, [xmlData, chapterURLs]] = (await automateBrowsers(this.options, [
-          {
-            network: {
-              domains: {
-                method: 'block',
-                value: this.BLOCKED_DOMAINS,
-              },
-              resource: {
-                method: 'unblock',
-                type: ['script', 'document'],
-              },
-            },
-            callback: async (page) => {
-              await page.goto(url, { waitUntil: 'domcontentloaded' });
-              await page.addScriptTag({ path: require.resolve('jquery') });
-              await page.waitForSelector('h1');
-              return await page.evaluate(() => {
-                const { $ } = window as InjectedScriptsWindow;
-                const title = $('h1').text();
-                const alt = $('span.mlabel:contains("Alternate Name(s):")')
-                  .parent()
-                  .text()
-                  .trim()
-                  .replace('Alternate Name(s): ', '');
-                const authors = $('span.mlabel:contains("Author(s):")')
-                  .siblings()
-                  .map((_, el) => $(el).text())
-                  .get();
-                const genres = $('span.mlabel:contains("Genre(s):")')
-                  .siblings()
-                  .map((_, el) => $(el).text())
-                  .get();
-                const summary = $('div.top-5.Content').text().trim();
-                const type = $('span.mlabel:contains("Type:")').siblings().text().toLowerCase();
-                const _status = $('span.mlabel:contains("Status:")')
-                  .siblings()
-                  .map((_, el) => $(el).text().toLowerCase().split(' ')[0])
-                  .get();
-                const status = { scan: _status[0], publish: _status[1] };
-                const img =
-                  document.querySelector('div.col-md-3.top-5 > img.img-fluid.bottom-5')?.getAttribute('src') || '';
-                return { title: { main: title, alt }, authors, genres, summary, type, status, coverImage: img };
-              });
-            },
+        const data = await automateBrowser(
+          this.options,
+
+          async (page) => {
+            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            await page.addScriptTag({ path: require.resolve('jquery') });
+            await page.waitForSelector('h1');
+            await page.waitForFunction('window.angular.element(document.body).scope()');
+            return await page.evaluate(() => {
+              const { $, angular } = window as InjectedScriptsWindow & AngularState;
+              const vm = angular.element(document.body).scope().vm;
+              const title = $('h1').text();
+              const alt = $('span.mlabel:contains("Alternate Name(s):")')
+                .parent()
+                .text()
+                .trim()
+                .replace('Alternate Name(s): ', '');
+              const authors = $('span.mlabel:contains("Author(s):")')
+                .siblings()
+                .map((_, el) => $(el).text())
+                .get();
+              const genres = $('span.mlabel:contains("Genre(s):")')
+                .siblings()
+                .map((_, el) => $(el).text())
+                .get() as MangaGenre<MangaSee>[];
+              const summary = $('div.top-5.Content').text().trim();
+              const type = $('span.mlabel:contains("Type:")').siblings().text().toLowerCase() as MangaType<MangaSee>;
+              const _status = $('span.mlabel:contains("Status:")')
+                .siblings()
+                .map((_, el) => $(el).text().toLowerCase().split(' ')[0])
+                .get();
+              const status = {
+                scan: _status[0] as MangaStatus<MangaSee>,
+                publish: _status[1] as MangaStatus<MangaSee>,
+              };
+              const img =
+                document.querySelector('div.col-md-3.top-5 > img.img-fluid.bottom-5')?.getAttribute('src') || '';
+              const chapters = angular
+                .element(document.body)
+                .scope()
+                .vm.Chapters.map((chapter, index) => ({
+                  name: chapter.ChapterName ?? `Chapter ${index}`,
+                  url: `https://mangasee123.com/read-online/${vm.IndexName}-chapter-${index}.html`,
+                  uploadDate: chapter.Date,
+                }));
+              return { title: { main: title, alt }, authors, genres, summary, type, status, coverImage: img, chapters };
+            });
           },
           {
-            callback: async (page) => {
-              await page.goto(xmlDocument, { waitUntil: 'domcontentloaded' });
-              return await page.evaluate(() => [
-                document.querySelector('*')?.outerHTML || '',
-                Array.from(document.querySelectorAll('item > link')).map((url) => url.innerHTML.replace('-page-1', '')),
-              ]);
+            domains: {
+              method: 'block',
+              value: this.BLOCKED_DOMAINS,
+            },
+            resource: {
+              method: 'unblock',
+              type: ['script', 'document'],
             },
           },
-        ])) as [Omit<MangaMeta<MangaSee>, 'chapters'>, [string, string[]]];
-
-        const $ = cheerio.load(xmlData);
-
-        const title = `${$('title').first().text()} `;
-
-        const chapterTitles = $('item > title').map((_, el) => $(el).text().replace(title, ''));
-        const chapterDates = $('pubDate').map((_, el) => new Date($(el).text()));
+        );
 
         success(
           {
             ...data,
-            chapters: chapterURLs.map((url, i) => ({
-              name: chapterTitles[i],
-              url,
-              uploadDate: chapterDates[i],
-            })),
+            chapters: data.chapters.map((chapter) => ({ ...chapter, uploadDate: new Date(chapter.uploadDate) })),
           },
           callback,
           res,
@@ -499,22 +637,7 @@ export default class MangaSee {
             await page.goto(url, { waitUntil: 'domcontentloaded' });
             await page.waitForFunction('window.angular.element(document.body).scope()');
             return await page.evaluate(() => {
-              const { angular } = window as InjectedScriptsWindow & {
-                angular: {
-                  element: (el: HTMLElement) => {
-                    scope: () => {
-                      vm: {
-                        Pages: number[];
-                        IndexName: string;
-                        CurPathName: string;
-                        CurChapter: { Directory: string; Chapter: string };
-                        ChapterImage: (chapter: string) => string;
-                        PageImage: (page: number) => string;
-                      };
-                    };
-                  };
-                };
-              };
+              const { angular } = window as typeof window & AngularState;
               const $state = angular.element(document.body).scope();
               const iterator: number[] = $state.vm.Pages;
               const title: string = $state.vm.IndexName;

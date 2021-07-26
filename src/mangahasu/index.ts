@@ -14,6 +14,7 @@ import {
   MangaStatus,
   MangaGenre,
   MangaType,
+  LatestHotManga,
 } from '..';
 import failure from '../functions/failure';
 import readHtml from '../functions/readHtml';
@@ -52,6 +53,13 @@ export interface MangahasuOptions {
   type?: MangaType<Mangahasu> | 'any';
   page?: number;
 }
+
+export interface MangahasuLatestHotManga {
+  title: string;
+  url: string;
+  coverImage: MangaCoverImage;
+}
+
 export type MangahasuGenre = keyof typeof MangahasuGenres;
 
 export default class Mangahasu {
@@ -295,6 +303,42 @@ export default class Mangahasu {
           callback,
           res,
         );
+      } catch (e) {
+        return failure(e, callback, rej);
+      }
+    });
+  }
+
+  /**
+   * Get a list of mangas from Mangahasu's latest releases
+   *
+   * @param options - Options to provide when getting latest updates
+   * @param callback - Callback function
+   * @returns Returns an array of mangas from Mangahasu's latest releases page.
+   */
+  public getLatestUpdates(
+    options: { page: number } = { page: 1 },
+    callback: MangaCallback<LatestHotManga<Mangahasu>[]> = () => void 0,
+  ): Promise<LatestHotManga<Mangahasu>[]> {
+    const { page } = options;
+    return new Promise(async (res, rej) => {
+      if (page < 1) return failure('Argument "page" must be greater than or equal to 1', callback, rej);
+      try {
+        const $ = await readHtml(`https://mangahasu.se/latest-releases.html?page=${page}`, this.options);
+        const mangaList = $('ul.list_manga > li');
+        const mangaListLength = mangaList.length;
+        const mangas: LatestHotManga<Mangahasu>[] = [];
+
+        for (let i = 0; i < mangaListLength; i++) {
+          const divContainer = mangaList.eq(i);
+          const imgEl = divContainer.find('img');
+          const src = imgEl.attr('src');
+          const alt = imgEl.attr('alt') ?? '';
+          const href = divContainer.find('a.name-manga').attr('href') ?? '';
+          mangas.push({ title: alt, coverImage: { url: src, alt }, url: href });
+        }
+
+        success(mangas, callback, res);
       } catch (e) {
         return failure(e, callback, rej);
       }

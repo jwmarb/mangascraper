@@ -1,6 +1,7 @@
 import jquery from 'jquery';
 import cheerio from 'cheerio';
 import {
+  LatestHotManga,
   Manga,
   MangaCallback,
   MangaChapters,
@@ -46,6 +47,14 @@ export type MangaParkMeta = {
     toon: MangaChapters<MangaPark>[];
   };
 };
+
+export interface MangaParkLatestHotManga {
+  title: string;
+  url: string;
+  coverImage: MangaCoverImage;
+  updatedWhen: string;
+  genres: MangaGenre<MangaPark>[];
+}
 
 export type MangaParkManga = {
   title: string;
@@ -456,6 +465,60 @@ export default class MangaPark {
           callback,
           res,
         );
+      } catch (e) {
+        failure(e, callback, rej);
+      }
+    });
+  }
+
+  /**
+   * Get a list of mangas from MangaPark's latest manga releases
+   *
+   * @param options - Options to provide when getting latest updates
+   * @param callback - Callback function
+   * @returns Returns an array of mangas from MangaPark's latest manga releases page
+   */
+  public getLatestUpdates(
+    options: { page: number } = { page: 1 },
+    callback: MangaCallback<LatestHotManga<MangaPark>[]> = () => void 0,
+  ): Promise<LatestHotManga<MangaPark>[]> {
+    const { page } = options;
+    return new Promise(async (res, rej) => {
+      if (page < 1) return failure('Argument "page" must be greater than or equal to 1', callback, rej);
+      try {
+        const $ = await readHtml(
+          `https://v2.mangapark.net/latest/${page}`,
+          this.options,
+          { resource: { type: ['document', 'image'], method: 'unblock' } },
+          'domcontentloaded',
+        );
+        const itemsOnPage = $('div.d-flex.flex-row.item');
+        const lengthOfItems = itemsOnPage.length;
+        const mangas: LatestHotManga<MangaPark>[] = [];
+
+        for (let i = 0; i < lengthOfItems; i++) {
+          const divContainer = itemsOnPage.eq(i);
+          const anchorEl = divContainer.children('a');
+          const title = $(anchorEl).attr('title') ?? '';
+          const href = $(anchorEl).attr('href') ?? '';
+          const imgEl = $(anchorEl).children('img');
+          const src = $(imgEl).attr('src');
+          const alt = $(imgEl).attr('alt') ?? title;
+          const genres = divContainer
+            .find('div.mb-2.gens')
+            .map((_, el) => $(el).text().trim().split(', '))
+            .get() as MangaGenre<MangaPark>[];
+          const uploadWhen = divContainer.children('ul').children('li').eq(0).find('span.time').text();
+          mangas.push({
+            title,
+            url: `https://v2.mangapark.net${href}`,
+            coverImage: { url: src, alt },
+            genres,
+            updatedWhen: uploadWhen,
+          });
+        }
+
+        success(mangas, callback, res);
       } catch (e) {
         failure(e, callback, rej);
       }

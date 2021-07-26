@@ -1,6 +1,12 @@
 import randomUserAgent from 'random-useragent';
 import { Browser, BrowserConnectOptions, BrowserLaunchArgumentOptions, LaunchOptions, Product } from 'puppeteer';
-import Mangahasu, { MangahasuGenre, MangahasuManga, MangahasuMeta, MangahasuOptions } from './mangahasu';
+import Mangahasu, {
+  MangahasuGenre,
+  MangahasuLatestHotManga,
+  MangahasuManga,
+  MangahasuMeta,
+  MangahasuOptions,
+} from './mangahasu';
 import Mangakakalot, {
   MangakakalotAlt,
   MangakakalotGenre,
@@ -8,8 +14,21 @@ import Mangakakalot, {
   MangakakalotOptions,
 } from './mangakakalot';
 import Manganato, { ManganatoGenre, ManganatoManga, ManganatoOptions, ManganatoQuery } from './manganato';
-import MangaSee, { MangaSeeGenre, MangaSeeManga, MangaSeeMangaAlt, MangaSeeMeta, MangaSeeOptions } from './mangasee';
-import MangaPark, { MangaParkManga, MangaParkGenre, MangaParkOptions, MangaParkMeta } from './mangapark';
+import MangaSee, {
+  MangaSeeGenre,
+  MangaSeeLatestHotManga,
+  MangaSeeManga,
+  MangaSeeMangaAlt,
+  MangaSeeMeta,
+  MangaSeeOptions,
+} from './mangasee';
+import MangaPark, {
+  MangaParkManga,
+  MangaParkGenre,
+  MangaParkOptions,
+  MangaParkMeta,
+  MangaParkLatestHotManga,
+} from './mangapark';
 import ReadMng, { ReadMngGenre, ReadMngManga, ReadMngMeta, ReadMngOptions } from './readmng';
 
 export { default as ReadMng } from './readmng';
@@ -18,6 +37,14 @@ export { default as Manganato } from './manganato';
 export { default as Mangahasu } from './mangahasu';
 export { default as MangaSee } from './mangasee';
 export { default as MangaPark } from './mangapark';
+
+export type LatestHotManga<T> = T extends MangaSee
+  ? MangaSeeLatestHotManga
+  : T extends MangaPark
+  ? MangaParkLatestHotManga
+  : T extends Mangahasu
+  ? MangahasuLatestHotManga
+  : never;
 
 export type ScrapingOptions = {
   proxy?: {
