@@ -294,7 +294,6 @@ class MangaBox {
           const chapterUrl = anchorEl.attr('href') ?? '';
           const date = chapterContainer.find('span.chapter-release-date').text().trim();
           const chapterDate = parse(date, 'dd.MM.yyyy', new Date());
-          console.log(chapterDate);
           chapters.push({ name: chapterName, url: chapterUrl, uploadDate: chapterDate });
         }
 
