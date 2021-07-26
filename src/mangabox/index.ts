@@ -260,11 +260,9 @@ class MangaBox {
           .replace(/\n/g, '')
           .split('; ')
           .slice(0, -1);
-        const authors = $('div.author-content > a')
-          .map((_, el) => $(el).text())
-          .get();
+        const authors = $('div.author-content > a').text().trim().split(' - ');
         const artists = $('div.artist-content > a')
-          .map((_, el) => $(el).text())
+          .map((_, el) => $(el).text().split(', '))
           .get();
         const genres = $('div.genres-content > a')
           .map((_, el) => $(el).text())
