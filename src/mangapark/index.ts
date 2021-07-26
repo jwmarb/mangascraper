@@ -5,7 +5,6 @@ import {
   Manga,
   MangaCallback,
   MangaChapters,
-  MangaCoverImage,
   MangaFilters,
   MangaGenre,
   MangaMeta,
@@ -30,7 +29,7 @@ export type MangaParkMeta = {
   };
   authors: string[];
   artists: string[];
-  coverImage: MangaCoverImage;
+  coverImage: string;
   summary: string;
   genres: MangaGenre<MangaPark>[];
   type: MangaType<MangaPark>;
@@ -51,7 +50,7 @@ export type MangaParkMeta = {
 export interface MangaParkLatestHotManga {
   title: string;
   url: string;
-  coverImage: MangaCoverImage;
+  coverImage: string;
   updatedWhen: string;
   genres: MangaGenre<MangaPark>[];
 }
@@ -60,7 +59,7 @@ export type MangaParkManga = {
   title: string;
   url: string;
   authors: string[];
-  coverImage: MangaCoverImage;
+  coverImage: string;
   genres: string[];
   rating: MangaRating;
 };
@@ -239,16 +238,8 @@ export default class MangaPark {
           };
         });
 
-        const coverImage = $('a.cover > img')
-          .map((_, el) => {
-            const imgEl = $(el);
-            const img = imgEl.attr('src');
-            const alt = imgEl.attr('alt') || '';
-            return {
-              url: img,
-              alt,
-            };
-          })
+        const coverImage: string[] = $('a.cover > img')
+          .map((_, el) => $(el).attr('src') ?? '')
           .get();
 
         const data = titleURLs.map(({ title, url: mangaUrl }, i) => ({
@@ -353,15 +344,7 @@ export default class MangaPark {
           .trim()
           .toLowerCase();
         const summary = $('div.summary').children().remove().end().text().trim();
-        const coverImage: MangaCoverImage = (() => {
-          const imgEl = $('img.w-100');
-          const src = imgEl.attr('src');
-          const alt = imgEl.attr('alt') || '';
-          return {
-            url: src,
-            alt,
-          };
-        })();
+        const coverImage: string = (() => $('img.w-100').attr('src') ?? '')();
 
         const sourceChapters: MangaChapters<MangaPark>[][] = [[], [], [], [], [], []];
         $('div.volumes').each((_, div) => {
@@ -502,8 +485,7 @@ export default class MangaPark {
           const title = $(anchorEl).attr('title') ?? '';
           const href = $(anchorEl).attr('href') ?? '';
           const imgEl = $(anchorEl).children('img');
-          const src = $(imgEl).attr('src');
-          const alt = $(imgEl).attr('alt') ?? title;
+          const src = $(imgEl).attr('src') ?? '';
           const genres = divContainer
             .find('div.mb-2.gens')
             .map((_, el) => $(el).text().trim().split(', '))
@@ -512,7 +494,7 @@ export default class MangaPark {
           mangas.push({
             title,
             url: `https://v2.mangapark.net${href}`,
-            coverImage: { url: src, alt },
+            coverImage: src,
             genres,
             updatedWhen: uploadWhen,
           });

@@ -6,7 +6,6 @@ import {
   MangahasuTypes,
   MangaFilters,
   MangahasuGenres,
-  MangaCoverImage,
   MangaMeta,
   MangaRating,
   MangaChapters,
@@ -24,7 +23,7 @@ import success from '../functions/success';
 export interface MangahasuManga {
   title: string;
   url: string;
-  coverImage: MangaCoverImage;
+  coverImage: string;
 }
 
 export type MangahasuMeta = {
@@ -40,7 +39,7 @@ export type MangahasuMeta = {
   status: string;
   views: string;
   rating: MangaRating;
-  coverImage: MangaCoverImage;
+  coverImage: string;
   chapters: MangaChapters<Mangahasu>[];
 };
 
@@ -57,7 +56,7 @@ export interface MangahasuOptions {
 export interface MangahasuLatestHotManga {
   title: string;
   url: string;
-  coverImage: MangaCoverImage;
+  coverImage: string;
 }
 
 export type MangahasuGenre = keyof typeof MangahasuGenres;
@@ -149,12 +148,8 @@ export default class Mangahasu {
           .get();
 
         /** Get manga covers */
-        const coverImages: MangaCoverImage[] = $(`ul.list_manga > li > div.div_item > div.wrapper_imgage > a > img`)
-          .map((_, el) => {
-            const img = $(el).attr('src');
-            const alt = $(el).attr('alt');
-            if (typeof alt !== 'undefined') return { url: img, alt };
-          })
+        const coverImages: string[] = $(`ul.list_manga > li > div.div_item > div.wrapper_imgage > a > img`)
+          .map((_, el) => $(el).attr('src') ?? '')
           .get();
 
         // const mangaList: Manga<Mangahasu>[] = [];
@@ -212,7 +207,7 @@ export default class Mangahasu {
         let status = '';
         let views = '';
         let rating: MangaRating = {} as MangaRating;
-        let coverImage: MangaCoverImage = {} as MangaCoverImage;
+        let coverImage: string;
 
         /** Get manga title */
         title = $(`div.info-title > h1`).text();
@@ -270,9 +265,7 @@ export default class Mangahasu {
         };
 
         /** Get manga cover image */
-        const img = $(`div.container > div.wrapper_content > div.info-img > img`).attr('src');
-        const alt = $(`div.container > div.wrapper_content > div.info-img > img`).attr('alt');
-        coverImage = { url: img, alt: typeof alt !== 'undefined' ? alt : '' };
+        coverImage = $(`div.container > div.wrapper_content > div.info-img > img`).attr('src') ?? '';
 
         /** Get manga chapters */
         const chapters: MangaChapters<Mangahasu>[] = $(`div.content-info > div.list-chapter > table.table > tbody > tr`)
@@ -332,10 +325,10 @@ export default class Mangahasu {
         for (let i = 0; i < mangaListLength; i++) {
           const divContainer = mangaList.eq(i);
           const imgEl = divContainer.find('img');
-          const src = imgEl.attr('src');
+          const src = imgEl.attr('src') ?? '';
           const alt = imgEl.attr('alt') ?? '';
           const href = divContainer.find('a.name-manga').attr('href') ?? '';
-          mangas.push({ title: alt, coverImage: { url: src, alt }, url: href });
+          mangas.push({ title: alt, coverImage: src, url: href });
         }
 
         success(mangas, callback, res);

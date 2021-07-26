@@ -4,7 +4,6 @@ import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import {
   MangaCallback,
-  MangaCoverImage,
   MangaMeta,
   MangaChapters,
   MangakakalotGenres,
@@ -23,14 +22,14 @@ export interface MangakakalotManga {
   authors: string[];
   updatedAt: Date;
   views: string;
-  coverImage: MangaCoverImage;
+  coverImage: string;
 }
 
 export interface MangakakalotAlt {
   title: string;
   url: string;
   views: string;
-  coverImage: MangaCoverImage;
+  coverImage: string;
 }
 
 export type MangakakalotGenre = keyof typeof MangakakalotGenres | 'any';
@@ -115,13 +114,8 @@ export default class Mangakakalot {
           .get();
 
         /** Gets all cover images */
-        const coverImage: MangaCoverImage[] = $(`div.story_item > a[rel="nofollow"] > img`)
-          .map((index, element) => {
-            const image = $(element).attr('src');
-            const alt = $(element).attr('alt');
-
-            if (alt != null) return { url: image, alt };
-          })
+        const coverImage: string[] = $(`div.story_item > a[rel="nofollow"] > img`)
+          .map((index, element) => $(element).attr('src') ?? '')
           .get();
 
         /** Gets all Authors, Dates, and View Count */
@@ -186,7 +180,7 @@ export default class Mangakakalot {
         let updatedAt: Date = new Date();
         let views = '';
 
-        let coverImage: MangaCoverImage = { alt: '', url: undefined };
+        let coverImage: string;
 
         const chaptersViews: string[] = [];
         const chaptersDate: Date[] = [];
@@ -234,10 +228,7 @@ export default class Mangakakalot {
         const summary = $(`div#noidungm`).clone().children().remove().end().text().trim();
 
         /** Get image URL and alt */
-        const imgEl = $(`div.manga-info-top > div.manga-info-pic > img`);
-        const imgURL = imgEl.attr('src');
-        const alt = imgEl.attr('alt') ?? '';
-        coverImage = { url: imgURL, alt };
+        coverImage = $(`div.manga-info-top > div.manga-info-pic > img`).attr('src') ?? '';
 
         /** Get manga chapters */
         const chapterDiv = $(`div.manga-info-chapter > div.chapter-list > div.row`);
@@ -346,13 +337,8 @@ export default class Mangakakalot {
           .get();
 
         /** Get manga cover img */
-        const covers: MangaCoverImage[] = $(`div.list-truyen-item-wrap > a > img`)
-          .map((_, element) => {
-            const imgEl = $(element);
-            const img = imgEl.attr('src');
-            const alt = imgEl.attr('alt') ?? '';
-            return { url: img, alt };
-          })
+        const covers: string[] = $(`div.list-truyen-item-wrap > a > img`)
+          .map((_, element) => $(element).attr('src') ?? '')
           .get();
 
         const mangaList: Manga<Mangakakalot, 'alt'>[] = titleURLs

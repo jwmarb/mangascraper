@@ -4,7 +4,6 @@ import readHtml from '../functions/readHtml';
 import success from '../functions/success';
 import {
   MangaCallback,
-  MangaCoverImage,
   MangaChapters,
   MangaMeta,
   MangaFilters,
@@ -28,7 +27,7 @@ export interface ManganatoManga {
   authors: string[];
   updatedAt: Date;
   views: string;
-  coverImage: MangaCoverImage;
+  coverImage: string;
 }
 
 export interface ManganatoOptions {
@@ -162,14 +161,8 @@ export default class Manganato {
           .get();
 
         /** Get manga cover image */
-        const coverImage: MangaCoverImage[] = $(
-          `div.panel-content-genres > div.content-genres-item > a.genres-item-img > img`,
-        )
-          .map((_, element) => {
-            const img = $(element).attr('src');
-            const alt = $(element).attr('alt');
-            if (alt != null) return { url: img, alt };
-          })
+        const coverImage: string[] = $(`div.panel-content-genres > div.content-genres-item > a.genres-item-img > img`)
+          .map((_, element) => $(element).attr('src'))
           .get();
 
         const mangaList: Manga<Manganato>[] = titleURLs.map(({ title, url }, i) => ({
@@ -286,10 +279,7 @@ export default class Manganato {
         const summary = $(`div.panel-story-info-description`).clone().children().remove().end().text().trim();
 
         /** Get manga cover image */
-        const imgEl = $(`div.story-info-left > span.info-image > img`);
-        const img = imgEl.attr('src');
-        const alt = imgEl.attr('alt');
-        const coverImage: MangaCoverImage = { url: img, alt: alt || '' };
+        const coverImage = $(`div.story-info-left > span.info-image > img`).attr('src') ?? '';
 
         /** Get manga chapters */
         // Get chapter names and URLs
@@ -439,7 +429,7 @@ export default class Manganato {
         const authors: string[][] = [];
         const updatedAt: Date[] = [];
         const views: string[] = [];
-        const coverImage: MangaCoverImage[] = [];
+        const coverImage: string[] = [];
 
         /** Get manga titles */
         $(`div.panel-content-genres > div.content-genres-item > div.genres-item-info > h3 > a.genres-item-name`).each(
@@ -475,9 +465,7 @@ export default class Manganato {
 
         /** Get manga cover image */
         $(`div.panel-content-genres > div.content-genres-item > a.genres-item-img > img.img-loading`).each((_, el) => {
-          const img = $(el).attr('src');
-          const alt = $(el).attr('alt');
-          if (typeof alt !== 'undefined') coverImage.push({ url: img, alt });
+          coverImage.push($(el).attr('src') ?? '');
         });
 
         /** Get manga URL */

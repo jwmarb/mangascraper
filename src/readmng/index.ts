@@ -3,7 +3,6 @@ import {
   Manga,
   MangaCallback,
   MangaChapters,
-  MangaCoverImage,
   MangaFilters,
   MangaGenre,
   MangaMeta,
@@ -31,7 +30,7 @@ export interface ReadMngMeta {
     alt: string[];
   };
   genres: MangaGenre<ReadMng>[];
-  coverImage: MangaCoverImage;
+  coverImage: string;
   type: 'manga' | 'manhua' | 'manhwa';
   views: string;
   status?: 'ongoing' | 'completed';
@@ -54,7 +53,7 @@ export interface ReadMngOptions {
 export interface ReadMngManga {
   title: string;
   url: string;
-  coverImage: MangaCoverImage;
+  coverImage: string;
   genres: MangaGenre<ReadMng>[];
   type: 'manhwa' | 'manhua' | 'manga';
   views: string;
@@ -215,16 +214,8 @@ export default class ReadMng {
                 })
                 .get();
 
-              const coverImages: MangaCoverImage[] = $('div.left > a > img')
-                .map((_, el) => {
-                  const imgEl = $(el);
-                  const src = imgEl.attr('src');
-                  const alt = imgEl.attr('alt') || '';
-                  return {
-                    url: src,
-                    alt,
-                  };
-                })
+              const coverImages: string[] = $('div.left > a > img')
+                .map((_, el) => $(el).attr('src') ?? '')
                 .get();
 
               const genres: MangaGenre<ReadMng>[][] = $('div.right > dl > dd:has("a")')
@@ -412,15 +403,7 @@ export default class ReadMng {
           })
           .get();
 
-        const coverImage: MangaCoverImage = (() => {
-          const imgEl = $('div.col-md-3 > img');
-          const src = imgEl.attr('src');
-          const alt = imgEl.attr('alt') || '';
-          return {
-            url: src,
-            alt,
-          };
-        })();
+        const coverImage: string = (() => $('div.col-md-3 > img').attr('src') ?? '')();
 
         success(
           {
