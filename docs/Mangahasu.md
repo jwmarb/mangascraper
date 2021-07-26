@@ -16,6 +16,7 @@
   - [`search(query, filters, callback)`](#mangahasusearchquery-filters-callback)
   - [`getMangaMeta(url, callback)`](#mangahasugetmangametaurl-callback)
   - [`getPages(url, callback)`](#mangahasugetpagesurl-callback)
+    = [`getLatestUpdates(options, callback)](#mangahasugetlatestupdatesoptions-callback)
 
 ---
 
@@ -299,4 +300,64 @@ await mangahasu.getPages('https://mangahasu.se/gamers/vol-3-chapter-14-gamers--f
   'https://img.mangahasu.se/1img/BdadB-2c3Xtbrn/rZNNLaZ-wvOamp2c/031.jpg',
   'https://img.mangahasu.se/1img/BdadB-2c3Xtbrn/rZNNLaZ-wvOamp2c/032.jpg',
 ];
+```
+
+---
+
+#### `mangahasu.getLatestUpdates(options, callback)`
+
+Gets a list of mangas from Mangahasu's latest releases page
+
+##### Parameters:
+
+- `options` «?[Object]»
+
+  - `page` «[Number]»
+
+- `callback` «?[Function] (error, data) => void»
+
+  - `error` «[Error]»
+
+  - `data` «[Array]<[String]>»
+
+##### Returns:
+
+- «[Array]<[Object]>»
+
+  - «[Object]»
+
+    - `title` «[String]»
+
+    - `coverImage` «[Object]»
+
+      - `url` «[String]»
+
+      - `alt` «[String]»
+
+    - `url` «[String]»
+
+##### Example
+
+```js
+await mangahasu.getLatestUpdates();
+
+[
+  {
+    title: 'Max Level Returner',
+    coverImage: {
+      url: 'https://img.mangahasu.se/1img/dZrEr-ZuqEfX9o/max-level-returner.jpg',
+      alt: 'Max Level Returner'
+    },
+    url: 'https://mangahasu.se/max-level-returner-p50181.html'
+  },
+  {
+    title: 'Arasa Dakedo, Hatsukoi desu',
+    coverImage: {
+      url: 'https://img.mangahasu.se/1img/yNNdN-Ms0zAiv2/im-nearly-30--but-this-is-my-first-love.jpg',
+      alt: 'Arasa Dakedo, Hatsukoi desu'
+    },
+    url: 'https://mangahasu.se/arasa-dakedo--hatsukoi-desu-p34454.html'
+  },
+  ...
+]
 ```

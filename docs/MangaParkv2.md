@@ -16,6 +16,7 @@
   - [`search(query, filters, callback)`](#mangaparksearchquery-filters-callback)
   - [`getMangaMeta(url, callback)`](#mangaparkgetmangametaurl-callback)
   - [`getPages(url, callback)`](#mangaparkgetpagesurl-callback)
+  - [`getLatestUpdates(options, callback)`](#mangaparkgetlatestupdatesoptions-callback)
 
 ---
 
@@ -386,4 +387,106 @@ await mangapark.getPages('https://v2.mangapark.net/manga/maou-no-hajimekata-wara
   'https://xcdn-209.mangapark.net/00004/images/db/43/db43c517d759a9543aa9f4a764070de902eeeca3_275796_870_1237.jpg?acc=sBsp75sXOurO3K9gwayD5w&exp=1626098905',
   'https://xcdn-209.mangapark.net/00004/images/78/b4/78b4b3b51c9686bb48ae8a2b0faed7bc7bc6710f_409107_870_1815.jpg?acc=PLneECJre87RyMrP3N3OKQ&exp=1626098905',
 ];
+```
+
+---
+
+#### `mangapark.getLatestUpdates(options, callback)`
+
+Gets a list of mangas from MangaPark's latest manga releases page
+
+##### Parameters:
+
+- `options` «?[Object]»
+
+  - `page` «[Number]»
+
+- `callback` «?[Function] (error, data) => void»
+
+  - `error` «[Error]»
+
+  - `data` «[Array]<[String]>»
+
+##### Returns:
+
+- «[Array]<[Object]>»
+
+  - «[Object]»
+
+    - `title` «[String]»
+
+    - `url` «[String]»
+
+    - `coverImage` «[Object]»
+
+      - `url` «[String]»
+
+      - `alt` «[String]»
+
+    - `genres` «[Array]<[String]>»
+
+    - `updatedWhen` «[String]»
+
+##### Example
+
+```js
+await mangapark.getLatestUpdates();
+
+[
+  {
+    title: 'Taming the Cat Master',
+    url: 'https://v2.mangapark.net/manga/taming-the-cat-master',
+    coverImage: {
+      url: 'https://xfs-000.animemark.net/pictures/W300/e6f/e6faec552e8e5a15c35f989984e9a4cd66760abf_200_298_18022.jpg?acc=fGJfjpL-5R53pA8W6ubD3A&exp=1627321647',
+      alt: 'Taming the Cat Master'
+    },
+    genres: [
+      'Shoujo',
+      'Comedy',
+      'Drama',
+      'Romance',
+      'School life',
+      'Slice of life'
+    ],
+    updatedWhen: '33 hours ago'
+  },
+  {
+    title: 'Hakumei to Mikochi',
+    url: 'https://v2.mangapark.net/manga/hakumei-to-mikochi',
+    coverImage: {
+      url: 'https://xfs-000.animemark.net/pictures/W300/f07/f073a581f82f56f2b7be819c49459200fed9fdce_200_284_27273.jpg?acc=yKuar7NDZ0GwhBrW02JB8g&exp=1627321647',
+      alt: 'Hakumei to Mikochi'
+    },
+    genres: [ 'Seinen', 'Fantasy', 'Slice of life' ],
+    updatedWhen: '33 hours ago'
+  },
+  {
+    title: "Can't See Can't Hear But Love",
+    url: 'https://v2.mangapark.net/manga/can-t-see-can-t-hear-but-love',
+    coverImage: {
+      url: 'https://xfs-000.animemark.net/pictures/W300/572/5726907d2ccea5345ac983218ccbb2595d89fbd5_200_266_16184.jpg?acc=SG1OMGznNH-osxQ0XmlHrQ&exp=1627321647',
+      alt: "Can't See Can't Hear But Love"
+    },
+    genres: [
+      'Comedy',
+      'Drama',
+      'Romance',
+      'Slice of life',
+      'Tragedy',
+      'Webtoon'
+    ],
+    updatedWhen: '33 hours ago'
+  },
+  {
+    title: 'Urban Fairy King',
+    url: 'https://v2.mangapark.net/manga/urban-fairy-king-boyi-animation',
+    coverImage: {
+      url: 'https://xfs-000.animemark.net/pictures/W300/bdd/bdd1632b244894b1376c86a35cce20bc24f62b1b_200_266_45988.jpg?acc=fJ7hoNjrRdzuafoLvYAmkQ&exp=1627321647',
+      alt: 'Urban Fairy King'
+    },
+    genres: [ 'Action', 'Martial arts', 'School life', 'Webtoon' ],
+    updatedWhen: '35 hours ago'
+  },
+  ...
+]
 ```

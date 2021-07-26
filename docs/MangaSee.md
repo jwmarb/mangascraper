@@ -17,6 +17,8 @@
   - [`getMangaMeta(url, callback)`](#mangaseegetmangametaurl-callback)
   - [`getPages(url, callback)`](#mangaseegetpagesurl-callback)
   - [`directory(callback)`](#mangaseedirectorycallback)
+  - [`getLatestUpdates(callback)`](#mangaseegetLatestUpdatescallback)
+  - [`getHotUpdates(callback)](#mangaseegetHotUpdatescallback)
 
 ---
 
@@ -324,5 +326,105 @@ await mangasee.directory();
     genres: [ 'Comedy', 'Ecchi', 'Sci-fi', 'Shounen' ]
   },
   ... more than 6200 items
+]
+```
+
+---
+
+#### `mangasee.getLatestUpdates(callback)`
+
+Gets all the mangas with latest updates from [MangaSee's homepage](https://mangasee123.com/).
+
+##### Parameters:
+
+- `callback` «?[Function] (error, data) => void»
+
+  - `error` «[Error]»
+
+  - `data` «[Array]<[Object]>»
+
+##### Returns:
+
+- «[Array]<[Object]>»
+
+  - «[Object]»
+
+    - `title` «[String]»
+
+    - `updatedAt` «[Date]»
+
+    - `url` «[String]»
+
+    - `coverImage` «[String]»
+
+##### Example
+
+```js
+await mangasee.getLatestUpdates();
+
+[
+  {
+    title: 'Tougen Anki',
+    updatedAt: 2021-07-26T00:34:46.000Z,
+    url: 'https://mangasee123.com/manga/Tougen-Anki',
+    coverImage: 'https://cover.nep.li/cover/Tougen-Anki.jpg'
+  },
+  {
+    title: 'Beware of the Brothers!',
+    updatedAt: 2021-07-26T00:34:39.000Z,
+    url: 'https://mangasee123.com/manga/Beware-of-the-Brothers',
+    coverImage: 'https://cover.nep.li/cover/Beware-of-the-Brothers.jpg'
+  },
+  ...
+]
+```
+
+---
+
+#### `mangasee.getHotUpdates(callback)`
+
+Gets all the mangas with the hottest updates from [MangaSee's homepage](https://mangasee123.com/).
+
+##### Parameters:
+
+- `callback` «?[Function] (error, data) => void»
+
+  - `error` «[Error]»
+
+  - `data` «[Array]<[Object]>»
+
+##### Returns:
+
+- «[Array]<[Object]>»
+
+  - «[Object]»
+
+    - `title` «[String]»
+
+    - `updatedAt` «[Date]»
+
+    - `url` «[String]»
+
+    - `coverImage` «[String]»
+
+##### Example
+
+```js
+await mangasee.getHotUpdates();
+
+[
+  {
+    title: 'Max Level Returner',
+    updatedAt: 2021-07-26T00:31:04.000Z,
+    url: 'https://mangasee123.com/manga/Max-Level-Returner',
+    coverImage: 'https://cover.nep.li/cover/Max-Level-Returner.jpg'
+  },
+  {
+    title: 'Teenage Mercenary',
+    updatedAt: 2021-07-25T18:02:01.000Z,
+    url: 'https://mangasee123.com/manga/Mercenary-Enrollment',
+    coverImage: 'https://cover.nep.li/cover/Mercenary-Enrollment.jpg'
+  },
+  ...
 ]
 ```
