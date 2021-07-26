@@ -207,7 +207,6 @@ export default class Mangahasu {
         let status = '';
         let views = '';
         let rating: MangaRating = {} as MangaRating;
-        let coverImage: string;
 
         /** Get manga title */
         title = $(`div.info-title > h1`).text();
@@ -265,7 +264,7 @@ export default class Mangahasu {
         };
 
         /** Get manga cover image */
-        coverImage = $(`div.container > div.wrapper_content > div.info-img > img`).attr('src') ?? '';
+        const coverImage = $(`div.container > div.wrapper_content > div.info-img > img`).attr('src') ?? '';
 
         /** Get manga chapters */
         const chapters: MangaChapters<Mangahasu>[] = $(`div.content-info > div.list-chapter > table.table > tbody > tr`)

@@ -122,8 +122,8 @@ class MangaBox {
   public search(
     query?: MangaSearch<MangaBox>,
     filters?: MangaFilters<MangaBox>,
-    callback: MangaCallback<any> = () => void 0,
-  ): Promise<any> {
+    callback: MangaCallback<Manga<MangaBox>[]> = () => void 0,
+  ): Promise<Manga<MangaBox>[]> {
     if (query == null) query = '';
     if (filters == null) filters = {};
     const {

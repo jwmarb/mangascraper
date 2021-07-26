@@ -180,8 +180,6 @@ export default class Mangakakalot {
         let updatedAt: Date = new Date();
         let views = '';
 
-        let coverImage: string;
-
         const chaptersViews: string[] = [];
         const chaptersDate: Date[] = [];
 
@@ -228,7 +226,7 @@ export default class Mangakakalot {
         const summary = $(`div#noidungm`).clone().children().remove().end().text().trim();
 
         /** Get image URL and alt */
-        coverImage = $(`div.manga-info-top > div.manga-info-pic > img`).attr('src') ?? '';
+        const coverImage = $(`div.manga-info-top > div.manga-info-pic > img`).attr('src') ?? '';
 
         /** Get manga chapters */
         const chapterDiv = $(`div.manga-info-chapter > div.chapter-list > div.row`);
