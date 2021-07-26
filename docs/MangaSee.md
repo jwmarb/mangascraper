@@ -17,8 +17,8 @@
   - [`getMangaMeta(url, callback)`](#mangaseegetmangametaurl-callback)
   - [`getPages(url, callback)`](#mangaseegetpagesurl-callback)
   - [`directory(callback)`](#mangaseedirectorycallback)
-  - [`getLatestUpdates(callback)`](#mangaseegetLatestUpdatescallback)
-  - [`getHotUpdates(callback)](#mangaseegetHotUpdatescallback)
+  - [`getLatestUpdates(callback)`](#mangaseegetlatestupdatescallback)
+  - [`getHotUpdates(callback)`](#mangaseegethotupdatescallback)
 
 ---
 

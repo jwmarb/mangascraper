@@ -16,7 +16,7 @@
   - [`search(query, filters, callback)`](#mangahasusearchquery-filters-callback)
   - [`getMangaMeta(url, callback)`](#mangahasugetmangametaurl-callback)
   - [`getPages(url, callback)`](#mangahasugetpagesurl-callback)
-    = [`getLatestUpdates(options, callback)](#mangahasugetlatestupdatesoptions-callback)
+  - [`getLatestUpdates(options, callback)`](#mangahasugetlatestupdatesoptions-callback)
 
 ---
 
