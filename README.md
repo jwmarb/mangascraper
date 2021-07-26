@@ -472,6 +472,44 @@ import { ReadMng } from '@specify_/mangascraper';
 
 </details>
 
+<details>
+
+<summary><strong> MangaBox </strong></summary>
+
+**For React JS**
+
+Get pages and display them on webpage. Do note that the `getMangaMeta` method of this class requires puppeteer, so if you want to get the manga meta, consider fetching to a custom API that uses the mangascraper package.
+
+```tsx
+import React from 'react';
+import { MangaBox } from '@specify_/mangascraper';
+
+const mangabox = new MangaBox();
+
+const App: React.FC = () => {
+  const [pages, setPages] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    mangabox
+      .getPages('https://mangabox.org/manga/solo-leveling-manhua-manga/chapter-159/')
+      .then((pages) => setPages(pages))
+      .catch((e) => console.error(e));
+  }, []);
+
+  return (
+    <div>
+      {pages.map((page) => (
+        <img src={page} />
+      ))}
+    </div>
+  );
+};
+
+export default App;
+```
+
+</details>
+
 ---
 
 ## API Reference
@@ -487,6 +525,8 @@ import { ReadMng } from '@specify_/mangascraper';
 - [MangaPark](/docs/MangaParkv2.md)
 
 - [ReadMng](/docs/ReadMng.md)
+
+- [MangaBox](/docs/MangaBox.md)
 
 ---
 
