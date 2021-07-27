@@ -598,7 +598,8 @@ export default class MangaSee {
                   name: chapter.ChapterName || `Chapter ${index}`,
                   url: `https://mangasee123.com/read-online/${vm.IndexName}-chapter-${index}.html`,
                   uploadDate: chapter.Date,
-                }));
+                }))
+                .reverse();
               return { title: { main: title, alt }, authors, genres, summary, type, status, coverImage: img, chapters };
             });
           },
