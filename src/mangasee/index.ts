@@ -41,6 +41,7 @@ interface AngularState {
         vm: {
           Pages: number[];
           ChapterURLEncode: (chapter: string) => string;
+          ChapterDisplay: (chapter: string) => number | string;
           IndexName: string;
           CurPathName: string;
           CurChapter: { Directory: string; Chapter: string };
@@ -595,8 +596,8 @@ export default class MangaSee {
                 .element(document.body)
                 .scope()
                 .vm.Chapters.reverse()
-                .map((chapter, index) => ({
-                  name: chapter.ChapterName || `Chapter ${index}`,
+                .map((chapter) => ({
+                  name: chapter.ChapterName || `Chapter ${vm.ChapterDisplay(chapter.Chapter)}`,
                   url: `https://mangasee123.com/read-online/${vm.IndexName}${vm.ChapterURLEncode(chapter.Chapter)}`,
                   uploadDate: chapter.Date,
                 }))
