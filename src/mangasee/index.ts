@@ -40,6 +40,7 @@ interface AngularState {
       scope: () => {
         vm: {
           Pages: number[];
+          ChapterURLEncode: (chapter: string) => string;
           IndexName: string;
           CurPathName: string;
           CurChapter: { Directory: string; Chapter: string };
@@ -596,7 +597,7 @@ export default class MangaSee {
                 .vm.Chapters.reverse()
                 .map((chapter, index) => ({
                   name: chapter.ChapterName || `Chapter ${index}`,
-                  url: `https://mangasee123.com/read-online/${vm.IndexName}-chapter-${index}.html`,
+                  url: `https://mangasee123.com/read-online/${vm.IndexName}${vm.ChapterURLEncode('1000115')}`,
                   uploadDate: chapter.Date,
                 }))
                 .reverse();
