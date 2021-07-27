@@ -597,7 +597,7 @@ export default class MangaSee {
                 .vm.Chapters.reverse()
                 .map((chapter, index) => ({
                   name: chapter.ChapterName || `Chapter ${index}`,
-                  url: `https://mangasee123.com/read-online/${vm.IndexName}${vm.ChapterURLEncode('1000115')}`,
+                  url: `https://mangasee123.com/read-online/${vm.IndexName}${vm.ChapterURLEncode(chapter.Chapter)}`,
                   uploadDate: chapter.Date,
                 }))
                 .reverse();
