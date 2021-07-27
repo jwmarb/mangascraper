@@ -593,8 +593,9 @@ export default class MangaSee {
               const chapters = angular
                 .element(document.body)
                 .scope()
-                .vm.Chapters.map((chapter, index) => ({
-                  name: chapter.ChapterName ?? `Chapter ${index}`,
+                .vm.Chapters.reverse()
+                .map((chapter, index) => ({
+                  name: chapter.ChapterName || `Chapter ${index}`,
                   url: `https://mangasee123.com/read-online/${vm.IndexName}-chapter-${index}.html`,
                   uploadDate: chapter.Date,
                 }));
