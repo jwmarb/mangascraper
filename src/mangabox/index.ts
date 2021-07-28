@@ -56,7 +56,7 @@ export interface MangaBoxOptions {
   };
   yearReleased?: number;
   includeNSFW?: boolean;
-  status?: MangaStatus<MangaBox>[] | 'any';
+  status?: MangaStatus<MangaBox>[] | 'any' | MangaStatus<MangaBox>;
   orderBy?: MangaOrder<MangaBox>;
 }
 
@@ -157,7 +157,9 @@ class MangaBox {
       const statusParam =
         status === 'any' || status == null
           ? ''
-          : status.map((statusInput) => `status[]=${MangaBoxStatus[statusInput]}`).join('&');
+          : Array.isArray(status)
+          ? status.map((statusInput) => `status[]=${MangaBoxStatus[statusInput]}`).join('&')
+          : `status[]=${MangaBoxStatus[status]}`;
 
       const orderParam = `m_orderby=${MangaBoxOrderBy[orderBy]}`;
 
