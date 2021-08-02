@@ -218,15 +218,15 @@ await mangakakalot.getMangaMeta('https://mangakakalot.com/read-rp1kv158504840628
 
 ---
 
-#### `mangakakalot.getMangas(filters, callback)`
+#### `mangakakalot.getMangasFromGenre(genre, filters, callback)`
 
 Gets a list of mangas with according to the applied `filters`
 
 ##### Parameters:
 
-- `filters` «?[Object]»
+- `genre` «[String]»
 
-  - `genre` «?[String]»
+- `filters` «?[Object]»
 
   - `status` «?[String]»
 
@@ -257,7 +257,7 @@ Gets a list of mangas with according to the applied `filters`
 ##### Example
 
 ```js
-await mangakakalot.getMangas({ genre: 'Historical' });
+await mangakakalot.getMangasFromGenre('Historical');
 
 [
   {

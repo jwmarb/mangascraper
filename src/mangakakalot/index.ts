@@ -282,6 +282,7 @@ export default class Mangakakalot {
   /**
    * Get a list of manga from mangakakalot
    *
+   * @param genre - Mangakakalot Genre
    * @param filters - Filters to apply based on mangakakalot's query system
    * @param callback - Callback function
    * @returns Returns a list of manga from mangakakalot
