@@ -387,7 +387,7 @@ export type MangaStatus<T> = T extends Mangakakalot | Mangahasu | Manganato | Ma
   : never;
 
 export type MangaType<T> = T extends MangaSee
-  ? 'doujinshi' | 'manga' | 'manhua' | 'manhwa'
+  ? 'doujinshi' | 'manga' | 'manhua' | 'manhwa' | 'oel' | 'one-shot'
   : T extends Mangahasu | ReadMng
   ? keyof typeof MangahasuTypes
   : T extends MangaPark

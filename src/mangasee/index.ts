@@ -34,6 +34,42 @@ interface AngularJSON {
   SeriesName: string;
 }
 
+type PassedPageVariables = { filters: MangaFilters<MangaSee>; query: MangaSearch<MangaSee> };
+
+type MangaSeeAngularStateMangaType = 'Manga' | 'Manhua' | 'Manhwa' | 'Doujinshi' | 'OEL' | 'One-shot';
+type MangaSeeAngularStateStatus = 'Cancelled' | 'Complete' | 'Discontinued' | 'Hiatus' | 'Ongoing';
+
+type AngularStateSearchDirectoryManga = {
+  $$hashKey: string;
+  a: string[]; // Authors
+  al: string[]; // Alternate Titles
+  g: MangaGenre<MangaSee>[]; // Genres
+  h: boolean; // Hot (is manga trending? If so, true - else false)
+  i: string; // manga slug
+  l: string; // for ChapterURLEncode() function.
+  ls: string; // Chapter Date
+  o: 'yes' | 'no'; // Official Translation
+  ps: MangaSeeAngularStateStatus; // Publish status
+  s: string; // Series name
+  ss: MangaSeeAngularStateStatus; // Scan status
+  t: MangaSeeAngularStateMangaType; // Series type
+  y: string; // Manga year created
+  v: string; // Most popular (all time)
+  vm: string; // Most popular (monthly)
+};
+
+interface AngularStateSearch {
+  angular: {
+    element: (el: HTMLElement) => {
+      scope: () => {
+        vm: {
+          Directory: AngularStateSearchDirectoryManga[];
+        };
+      };
+    };
+  };
+}
+
 interface AngularState {
   angular: {
     element: (el: HTMLElement) => {
@@ -185,11 +221,11 @@ export default class MangaSee {
 
     const {
       orderBy = 'A-Z',
-      orderType = 'ascending',
+      orderType = 'descending',
       translationGroup = 'any',
       status = { scan: 'any', publish: 'any' },
       type: mangaType = 'any',
-      genres: genre = { include: [], exclude: [] },
+      genres = { include: [], exclude: [] },
     } = filters;
 
     function generateURL() {
@@ -232,10 +268,10 @@ export default class MangaSee {
           : `pstatus=${status.publish === 'paused' ? 'hiatus' : status.publish}`;
 
       const includeGenres =
-        genre.include == null || genre.include.length === 0 ? `` : `genre=${genre.include.join(',')}`;
+        genres.include == null || genres.include.length === 0 ? `` : `genre=${genres.include.join(',')}`;
 
       const excludeGenres =
-        genre.exclude == null || genre.exclude.length === 0 ? `` : `genreNo=${genre.exclude.join(',')}`;
+        genres.exclude == null || genres.exclude.length === 0 ? `` : `genreNo=${genres.exclude.join(',')}`;
 
       const urlParams = [
         parsedQuery,
@@ -256,14 +292,18 @@ export default class MangaSee {
 
     return new Promise(async (res, rej) => {
       try {
-        const html = await automateBrowser(
+        const data = await automateBrowser(
           this.options,
           async (page) => {
-            await page.goto(generateURL(), { waitUntil: 'domcontentloaded' });
-            await page.addScriptTag({ path: require.resolve('jquery') });
-            await page.waitForSelector('a.SeriesName.ng-binding, div.NoResults', { hidden: false, visible: true });
+            await page.goto('https://mangasee123.com/search', { waitUntil: 'domcontentloaded' });
+            await page.waitForFunction('window.angular.element(document.body).scope().vm.Directory');
+            return await page.evaluate(() => {
+              const { angular } = window as typeof window & AngularStateSearch;
 
-            return await page.evaluate(() => document.documentElement.innerHTML);
+              const $state = angular.element(document.body).scope();
+
+              return $state.vm.Directory;
+            });
           },
           {
             domains: {
@@ -277,97 +317,269 @@ export default class MangaSee {
           },
         );
 
-        const $ = cheerio.load(html);
-
-        if ($('div.NoResults').length === 1) return success([], callback, res);
-
-        let memo: string[] = [];
-
-        // Get title + manga URL
-        const titlesURL = $(`a.SeriesName.ng-binding`)
-          .map((_, el) => {
-            const anchorEl = $(el);
-            const title = anchorEl.text();
-            const url = anchorEl.attr('href') || '';
-            return { title, url: `https://mangasee123.com${url}` };
-          })
-          .get();
-
-        // Get manga authors
-        const authors: string[][] = [];
-        $('div[ng-if="vm.FullDisplay"]:contains("Author") > span').each((_, el) => {
-          const author = $(el).text().trim();
-          if (author.endsWith(',')) {
-            memo = [...memo, author.slice(0, author.length - 1)];
-            return;
+        function convertToAngularStatus(status?: MangaStatus<MangaSee> | 'any'): MangaSeeAngularStateStatus | null {
+          switch (status) {
+            case 'cancelled':
+              return 'Cancelled';
+            case 'completed':
+              return 'Complete';
+            case 'discontinued':
+              return 'Discontinued';
+            case 'ongoing':
+              return 'Ongoing';
+            case 'paused':
+              return 'Hiatus';
+            case 'any':
+            default:
+              return null;
           }
+        }
 
-          if (!author.endsWith(',')) {
-            const currentMemo = [...memo, author];
-            memo = [];
-            authors.push(currentMemo);
+        const $translationGroup = (() => {
+          switch (translationGroup) {
+            case 'any':
+            default:
+              return null;
+            case 'official':
+              return 'yes';
           }
-        });
-
-        // Get manga statuses
-        const statuses = $('div[ng-if="vm.FullDisplay"]:contains("Status") > a')
-          .map((_, el) => $(el).text().trim())
-          .get()
-          .reduce<{ scan?: string; publish?: string }[]>((acc, cV, cI, arr) => {
-            const object = arr.slice(cI, cI + 2).map((text) => {
-              if (text.endsWith('(Scan)'))
-                return { scan: text.replace(' (Scan)', '').replace('Hiatus', 'Paused').toLowerCase() };
-              return { publish: text.replace(' (Publish)', '').replace('Hiatus', 'Paused').toLowerCase() };
-            });
-
-            if (cI % 2 === 0) acc.push(Object.assign(object[0], object[1]));
-            return acc;
-          }, []);
-
-        // Get manga updated time
-        const updatedAt = $('div[ng-if="vm.FullDisplay"]:contains("Latest") > span')
-          .text()
-          .trim()
-          .slice(2)
-          .split('· ')
-          .map((date) => new Date(date));
-
-        // Get manga genres
-        const genres: string[][] = [];
-        $('div.col-md-10.col-8 > div:contains("Genres") > span').each((_, el) => {
-          const mangaGenre = $(el).text().trim();
-          if (mangaGenre.endsWith(',')) {
-            memo = [...memo, mangaGenre.slice(0, mangaGenre.length - 1)];
-            return;
+        })();
+        const $scanStatus = convertToAngularStatus(status.scan);
+        const $publishStatus = convertToAngularStatus(status.publish);
+        const $type: MangaSeeAngularStateMangaType | null = (() => {
+          switch (mangaType) {
+            case 'doujinshi':
+              return 'Doujinshi';
+            case 'manga':
+              return 'Manga';
+            case 'manhua':
+              return 'Manhua';
+            case 'manhwa':
+              return 'Manhwa';
+            case 'any':
+            default:
+              return null;
           }
+        })();
 
-          if (!mangaGenre.endsWith(',')) {
-            const currentMemo = [...memo, mangaGenre];
-            memo = [];
-            genres.push(currentMemo);
+        function filterQuery(manga: AngularStateSearchDirectoryManga) {
+          if (query == null) return true;
+          if (typeof query === 'string') return manga.s.toLowerCase().includes(query.toLowerCase().trim());
+          const queryFilters = [];
+          if ('title' in query && query.title)
+            queryFilters.push(manga.s.toLowerCase().includes(query.title.toLowerCase().trim()));
+          if ('author' in query && query.author) {
+            const { author } = query;
+            queryFilters.push(manga.a.some((mangaka) => mangaka.toLowerCase().includes(author.toLowerCase().trim())));
           }
-        });
+          return queryFilters.every((boolean) => boolean === true);
+        }
 
-        const img = $(`a.SeriesName > img`)
-          .map((_, el) => {
-            const src = $(el).attr('src');
-            if (src != null) return src;
-          })
-          .get();
+        function hasGenres(manga: AngularStateSearchDirectoryManga) {
+          const { include } = genres;
+          if (include == null) return true;
+          const mangaGenres = manga.g.map((genre) => include.indexOf(genre) !== -1);
+          return mangaGenres.filter((validGenre) => validGenre).length === include.length;
+        }
 
-        const data = titlesURL.map(({ title, url }, i) => ({
-          title,
-          url,
-          coverImage: img[i],
-          status: {
-            scan: statuses[i].scan as MangaStatus<MangaSee>,
-            publish: statuses[i].publish as MangaStatus<MangaSee>,
-          },
-          genres: genres[i] as (keyof typeof MangaSeeGenres)[],
-          updatedAt: updatedAt[i],
-        }));
+        function convertStatusToMatchMangaType(status: MangaSeeAngularStateStatus): MangaStatus<MangaSee> {
+          switch (status) {
+            case 'Cancelled':
+              return 'cancelled';
+            case 'Complete':
+              return 'completed';
+            case 'Discontinued':
+              return 'discontinued';
+            case 'Hiatus':
+              return 'paused';
+            case 'Ongoing':
+              return 'ongoing';
+          }
+        }
 
-        success(data, callback, res);
+        const filteredArray = data.filter(
+          (manga) =>
+            filterQuery(manga) &&
+            hasGenres(manga) &&
+            (genres.exclude && genres.exclude.length > 0
+              ? manga.g.every((genre) => genres.exclude?.every((genreExcluded) => genreExcluded !== genre))
+              : true) &&
+            ($scanStatus ? manga.ss === $scanStatus : true) &&
+            ($publishStatus ? manga.ps === $publishStatus : true) &&
+            ($type ? manga.t === $type : true) &&
+            ($translationGroup ? manga.o === $translationGroup : true),
+        );
+
+        function arrangeFilteredArray(array: typeof filteredArray): typeof filteredArray {
+          switch (orderBy) {
+            case 'A-Z':
+              return orderType === 'descending' ? array.sort() : array.sort().reverse();
+            case 'latest_updates':
+              return orderType === 'descending'
+                ? array.sort((a, b) => {
+                    const parsedA = Date.parse(a.ls);
+                    const parsedB = Date.parse(b.ls);
+                    return parsedB - parsedA;
+                  })
+                : array.sort((a, b) => {
+                    const parsedA = Date.parse(a.ls);
+                    const parsedB = Date.parse(b.ls);
+                    return parsedA - parsedB;
+                  });
+            case 'popularity(all_time)':
+              return orderType === 'descending'
+                ? array.sort((a, b) => {
+                    return Number(b.v) - Number(a.v);
+                  })
+                : array.sort((a, b) => {
+                    return Number(a.v) - Number(b.v);
+                  });
+            case 'popularity(monthly)':
+              return orderType === 'descending'
+                ? array.sort((a, b) => {
+                    return Number(b.vm) - Number(a.vm);
+                  })
+                : array.sort((a, b) => {
+                    return Number(a.vm) - Number(b.vm);
+                  });
+            case 'year_released':
+              return orderType === 'ascending'
+                ? array.sort((a, b) => {
+                    return Number(a.y) - Number(b.y);
+                  })
+                : array
+                    .sort((a, b) => {
+                      return Number(a.y) - Number(b.y);
+                    })
+                    .reverse();
+          }
+        }
+        // const html = await automateBrowser(
+        //   this.options,
+        //   async (page) => {
+        //     await page.goto(generateURL(), { waitUntil: 'domcontentloaded' });
+        //     await page.addScriptTag({ path: require.resolve('jquery') });
+        //     await page.waitForSelector('a.SeriesName.ng-binding, div.NoResults', { hidden: false, visible: true });
+
+        //     return await page.evaluate(() => document.documentElement.innerHTML);
+        //   },
+        //   {
+        //     domains: {
+        //       method: 'block',
+        //       value: this.BLOCKED_DOMAINS,
+        //     },
+        //     resource: {
+        //       method: 'unblock',
+        //       type: ['document', 'script'],
+        //     },
+        //   },
+        // );
+
+        // const $ = cheerio.load(html);
+
+        // if ($('div.NoResults').length === 1) return success([], callback, res);
+
+        // let memo: string[] = [];
+
+        // // Get title + manga URL
+        // const titlesURL = $(`a.SeriesName.ng-binding`)
+        //   .map((_, el) => {
+        //     const anchorEl = $(el);
+        //     const title = anchorEl.text();
+        //     const url = anchorEl.attr('href') || '';
+        //     return { title, url: `https://mangasee123.com${url}` };
+        //   })
+        //   .get();
+
+        // // Get manga authors
+        // const authors: string[][] = [];
+        // $('div[ng-if="vm.FullDisplay"]:contains("Author") > span').each((_, el) => {
+        //   const author = $(el).text().trim();
+        //   if (author.endsWith(',')) {
+        //     memo = [...memo, author.slice(0, author.length - 1)];
+        //     return;
+        //   }
+
+        //   if (!author.endsWith(',')) {
+        //     const currentMemo = [...memo, author];
+        //     memo = [];
+        //     authors.push(currentMemo);
+        //   }
+        // });
+
+        // // Get manga statuses
+        // const statuses = $('div[ng-if="vm.FullDisplay"]:contains("Status") > a')
+        //   .map((_, el) => $(el).text().trim())
+        //   .get()
+        //   .reduce<{ scan?: string; publish?: string }[]>((acc, cV, cI, arr) => {
+        //     const object = arr.slice(cI, cI + 2).map((text) => {
+        //       if (text.endsWith('(Scan)'))
+        //         return { scan: text.replace(' (Scan)', '').replace('Hiatus', 'Paused').toLowerCase() };
+        //       return { publish: text.replace(' (Publish)', '').replace('Hiatus', 'Paused').toLowerCase() };
+        //     });
+
+        //     if (cI % 2 === 0) acc.push(Object.assign(object[0], object[1]));
+        //     return acc;
+        //   }, []);
+
+        // // Get manga updated time
+        // const updatedAt = $('div[ng-if="vm.FullDisplay"]:contains("Latest") > span')
+        //   .text()
+        //   .trim()
+        //   .slice(2)
+        //   .split('· ')
+        //   .map((date) => new Date(date));
+
+        // // Get manga genres
+        // const genres: string[][] = [];
+        // $('div.col-md-10.col-8 > div:contains("Genres") > span').each((_, el) => {
+        //   const mangaGenre = $(el).text().trim();
+        //   if (mangaGenre.endsWith(',')) {
+        //     memo = [...memo, mangaGenre.slice(0, mangaGenre.length - 1)];
+        //     return;
+        //   }
+
+        //   if (!mangaGenre.endsWith(',')) {
+        //     const currentMemo = [...memo, mangaGenre];
+        //     memo = [];
+        //     genres.push(currentMemo);
+        //   }
+        // });
+
+        // const img = $(`a.SeriesName > img`)
+        //   .map((_, el) => {
+        //     const src = $(el).attr('src');
+        //     if (src != null) return src;
+        //   })
+        //   .get();
+
+        // const data = titlesURL.map(({ title, url }, i) => ({
+        //   title,
+        //   url,
+        //   coverImage: img[i],
+        //   status: {
+        //     scan: statuses[i].scan as MangaStatus<MangaSee>,
+        //     publish: statuses[i].publish as MangaStatus<MangaSee>,
+        //   },
+        //   genres: genres[i] as (keyof typeof MangaSeeGenres)[],
+        //   updatedAt: updatedAt[i],
+        // }));
+
+        success(
+          arrangeFilteredArray(filteredArray).map((manga) => ({
+            title: manga.s,
+            coverImage: `https://cover.nep.li/cover/${manga.i}.jpg`,
+            url: `https://mangasee123.com/manga/${manga.i}`,
+            genres: manga.g,
+            status: {
+              scan: convertStatusToMatchMangaType(manga.ss),
+              publish: convertStatusToMatchMangaType(manga.ps),
+            },
+            updatedAt: new Date(manga.ls),
+          })),
+          callback,
+          res,
+        );
       } catch (e) {
         failure(e, callback, rej);
       }
