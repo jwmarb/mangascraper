@@ -34,8 +34,6 @@ interface AngularJSON {
   SeriesName: string;
 }
 
-type PassedPageVariables = { filters: MangaFilters<MangaSee>; query: MangaSearch<MangaSee> };
-
 type MangaSeeAngularStateMangaType = 'Manga' | 'Manhua' | 'Manhwa' | 'Doujinshi' | 'OEL' | 'One-shot';
 type MangaSeeAngularStateStatus = 'Cancelled' | 'Complete' | 'Discontinued' | 'Hiatus' | 'Ongoing';
 
